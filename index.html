@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Paper Desks LIVE · FOMO Terminal</title>
@@ -78,6 +79,7 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
 @media(min-width:700px){.wk{width:auto}.wk a{padding:7px 14px}}
 .sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}@media(min-width:700px){.sg{grid-template-columns:repeat(5,1fr)}}
 .sg div{background:var(--panel2);border-radius:12px;padding:10px}.sg .l{font:600 11px var(--sans);color:var(--t2)}.sg .v{font:700 16px var(--mono);margin-top:3px}
+.pd{width:100%;border-collapse:collapse;margin-top:12px;font:600 12px var(--mono)}.pd th,.pd td{padding:7px 4px;text-align:right;border-top:1px solid var(--line)}.pd th:first-child,.pd td:first-child{text-align:left;color:var(--t2);font-family:var(--sans)}.pd thead th{color:var(--t);font:700 12px var(--sans);border-top:0}
 </style>
 </head>
 <body>
@@ -104,7 +106,7 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
 </div>
 <div class="panel section"><h2>Balance over time <span class="tf" id="tf"></span></h2><div id="chart"></div></div>
 <div class="section panel"><h2><span id="aghead">Agents</span><span class="tf" id="teamtabs"></span></h2><div class="grid g3" id="agents"></div></div>
-<div class="section"><div class="panel"><h2 id="sthead">Summary</h2><div class="sg" id="stats"></div></div>
+<div class="section"><div class="panel"><h2 id="sthead">Summary</h2><div class="sg" id="stats"></div><div id="perdesk"></div></div>
   <div class="panel"><h2>Open positions <small id="posage"></small></h2><div class="grid g2" id="pos"></div></div></div>
 <div class="section grid g2">
   <div class="panel"><h2>Activity <small>newest first</small></h2><ul class="feed" id="feed"></ul></div>
@@ -225,7 +227,10 @@ function renderWallets(){const p=$("walletsPanel");if(!p)return;p.style.display=
  $("wallets").innerHTML=W.length?W.map(w=>{const a=encodeURIComponent(w.addr);return `<div class="wl"><span><span class="ad">${esc(w.short)}</span><span class="sub">${w.roundtrips??0} round trips · median hold ${hold(w.median_hold_s)} · ${w.copies} copies${w.pnl_usd!=null?" · P&amp;L "+signed(w.pnl_usd):""}${w.dropped_at?" · dropped "+esc(w.dropped_at.slice(5,16)):""}</span></span><span class="ws ${sc(w.status)}">${esc(w.status)}</span><span class="wk"><a href="https://solscan.io/account/${a}" target="_blank" rel="noopener">Solscan</a><a href="https://gmgn.ai/sol/address/${a}" target="_blank" rel="noopener">GMGN</a></span></div>`}).join(""):'<div class="empty">No wallets tracked yet.</div>'}
 function renderStats(){const S=(DATA.stats||{})[desk];if(!S){$("stats").innerHTML='<div class="empty">No stats yet.</div>';return}
  $("sthead").innerHTML=(desk==="All"?"Summary · all 3 desks":"Summary · "+esc(desk)+" desk");const c=(l,v,k)=>`<div><div class="l">${l}</div><div class="v ${k||""}">${v}</div></div>`;
- $("stats").innerHTML=c(desk==="Copy"?"Wallet buys seen":"Scanned",S.scanned.toLocaleString())+c("Blocked",S.blocked.toLocaleString())+c("Entered",S.entered)+c("Open now",S.open)+c("Stopped out",S.stopped)+c("Closed",S.closed)+c("Realized P&amp;L",signed(S.real)+" ("+pct(S.real_pc)+")",cls(S.real))+c("Unrealized P&amp;L",signed(S.unreal),cls(S.unreal))+c("Win rate",S.win==null?"—":S.win+"%")+c("Wins",S.wins)}
+ $("stats").innerHTML=c(desk==="Copy"?"Wallet buys seen":"Scanned",S.scanned.toLocaleString())+c("Blocked",S.blocked.toLocaleString())+c("Entered",S.entered)+c("Open now",S.open)+c("Stopped out",S.stopped)+c("Closed",S.closed)+c("Realized P&amp;L",signed(S.real)+" ("+pct(S.real_pc)+")",cls(S.real))+c("Unrealized P&amp;L",signed(S.unreal),cls(S.unreal))+c("Win rate",S.win==null?"—":S.win+"%")+c("Wins",S.wins);
+ const N=["Memecoin","Majors","Copy"].filter(n=>DATA.stats[n]);if(desk!=="All"||!N.length){$("perdesk").innerHTML="";return}
+ const R=(l,f)=>`<tr><td>${l}</td>${N.map(n=>`<td>${f(DATA.stats[n])}</td>`).join("")}</tr>`;
+ $("perdesk").innerHTML=`<table class="pd"><thead><tr><th>Per desk</th>${N.map(n=>`<th>${esc(n)}</th>`).join("")}</tr></thead><tbody>`+R("Scanned",x=>x.scanned.toLocaleString())+R("Blocked",x=>x.blocked.toLocaleString())+R("Entered",x=>x.entered)+R("Open",x=>x.open)+R("Stopped out",x=>x.stopped)+R("Closed",x=>x.closed)+R("Realized",x=>`<span class="${cls(x.real)}">${signed(x.real)}</span>`)+R("Unrealized",x=>`<span class="${cls(x.unreal)}">${signed(x.unreal)}</span>`)+R("Win rate",x=>x.win==null?"—":x.win+"%")+"</tbody></table>"}
 function renderAll(anim){if(!DATA)return;renderStats();renderWallets();renderTabs();renderPos();renderAgents();renderFeed();renderRest();renderLive();drawChart(anim);
  $("tf").innerHTML=["1H","4H","All"].map(t=>`<button class="${t===tf?"on":""}" data-t="${t}">${t}</button>`).join("");$("tf").querySelectorAll("button").forEach(b=>b.onclick=()=>{tf=b.dataset.t;drawChart(true);renderAll(true)})}
 
