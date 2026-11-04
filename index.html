@@ -201,7 +201,7 @@ function renderAgents(){const names=DATA.agents.map(a=>a.desk);if(!team||!names.
 function renderPos(){const ds=desk==="All"?["Memecoin","Majors","Copy"]:[desk];
  $("pos").innerHTML=ds.map(dn=>{const ops=DATA.open.filter(o=>o.desk===dn);return `<h3 class="dh" style="font:700 14px var(--sans);margin:14px 2px 8px">${esc(dn)} desk · ${ops.length} open</h3>`+(ops.length?ops.map(o=>{const v=posView(o);return `<div class="panel card" data-card="${esc(key(o))}" style="background:var(--panel2)"><div class="hd"><span class="pair">${esc(o.pair||o.a)}</span><span class="st active">${esc(o.desk)} · paper</span></div><div class="cg">
  <div><div class="l">Direction</div><div class="v ${o.side==="short"?"dn":"up"}">${o.side==="short"?"SHORT":"LONG"}</div></div>
- <div><div class="l">Signal score</div><div class="v">${o.sc==null?"N/A":o.sc+"/100"}${o.base_sc!=null?` <span class="sub">(base ${o.base_sc}${o.lv_adj!=null?` · lv ${o.lv_adj>0?"+":""}${o.lv_adj}`:""}${o.fu_adj!=null?` · fu ${o.fu_adj>0?"+":""}${o.fu_adj}`:""})`:""}</span>`:""}</div></div>
+ <div><div class="l">Signal score</div><div class="v">${o.sc==null?"N/A":o.sc+"/100"}${o.base_sc!=null?` <span class="sub">(base ${o.base_sc}${o.lv_adj!=null?` · lv ${o.lv_adj>0?"+":""}${o.lv_adj}`:""}${o.fu_adj!=null?` · fu ${o.fu_adj>0?"+":""}${o.fu_adj}`:""})</span>`:""}</div></div>
  <div><div class="l">Levels / news</div><div class="v" style="font-size:12px">${(o.lv||o.fu)?esc([o.lv,o.fu].filter(Boolean).join(" · ")):"N/A (pre-levels entries)"}</div></div>
  <div><div class="l">Entry price</div><div class="v">${price(o.e)} <span class="sub">${esc(o.t)} WIB</span></div></div>
  <div><div class="l">Leverage</div><div class="v">${o.inst==="perp"?esc(o.lev)+"x isolated":"1x (spot)"}</div></div>
