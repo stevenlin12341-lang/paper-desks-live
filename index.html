@@ -133,7 +133,7 @@ const key=o=>o.desk+"|"+o.a+"|"+o.t;
 const plainWhy=r=>String(r||"").replace("QUICK-FLIP wallet","Wallet flips too fast").replace("STALE SIGNAL","Signal too old").replace("unverifiable:","Couldn't verify").replace("(no longs in downtrend)","· falling trend").replace("liquidity","Too little money in pool:").replace("top 10 holders","Top 10 wallets hold");
 
 function livePx(o){const k=o.sym?("B:"+o.sym):o.mint?("D:"+o.mint):null;return k&&PX[k]!=null?PX[k]:null}
-function posView(o){const lp=livePx(o);const p=lp??o.p;const qty=o.qty||(o.z/o.e);const val=qty*p;return {p,live:lp!=null,val,u:val-o.z,pc:(p/o.e-1)*100}}
+function posView(o){const lp=livePx(o);const p=lp??o.p;const qty=o.qty||(o.z/o.e);const sg=o.side==="short"?-1:1;const m=o.m||o.z;const u=sg*qty*(p-o.e)-(o.f||0);return {p,live:lp!=null,val:m+u,u,pc:u/m*100,mv:sg*(p/o.e-1)*100}}
 function deskLive(d){const ops=DATA.open.filter(o=>o.desk===d.name);if(!ops.length)return d.eq;return d.cash+ops.reduce((s,o)=>s+posView(o).val,0)}
 
 function renderTabs(){$("tabs").innerHTML=["All","Memecoin","Majors","Copy"].map(t=>`<button class="tab ${t===desk?"on":""}" data-t="${t}">${t==="All"?"All desks":t}</button>`).join("");
@@ -150,7 +150,7 @@ function renderLive(){if(!DATA)return;const ds=DATA.desks.filter(d=>inDesk(d.nam
  const cash=ds.reduce((s,d)=>s+d.cash,0);setTxt("intr",money(eq-cash));setTxt("cash",money(cash));setTxt("nopen",String(DATA.open.filter(o=>inDesk(o.desk)).length));
  $("desks").innerHTML=DATA.desks.map(d=>{const e=deskLive(d),df=e-START;return `<div class="row"><span><b>${esc(d.name)}</b> <span class="sub">cycle ${d.cycle} · ${esc(d.last)}</span></span><span style="text-align:right"><b style="font-variant-numeric:tabular-nums">${money(e)}</b><br><span class="${cls(df)}" style="font:600 12px var(--mono)">${signed(df)} · ${pct(df/START*100)}</span></span></div>`}).join("");
  const ops=DATA.open.filter(o=>inDesk(o.desk));
- $("ticker").innerHTML=ops.map(o=>{const v=posView(o);return `<span class="tk">${esc(o.a)} <span data-px="${esc(key(o))}">${price(v.p)}</span><span class="${cls(v.pc)}">${pct(v.pc)}</span></span>`}).join("");
+ $("ticker").innerHTML=ops.map(o=>{const v=posView(o);return `<span class="tk">${esc(o.a)} <span data-px="${esc(key(o))}">${price(v.p)}</span><span class="${cls(v.mv)}">${pct(v.mv)}</span></span>`}).join("");
  ops.forEach(o=>{const v=posView(o),k=key(o);const c=document.querySelector(`[data-card="${CSS.escape(k)}"]`);if(!c)return;
   const pe=c.querySelector(".cur"),ue=c.querySelector(".pnl");const old=parseFloat(pe.dataset.v);pe.textContent=price(v.p);if(isFinite(old)&&old!==v.p)flash(pe,v.p-old);pe.dataset.v=v.p;
   ue.className="v pnl "+cls(v.u);ue.textContent=signed(v.u)+" · "+pct(v.pc);c.querySelector(".src").textContent=v.live?"live":"snapshot";});
@@ -200,17 +200,18 @@ function renderAgents(){const names=DATA.agents.map(a=>a.desk);if(!team||!names.
 
 function renderPos(){const ds=desk==="All"?["Memecoin","Majors","Copy"]:[desk];
  $("pos").innerHTML=ds.map(dn=>{const ops=DATA.open.filter(o=>o.desk===dn);return `<h3 class="dh" style="font:700 14px var(--sans);margin:14px 2px 8px">${esc(dn)} desk · ${ops.length} open</h3>`+(ops.length?ops.map(o=>{const v=posView(o);return `<div class="panel card" data-card="${esc(key(o))}" style="background:var(--panel2)"><div class="hd"><span class="pair">${esc(o.pair||o.a)}</span><span class="st active">${esc(o.desk)} · paper</span></div><div class="cg">
- <div><div class="l">Direction</div><div class="v up">LONG</div></div>
+ <div><div class="l">Direction</div><div class="v ${o.side==="short"?"dn":"up"}">${o.side==="short"?"SHORT":"LONG"}</div></div>
  <div><div class="l">Signal score</div><div class="v">${o.sc==null?"N/A":o.sc+"/100"}</div></div>
  <div><div class="l">Entry price</div><div class="v">${price(o.e)} <span class="sub">${esc(o.t)} WIB</span></div></div>
- <div><div class="l">Leverage</div><div class="v">N/A (spot)</div></div>
- <div><div class="l">Margin allocated</div><div class="v">${money(o.z)}</div></div>
- <div><div class="l">Position notional</div><div class="v">${money(o.z)}</div></div>
+ <div><div class="l">Leverage</div><div class="v">${o.inst==="perp"?esc(o.lev)+"x isolated":"1x (spot)"}</div></div>
+ <div><div class="l">Margin allocated</div><div class="v">${money(o.m||o.z)}</div></div>
+ <div><div class="l">Position notional</div><div class="v">${money(o.n||o.z)}</div></div>
+ <div><div class="l">Liquidation price</div><div class="v">${o.liq?price(o.liq):"N/A (no leverage)"}</div></div>
  <div><div class="l">Stop-loss</div><div class="v">${o.s?price(o.s):"N/A"}</div></div>
- <div><div class="l">Take-profit</div><div class="v" style="font-size:13px">${esc(o.rule||"N/A")}${o.trail?" (trailing on)":""}</div></div>
+ <div><div class="l">Take-profit</div><div class="v" style="font-size:13px">${o.tp1?("TP1 "+price(o.tp1)+" (close 50%, SL to BE) · TP2 "+price(o.tp2)+" · trail 3% after +5%"):esc(o.rule||"N/A")}${o.trail?" (trailing on)":""}</div></div>
  <div><div class="l">Current price · <span class="src">${v.live?"live":"snapshot"}</span></div><div class="v cur" data-v="${v.p}">${price(v.p)}</div></div>
- <div><div class="l">Unrealized P&amp;L</div><div class="v pnl ${cls(v.u)}">${signed(v.u)} · ${pct(v.pc)}</div></div>
- </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?(pxSrc||"exchange feed"):"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):`<div class="empty">No open ${esc(dn)} positions right now. The agents are still scanning, and new trades show up here automatically.</div>`)}).join("")}
+ <div><div class="l">Unrealized P&amp;L${o.inst==="perp"?" (on margin)":""}</div><div class="v pnl ${cls(v.u)}">${signed(v.u)} · ${pct(v.pc)}</div></div>
+ </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?(pxSrc||"exchange feed"):"DexScreener"} · P&amp;L excludes exit fees/slippage${o.inst==="perp"?" · funding "+signed(-(o.f||0))+" included":""}</div></div>`}).join(""):`<div class="empty">No open ${esc(dn)} positions right now. The agents are still scanning, and new trades show up here automatically.</div>`)}).join("")}
 
 function renderFeed(){const acts=DATA.act.filter(a=>inDesk(a.desk)).slice(0,12);const nowS=Date.now()/1000;
  $("feed").innerHTML=acts.length?acts.map(a=>{const k=a.ts+a.txt+a.desk;const isNew=!firstFeed&&!lastFeed.has(k);return `<li class="${isNew?"new":""} ${nowS-a.ts<3600?"fresh":""}"><span class="ic ${a.side==="b"?"b":"s"}">${a.side==="b"?"B":"S"}</span><span class="tx"><b>${esc(a.txt)}</b><span>${esc(a.role)} · ${esc(a.d)}</span></span><span class="tm">${wib(a.ts)} WIB<br>${esc(a.desk)}</span></li>`}).join(""):'<li class="empty">No trades yet on this desk.</li>';
