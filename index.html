@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Paper Desks LIVE · FOMO Terminal</title>
+<meta name="description" content="Live paper-trading dashboard. PAPER ONLY, no real money.">
+<style>
+:root{--bg:#07080a;--panel:#0e1014;--panel2:#13161c;--line:#262a33;--y:#ffd21f;--y2:#ffe46b;--g:#2ee68a;--r:#ff4d6a;--b:#5aa9ff;--c:#38e1ff;--p:#b48cff;--t:#e9ecf1;--t2:#a3a9b5;--t3:#6b7280;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+@media (prefers-color-scheme:light){body.auto{--bg:#f6f7f9;--panel:#fff;--panel2:#f1f3f6;--line:#e2e5ea;--t:#111318;--t2:#4b5160;--t3:#8a909c;--y:#c99a00}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--t);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body{background-image:radial-gradient(1200px 500px at 10% -10%,rgba(255,210,31,.08),transparent),radial-gradient(900px 400px at 110% 10%,rgba(56,225,255,.06),transparent);min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid var(--y);border-radius:16px;background:linear-gradient(180deg,rgba(255,210,31,.10),rgba(255,210,31,.02));box-shadow:0 0 0 1px rgba(255,210,31,.15),0 10px 40px -20px rgba(255,210,31,.5)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.01em}
+.logo{width:34px;height:34px;border-radius:10px;background:var(--y);display:grid;place-items:center;color:#000;font-weight:900}
+.sub{font-family:var(--mono);font-size:11px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase}
+.live{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(46,230,138,.12);color:var(--g);border:1px solid rgba(46,230,138,.35)}
+.live.paused{background:rgba(255,77,106,.12);color:var(--r);border-color:rgba(255,77,106,.35)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 currentColor;animation:pulse 1.6s infinite}
+.paused .dot{animation:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,230,138,.7)}70%{box-shadow:0 0 0 10px rgba(46,230,138,0)}100%{box-shadow:0 0 0 0 rgba(46,230,138,0)}}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--t2)}
+.chip{padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.warn{margin:12px 0;padding:10px 14px;border-radius:12px;border:1px dashed var(--y);color:var(--y2);font-size:13px;background:rgba(255,210,31,.05)}
+.warn b{color:var(--y)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.tab{font:600 13px var(--sans);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--t2);cursor:pointer;transition:.2s}
+.tab:hover{color:var(--t)}.tab.on{background:var(--y);color:#000;border-color:var(--y)}
+.ticker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tk{display:inline-flex;gap:8px;align-items:center;font:600 12px var(--mono);padding:6px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.g2,.g3{grid-template-columns:1fr}.big{font-size:40px!important}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden}
+.panel.hl{border-color:rgba(255,210,31,.5)}
+h2{font-size:12px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--y);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h2 small{color:var(--t3);letter-spacing:.04em;text-transform:none;font-size:11px}
+.section{margin-top:16px}
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}@media(max-width:820px){.hero{grid-template-columns:1fr}}
+.big{font-size:56px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.05}
+.lbl{font-size:12px;color:var(--t3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.pill{display:inline-flex;align-items:center;gap:6px;font:700 13px var(--mono);padding:5px 10px;border-radius:999px}
+.up{color:var(--g)}.dn{color:var(--r)}.pill.up{background:rgba(46,230,138,.12)}.pill.dn{background:rgba(255,77,106,.12)}.pill.nt{background:var(--panel2);color:var(--t2)}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.kv div{background:var(--panel2);border-radius:12px;padding:10px}.kv b{display:block;font-size:17px;margin-top:4px;font-variant-numeric:tabular-nums}
+.tf{display:flex;gap:4px}.tf button{font:600 11px var(--mono);padding:5px 9px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--t2);cursor:pointer}.tf button.on{background:var(--g);color:#000;border-color:var(--g)}
+svg text{font-family:var(--mono)}
+.agent{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px;transition:transform .25s,border-color .25s}
+.agent:hover{transform:translateY(-2px)}.agent.active{border-color:rgba(46,230,138,.4)}.agent.blocked{border-color:rgba(255,210,31,.45)}
+.agent .nm{font-weight:800}.agent .rl{font-size:12px;color:var(--t3)}.agent .did{margin-top:6px;font-size:13px;color:var(--t)}.agent .coin{margin-top:6px;font:600 11px var(--mono);color:var(--c)}
+.agent .why{margin-top:4px;font-size:11px;color:var(--t3)}
+.st{font:700 10px var(--mono);padding:3px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.st.active{background:rgba(46,230,138,.15);color:var(--g)}.st.idle{background:var(--panel);color:var(--t3)}.st.blocked{background:rgba(255,210,31,.15);color:var(--y)}
+.card .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.card .pair{font-size:20px;font-weight:800}
+.cg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+.cg .l{font-size:11px;color:var(--t3)}.cg .v{font-size:16px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.foot{border-top:1px solid var(--line);margin-top:12px;padding-top:8px;font-size:11px;color:var(--t3)}
+.flash-up{animation:fu 0.9s}.flash-dn{animation:fd 0.9s}
+@keyframes fu{0%{background:rgba(46,230,138,.35)}100%{background:transparent}}@keyframes fd{0%{background:rgba(255,77,106,.35)}100%{background:transparent}}
+.feed{list-style:none;margin:0;padding:0}.feed li{display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line)}
+.feed li.new{animation:slide .7s ease}.feed li.fresh{background:linear-gradient(90deg,rgba(255,210,31,.10),transparent)}
+@keyframes slide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:13px;flex:none}
+.ic.b{background:rgba(46,230,138,.15);color:var(--g)}.ic.s{background:rgba(255,77,106,.15);color:var(--r)}
+.feed .tx{flex:1;min-width:0}.feed .tx b{display:block}.feed .tx span{font-size:12px;color:var(--t3)}
+.feed .tm{font:600 11px var(--mono);color:var(--t2);text-align:right}
+details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bottom:8px}summary{cursor:pointer;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}.row:last-child{border:0}.row .r{color:var(--t3);font-size:12px;text-align:right}
+.empty{color:var(--t2);font-size:14px;padding:6px 0}
+.footer{margin-top:22px;font-size:11px;color:var(--t3);text-align:center;font-family:var(--mono)}
+.fadein{animation:slide .6s ease both}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">P</div><div>Paper Desks<div class="sub">FOMO terminal · paper only</div></div></div>
+  <div class="meta">
+    <span id="live" class="live"><span class="dot"></span><span id="livetxt">LIVE</span></span>
+    <span class="chip" id="pxage">prices: connecting…</span>
+    <span class="chip" id="dataage">data: loading…</span>
+  </div>
+</header>
+<div class="warn"><b>PAPER ONLY.</b> Practice money: no real funds, no keys, no real trades. Prices stream live from Binance and DexScreener. Trades, agents and activity come from the desks' latest snapshot, re-checked every 30s. A score is a checklist rating, not a win chance.</div>
+<div class="tabs" id="tabs"></div>
+<div class="ticker" id="ticker"></div>
+<div class="hero">
+  <div class="panel hl">
+    <div class="lbl" id="herolbl">Total paper balance</div>
+    <div class="big" id="bal">—</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px"><span id="gain" class="pill nt">—</span><span class="sub" id="herosub"></span></div>
+    <div class="kv"><div><span class="lbl">In trades</span><b id="intr">—</b></div><div><span class="lbl">Free cash</span><b id="cash">—</b></div><div><span class="lbl">Open trades</span><b id="nopen">—</b></div></div>
+  </div>
+  <div class="panel"><h2>Desks <small>live equity</small></h2><div id="desks"></div></div>
+</div>
+<div class="panel section"><h2>Balance over time <span class="tf" id="tf"></span></h2><div id="chart"></div></div>
+<div class="section panel"><h2><span id="aghead">Agents</span><span class="tf" id="teamtabs"></span></h2><div class="grid g3" id="agents"></div></div>
+<div class="section"><div class="panel"><h2>Open positions <small id="posage"></small></h2><div class="grid g2" id="pos"></div></div></div>
+<div class="section grid g2">
+  <div class="panel"><h2>Activity <small>newest first</small></h2><ul class="feed" id="feed"></ul></div>
+  <div class="panel"><h2>Latest kills &amp; scores</h2><div id="latest"></div></div>
+</div>
+<div class="section grid g2">
+  <div class="panel"><h2>Closed trades</h2><div id="closed"></div></div>
+  <div class="panel"><h2>Ready for real money? · learning</h2><div id="ready"></div></div>
+</div>
+<div class="footer" id="footer">PAPER ONLY · not financial advice · not a live trading account</div>
+</div>
+<script>
+"use strict";
+const START=10000, $=id=>document.getElementById(id);
+let DATA=null, desk="All", tf="All", team=null, PX={}, pxOK={bin:null,dex:null}, pxAt=0, lastFeed=new Set(), firstFeed=true, dataAt=0, shownBal=null;
+const money=n=>(n<0?"-$":"$")+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const signed=n=>(n>0?"+":"")+money(n), pct=n=>(n>0?"+":"")+n.toFixed(2)+"%";
+const price=n=>n==null||!isFinite(n)?"N/A":n>=100?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):n>=1?n.toFixed(4):n.toPrecision(5);
+const wib=ts=>new Date((ts+7*3600)*1000).toISOString().slice(11,16);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cls=n=>n>0?"up":n<0?"dn":"nt";
+const key=o=>o.desk+"|"+o.a+"|"+o.t;
+const plainWhy=r=>String(r||"").replace("QUICK-FLIP wallet","Wallet flips too fast").replace("STALE SIGNAL","Signal too old").replace("unverifiable:","Couldn't verify").replace("(no longs in downtrend)","· falling trend").replace("liquidity","Too little money in pool:").replace("top 10 holders","Top 10 wallets hold");
+
+function livePx(o){const k=o.sym?("B:"+o.sym):o.mint?("D:"+o.mint):null;return k&&PX[k]!=null?PX[k]:null}
+function posView(o){const lp=livePx(o);const p=lp??o.p;const qty=o.qty||(o.z/o.e);const val=qty*p;return {p,live:lp!=null,val,u:val-o.z,pc:(p/o.e-1)*100}}
+function deskLive(d){const ops=DATA.open.filter(o=>o.desk===d.name);if(!ops.length)return d.eq;return d.cash+ops.reduce((s,o)=>s+posView(o).val,0)}
+
+function renderTabs(){$("tabs").innerHTML=["All","Memecoin","Majors","Copy"].map(t=>`<button class="tab ${t===desk?"on":""}" data-t="${t}">${t==="All"?"All desks":t}</button>`).join("");
+ $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{desk=b.dataset.t;shownBal=null;renderAll(true)})}
+function inDesk(n){return desk==="All"||n===desk}
+
+function countTo(el,target){const from=shownBal==null?target*0.98:shownBal;shownBal=target;const t0=performance.now(),D=shownBal===from?0:900;
+ if(!D){el.textContent=money(target);return}cancelAnimationFrame(el._r);const st=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);el.textContent=money(from+(target-from)*e);if(k<1)el._r=requestAnimationFrame(st)};el._r=requestAnimationFrame(st)}
+
+function renderLive(){if(!DATA)return;const ds=DATA.desks.filter(d=>inDesk(d.name));const eq=ds.reduce((s,d)=>s+deskLive(d),0),base=START*Math.max(1,ds.length);
+ const prev=shownBal;countTo($("bal"),eq);if(prev!=null&&Math.abs(prev-eq)>0.004)flash($("bal"),eq-prev);
+ const diff=eq-base;$("gain").className="pill "+cls(diff);$("gain").textContent=signed(diff)+" · "+pct(diff/base*100);
+ $("herolbl").textContent=desk==="All"?"Total paper balance":desk+" paper balance";$("herosub").textContent="since the "+money(base)+" start";
+ const cash=ds.reduce((s,d)=>s+d.cash,0);setTxt("intr",money(eq-cash));setTxt("cash",money(cash));setTxt("nopen",String(DATA.open.filter(o=>inDesk(o.desk)).length));
+ $("desks").innerHTML=DATA.desks.map(d=>{const e=deskLive(d),df=e-START;return `<div class="row"><span><b>${esc(d.name)}</b> <span class="sub">cycle ${d.cycle} · ${esc(d.last)}</span></span><span style="text-align:right"><b style="font-variant-numeric:tabular-nums">${money(e)}</b><br><span class="${cls(df)}" style="font:600 12px var(--mono)">${signed(df)} · ${pct(df/START*100)}</span></span></div>`}).join("");
+ const ops=DATA.open.filter(o=>inDesk(o.desk));
+ $("ticker").innerHTML=ops.map(o=>{const v=posView(o);return `<span class="tk">${esc(o.a)} <span data-px="${esc(key(o))}">${price(v.p)}</span><span class="${cls(v.pc)}">${pct(v.pc)}</span></span>`}).join("");
+ ops.forEach(o=>{const v=posView(o),k=key(o);const c=document.querySelector(`[data-card="${CSS.escape(k)}"]`);if(!c)return;
+  const pe=c.querySelector(".cur"),ue=c.querySelector(".pnl");const old=parseFloat(pe.dataset.v);pe.textContent=price(v.p);if(isFinite(old)&&old!==v.p)flash(pe,v.p-old);pe.dataset.v=v.p;
+  ue.className="v pnl "+cls(v.u);ue.textContent=signed(v.u)+" · "+pct(v.pc);c.querySelector(".src").textContent=v.live?"live":"snapshot";});
+ drawChart(false)}
+function setTxt(id,t){const e=$(id);if(e.textContent!==t)e.textContent=t}
+function flash(el,d){el.classList.remove("flash-up","flash-dn");void el.offsetWidth;el.classList.add(d>0?"flash-up":"flash-dn")}
+
+function curve(){const pick=desk==="All"?DATA.full:DATA.full.filter(f=>f.desk===desk);if(!pick.length)return[];
+ const times=[...new Set(pick.flatMap(f=>f.pts.map(p=>p[0])))].sort((a,b)=>a-b);
+ const pts=times.map(t=>[t,pick.reduce((s,f)=>{const pr=f.pts.filter(p=>p[0]<=t);return s+(pr.length?pr[pr.length-1][1]:START)},0)]);
+ if(pxAt){const ds=DATA.desks.filter(d=>inDesk(d.name));pts.push([Math.floor(pxAt/1000),ds.reduce((s,d)=>s+deskLive(d),0)])}return pts}
+let drawn=false;
+function drawChart(anim){if(!DATA)return;const full=curve();if(full.length<2){$("chart").innerHTML='<div class="empty">Not enough history yet.</div>';return}
+ const tEnd=full[full.length-1][0],span=tf==="1H"?3600:tf==="4H"?14400:Infinity;const pts=full.filter(p=>p[0]>=tEnd-span);if(pts.length<2){$("chart").innerHTML='<div class="empty">No points in this window yet.</div>';return}
+ const ds=DATA.desks.filter(d=>inDesk(d.name)),base=START*Math.max(1,ds.length);
+ const W=1000,H=320,L=70,R=20,T=48,B=30,t0=pts[0][0],t1=tEnd;const vs=pts.map(p=>p[1]).concat([base]);const lo=Math.min(...vs),hi=Math.max(...vs),pad=Math.max(2,(hi-lo)*.2),y0=lo-pad,y1=hi+pad;
+ const x=t=>L+(t-t0)/Math.max(1,t1-t0)*(W-L-R),y=v=>T+(1-(v-y0)/(y1-y0))*(H-T-B);const P=pts.map(p=>[x(p[0]),y(p[1])]);
+ let d=`M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`}
+ const up=pts[pts.length-1][1]>=base,col=up?"var(--g)":"var(--r)",colh=up?"#2ee68a":"#ff4d6a";const last=P[P.length-1];
+ const valAt=t=>{const pr=pts.filter(p=>p[0]<=t);return pr.length?pr[pr.length-1][1]:pts[0][1]};
+ const seen=new Set();const ms=DATA.act.filter(a=>inDesk(a.desk)&&a.ts>=t0&&a.ts<=t1).filter(m=>{const k=m.txt+Math.round(x(m.ts)/60);if(seen.has(k))return false;seen.add(k);return true});
+ let g="";[.2,.5,.8].forEach(f=>{const v=y0+(y1-y0)*f;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--t3)">$${Math.round(v).toLocaleString("en-US")}</text>`});
+ g+=`<line x1="${L}" x2="${W-R}" y1="${y(base)}" y2="${y(base)}" stroke="var(--t3)" stroke-dasharray="5 5"/><text x="${L+4}" y="${y(base)-6}" font-size="12" fill="var(--t3)">Start ${money(base)}</text>`;
+ const area=d+` L${last[0].toFixed(1)} ${H-B} L${P[0][0].toFixed(1)} ${H-B} Z`;
+ const mk=ms.map((m,i)=>{const mx=x(m.ts),my=y(valAt(m.ts)),ly=16+(i%2)*20,w=m.txt.length*7.6+18,c=m.side==="b"?"var(--g)":"var(--r)";const fresh=i===0&&t1-m.ts<7200;
+  return `<g><line x1="${mx}" x2="${mx}" y1="${ly+8}" y2="${my}" stroke="${c}" stroke-opacity=".5" stroke-dasharray="3 3"/><rect x="${mx-w/2}" y="${ly-9}" width="${w}" height="19" rx="9.5" fill="var(--panel)" stroke="${c}"/><text x="${mx}" y="${ly+5}" text-anchor="middle" font-size="12" fill="var(--t)">${esc(m.txt)}</text><circle cx="${mx}" cy="${my}" r="5" fill="var(--panel)" stroke="${c}" stroke-width="2.5"/>${fresh?`<circle cx="${mx}" cy="${my}" r="6" fill="none" stroke="${c}" stroke-width="2"><animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".9;0;.9" dur="2s" repeatCount="indefinite"/></circle>`:""}</g>`}).join("");
+ const ax=[t0,(t0+t1)/2,t1].map((t,i)=>`<text x="${x(t)}" y="${H-8}" text-anchor="${i===0?"start":i===2?"end":"middle"}" font-size="12" fill="var(--t3)">${wib(t)} WIB</text>`).join("");
+ const doAnim=anim||!drawn;drawn=true;
+ $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Balance over time"><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${colh}" stop-opacity=".35"/><stop offset="1" stop-color="${colh}" stop-opacity="0"/></linearGradient></defs>${g}<path d="${area}" fill="url(#ga)"/><path d="${d}" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">${doAnim?'<animate attributeName="stroke-dashoffset" from="1" to="0" dur="1.4s" fill="freeze"/>':""}</path>${mk}<circle cx="${last[0]}" cy="${last[1]}" r="6" fill="${col}"/><circle cx="${last[0]}" cy="${last[1]}" r="6" fill="none" stroke="${col}" stroke-width="2"><animate attributeName="r" values="6;15" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="1.6s" repeatCount="indefinite"/></circle>${ax}</svg>`}
+
+const HUE={Scout:"#5aa9ff",Watcher:"#5aa9ff",Filter:"#ffd21f","Entry filter":"#ffd21f",Analyst:"#38e1ff",Copier:"#b48cff",Executor:"#2ee68a",Risk:"#ff8a3d",Logger:"#c0c6d2"};
+function face(n,st){const hue=HUE[n]||"#9aa",ink="#0b0d10",a=st==="active",bl=st==="blocked",L=`stroke="${ink}" stroke-width="2.4" fill="none" stroke-linecap="round"`;
+ const blink=a?`<animate attributeName="ry" values="3.6;3.6;0.4;3.6" keyTimes="0;0.9;0.95;1" dur="4s" repeatCount="indefinite"/>`:"";
+ const eyes=st==="idle"?`<path d="M19 31 q4 3 8 0" ${L}/><path d="M33 31 q4 3 8 0" ${L}/>`:`<ellipse cx="23" cy="30" rx="3" ry="3.6" fill="${ink}">${blink}</ellipse><ellipse cx="37" cy="30" rx="3" ry="3.6" fill="${ink}">${blink}</ellipse>`;
+ const brows=bl?`<path d="M18 22 l8 3" ${L}/><path d="M42 22 l-8 3" ${L}/>`:"";
+ const mouth=a?`<path d="M23 39 q7 7 14 0" ${L}/>`:bl?`<path d="M23 43 q7 -6 14 0" ${L}/>`:`<path d="M25 41 h10" ${L}/>`;
+ const X={Scout:`<line x1="30" y1="9" x2="30" y2="2" ${L}/><circle cx="30" cy="2" r="2.6" fill="${ink}"/>`,Watcher:`<circle cx="23" cy="30" r="7" ${L}/><circle cx="37" cy="30" r="7" ${L}/>`,Filter:`<path d="M16 7 h28 l-10 6 h-8 z" fill="${ink}"/>`,"Entry filter":`<path d="M16 7 h28 l-10 6 h-8 z" fill="${ink}"/>`,Analyst:`<rect x="16" y="25" width="12" height="10" rx="3" ${L}/><rect x="32" y="25" width="12" height="10" rx="3" ${L}/><line x1="28" y1="29" x2="32" y2="29" ${L}/>`,Copier:`<circle cx="50" cy="14" r="4" stroke="${hue}" stroke-width="2.4" fill="none"/><circle cx="54" cy="21" r="4" stroke="${hue}" stroke-width="2.4" fill="none"/>`,Executor:`<path d="M10 20 q20 -10 40 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/>`,Risk:`<path d="M12 17 q18 -16 36 0 v2 h-36 z" fill="${ink}"/>`,Logger:`<line x1="47" y1="8" x2="53" y2="20" stroke="${hue}" stroke-width="3.5" stroke-linecap="round"/>`}[n]||"";
+ return `<svg width="58" height="58" viewBox="0 0 60 60" style="flex:none" aria-label="${esc(n)} ${st}">${a?`<circle cx="30" cy="31" r="22" fill="none" stroke="#2ee68a" stroke-width="2"><animate attributeName="r" values="22;29" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".7;0" dur="1.8s" repeatCount="indefinite"/></circle>`:""}<g opacity="${st==="idle"?.55:1}">${a?`<animateTransform attributeName="transform" type="translate" values="0 0;0 -1.5;0 0" dur="2.4s" repeatCount="indefinite"/>`:""}<circle cx="30" cy="31" r="22" fill="${hue}" stroke="${bl?"#ffd21f":"rgba(0,0,0,.25)"}" stroke-width="${bl?3:1}"/>${eyes}${brows}${mouth}${X}</g></svg>`}
+
+function renderAgents(){const names=DATA.agents.map(a=>a.desk);if(!team||!names.includes(team))team=names.includes("Majors")?"Majors":names[0];
+ const tn=desk==="All"?team:desk,tm=DATA.agents.find(a=>a.desk===tn);
+ $("teamtabs").innerHTML=desk==="All"?names.map(n=>`<button class="${n===team?"on":""}" data-n="${esc(n)}">${esc(n)}</button>`).join(""):"";
+ $("teamtabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{team=b.dataset.n;renderAgents()});
+ if(!tm){$("aghead").textContent="Agents";$("agents").innerHTML='<div class="empty">No agent cycle logged for this desk yet.</div>';return}
+ const run=tm.rows.filter(r=>r.st==="active").length;$("aghead").textContent=`Agents · ${run}/${tm.rows.length} active · ${tn} cycle ${tm.cycle} @ ${tm.tm} WIB`;
+ $("agents").innerHTML=tm.rows.map((a,i)=>`<div class="agent ${esc(a.st)} fadein" style="animation-delay:${i*60}ms">${face(a.n,a.st)}<div style="min-width:0;flex:1"><div style="display:flex;justify-content:space-between;gap:6px;align-items:center;flex-wrap:wrap"><span class="nm">${esc(a.n)}</span><span class="st ${esc(a.st)}">${esc(a.st)}</span></div><div class="rl">${esc(a.role)}</div><div class="did">${esc(plainWhy(a.did))}</div><div class="coin">On: ${esc(a.coin)}</div>${a.why?`<div class="why">${esc(plainWhy(a.why))}</div>`:""}</div></div>`).join("")}
+
+function renderPos(){const ops=DATA.open.filter(o=>inDesk(o.desk));
+ $("pos").innerHTML=ops.length?ops.map(o=>{const v=posView(o);return `<div class="panel card" data-card="${esc(key(o))}" style="background:var(--panel2)"><div class="hd"><span class="pair">${esc(o.pair||o.a)}</span><span class="st active">${esc(o.desk)} · paper</span></div><div class="cg">
+ <div><div class="l">Direction</div><div class="v up">LONG</div></div>
+ <div><div class="l">Signal score</div><div class="v">${o.sc==null?"N/A":o.sc+"/100"}</div></div>
+ <div><div class="l">Entry price</div><div class="v">${price(o.e)} <span class="sub">${esc(o.t)} WIB</span></div></div>
+ <div><div class="l">Leverage</div><div class="v">N/A (spot)</div></div>
+ <div><div class="l">Margin allocated</div><div class="v">${money(o.z)}</div></div>
+ <div><div class="l">Position notional</div><div class="v">${money(o.z)}</div></div>
+ <div><div class="l">Stop-loss</div><div class="v">${o.s?price(o.s):"N/A"}</div></div>
+ <div><div class="l">Take-profit</div><div class="v" style="font-size:13px">${esc(o.rule||"N/A")}${o.trail?" (trailing on)":""}</div></div>
+ <div><div class="l">Current price · <span class="src">${v.live?"live":"snapshot"}</span></div><div class="v cur" data-v="${v.p}">${price(v.p)}</div></div>
+ <div><div class="l">Unrealized P&amp;L</div><div class="v pnl ${cls(v.u)}">${signed(v.u)} · ${pct(v.pc)}</div></div>
+ </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?"Binance":"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):'<div class="empty">No open paper trades right now. The agents are still scanning. New positions show up here as cards automatically.</div>'}
+
+function renderFeed(){const acts=DATA.act.filter(a=>inDesk(a.desk)).slice(0,12);const nowS=Date.now()/1000;
+ $("feed").innerHTML=acts.length?acts.map(a=>{const k=a.ts+a.txt+a.desk;const isNew=!firstFeed&&!lastFeed.has(k);return `<li class="${isNew?"new":""} ${nowS-a.ts<3600?"fresh":""}"><span class="ic ${a.side==="b"?"b":"s"}">${a.side==="b"?"B":"S"}</span><span class="tx"><b>${esc(a.txt)}</b><span>${esc(a.role)} · ${esc(a.d)}</span></span><span class="tm">${wib(a.ts)} WIB<br>${esc(a.desk)}</span></li>`}).join(""):'<li class="empty">No trades yet on this desk.</li>';
+ DATA.act.forEach(a=>lastFeed.add(a.ts+a.txt+a.desk));firstFeed=false}
+
+function renderRest(){const lat=DATA.latest.filter(l=>inDesk(l.desk));
+ $("latest").innerHTML=lat.map(l=>`<details ${l.desk==="Majors"||desk!=="All"?"open":""}><summary>${esc(l.desk)} · cycle ${l.cycle} · ${l.items.length} coins</summary>${l.items.map(i=>`<div class="row"><span><b>${esc(i.a??"(unnamed)")}</b></span><span class="r"><span class="st ${i.k==="killed"?"blocked":"active"}">${i.k==="killed"?"skipped":esc(i.k)}</span><br>${esc(plainWhy(i.r))}</span></div>`).join("")}</details>`).join("")||'<div class="empty">Nothing checked yet.</div>';
+ const cl=DATA.closed.filter(c=>inDesk(c.desk));
+ $("closed").innerHTML=cl.length?cl.map(c=>`<div class="row"><span><b>${esc(c.a)}</b> <span class="sub">${esc(c.desk)} · ${esc(c.t)} · ${esc(String(c.r).split("_").join(" "))}</span></span><span class="${cls(c.u)}" style="font:700 13px var(--mono)">${signed(c.u)} · ${pct(c.pc)}</span></div>`).join(""):'<div class="empty">No closed trades on this desk yet.</div>';
+ $("ready").innerHTML=DATA.desks.map(d=>`<div class="row"><span><b>${esc(d.name)}</b><br><span class="sub">${d.ready.met??0}/${d.ready.gates??0} checks · learning ${d.learn.train}/30 practice + ${d.learn.hold}/10 test · model ${esc(d.model)}</span></span><span class="st blocked">not yet</span></div>`).join("")+`<div class="foot">From READINESS.md as of ${esc(DATA.ready_asof)}. Going live always needs your explicit written go-ahead.</div>`}
+
+function renderAll(anim){if(!DATA)return;renderTabs();renderPos();renderAgents();renderFeed();renderRest();renderLive();drawChart(anim);
+ $("tf").innerHTML=["1H","4H","All"].map(t=>`<button class="${t===tf?"on":""}" data-t="${t}">${t}</button>`).join("");$("tf").querySelectorAll("button").forEach(b=>b.onclick=()=>{tf=b.dataset.t;drawChart(true);renderAll(true)})}
+
+async function loadData(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();const changed=!DATA||j.updated!==DATA.updated;DATA=j;dataAt=Date.now();if(changed)renderAll(!drawn);}catch(e){$("dataage").textContent="data: fetch failed, keeping last"}}
+async function pollBinance(){if(!DATA)return;const syms=[...new Set(DATA.open.filter(o=>o.sym).map(o=>o.sym))];if(!syms.length){pxOK.bin=null;return}
+ try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);const r=await fetch("https://api.binance.com/api/v3/ticker/price?symbols="+encodeURIComponent(JSON.stringify(syms)),{signal:ctl.signal,cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();j.forEach(x=>{const v=parseFloat(x.price);if(isFinite(v)&&v>0)PX["B:"+x.symbol]=v});pxOK.bin=true;pxAt=Date.now();renderLive()}catch(e){pxOK.bin=false}}
+async function pollDex(){if(!DATA)return;const mints=[...new Set(DATA.open.filter(o=>!o.sym&&o.mint).map(o=>o.mint))].slice(0,30);if(!mints.length){pxOK.dex=null;return}
+ try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);const r=await fetch("https://api.dexscreener.com/tokens/v1/solana/"+mints.join(","),{signal:ctl.signal,cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();const best={};(Array.isArray(j)?j:[]).forEach(p=>{const m=p.baseToken&&p.baseToken.address,liq=(p.liquidity&&p.liquidity.usd)||0,v=parseFloat(p.priceUsd);if(m&&isFinite(v)&&v>0&&(!best[m]||liq>best[m].l))best[m]={l:liq,v}});Object.entries(best).forEach(([m,b])=>PX["D:"+m]=b.v);pxOK.dex=true;pxAt=Date.now();renderLive()}catch(e){pxOK.dex=false}}
+function tickStatus(){const paused=pxOK.bin===false||pxOK.dex===false;const el=$("live");el.className="live"+(paused?" paused":"");$("livetxt").textContent=paused?"PRICE FEED PAUSED":"LIVE";
+ const any=DATA&&DATA.open.length;$("pxage").textContent=!any?"prices: no open positions to price":pxAt?`prices updated ${Math.max(0,Math.round((Date.now()-pxAt)/1000))}s ago`+(paused?" · keeping last values":""):"prices: connecting…";
+ if(DATA){const age=DATA.gen_ts?Math.round(Date.now()/1000-DATA.gen_ts):null;$("dataage").textContent=`desk snapshot ${DATA.updated}`+(age!=null?` · ${age<120?age+"s":Math.round(age/60)+"m"} old`:"");$("posage").textContent="prices tick live · entries from snapshot"}}
+loadData().then(()=>{pollBinance();pollDex()});
+setInterval(pollBinance,2000);setInterval(pollDex,10000);setInterval(loadData,30000);setInterval(tickStatus,1000);
+</script>
+</body>
+</html>

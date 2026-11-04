@@ -1,0 +1,8 @@
+data.json.tmp
+*.tmp
+.env
+*.key
+*.pem
+.config/
+hosts.yml
+node_modules/
