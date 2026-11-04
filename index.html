@@ -83,7 +83,7 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
     <span class="chip" id="dataage">data: loading…</span>
   </div>
 </header>
-<div class="warn"><b>PAPER ONLY.</b> Practice money: no real funds, no keys, no real trades. Prices stream live from Binance and DexScreener. Trades, agents and activity come from the desks' latest snapshot, re-checked every 30s. A score is a checklist rating, not a win chance.</div>
+<div class="warn"><b>PAPER ONLY.</b> Practice money: no real funds, no keys, no real trades. Prices stream live from Binance, with OKX, Bybit, Coinbase and CoinGecko as backups, plus DexScreener. Trades, agents and activity come from the desks' latest snapshot, re-checked every 30s. A score is a checklist rating, not a win chance.</div>
 <div class="tabs" id="tabs"></div>
 <div class="ticker" id="ticker"></div>
 <div class="hero">
@@ -199,7 +199,7 @@ function renderPos(){const ops=DATA.open.filter(o=>inDesk(o.desk));
  <div><div class="l">Take-profit</div><div class="v" style="font-size:13px">${esc(o.rule||"N/A")}${o.trail?" (trailing on)":""}</div></div>
  <div><div class="l">Current price · <span class="src">${v.live?"live":"snapshot"}</span></div><div class="v cur" data-v="${v.p}">${price(v.p)}</div></div>
  <div><div class="l">Unrealized P&amp;L</div><div class="v pnl ${cls(v.u)}">${signed(v.u)} · ${pct(v.pc)}</div></div>
- </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?"Binance":"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):'<div class="empty">No open paper trades right now. The agents are still scanning. New positions show up here as cards automatically.</div>'}
+ </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?(pxSrc||"exchange feed"):"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):'<div class="empty">No open paper trades right now. The agents are still scanning. New positions show up here as cards automatically.</div>'}
 
 function renderFeed(){const acts=DATA.act.filter(a=>inDesk(a.desk)).slice(0,12);const nowS=Date.now()/1000;
  $("feed").innerHTML=acts.length?acts.map(a=>{const k=a.ts+a.txt+a.desk;const isNew=!firstFeed&&!lastFeed.has(k);return `<li class="${isNew?"new":""} ${nowS-a.ts<3600?"fresh":""}"><span class="ic ${a.side==="b"?"b":"s"}">${a.side==="b"?"B":"S"}</span><span class="tx"><b>${esc(a.txt)}</b><span>${esc(a.role)} · ${esc(a.d)}</span></span><span class="tm">${wib(a.ts)} WIB<br>${esc(a.desk)}</span></li>`}).join(""):'<li class="empty">No trades yet on this desk.</li>';
@@ -215,15 +215,34 @@ function renderAll(anim){if(!DATA)return;renderTabs();renderPos();renderAgents()
  $("tf").innerHTML=["1H","4H","All"].map(t=>`<button class="${t===tf?"on":""}" data-t="${t}">${t}</button>`).join("");$("tf").querySelectorAll("button").forEach(b=>b.onclick=()=>{tf=b.dataset.t;drawChart(true);renderAll(true)})}
 
 async function loadData(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();const changed=!DATA||j.updated!==DATA.updated;DATA=j;dataAt=Date.now();if(changed)renderAll(!drawn);}catch(e){$("dataage").textContent="data: fetch failed, keeping last"}}
-async function pollBinance(){if(!DATA)return;const syms=[...new Set(DATA.open.filter(o=>o.sym).map(o=>o.sym))];if(!syms.length){pxOK.bin=null;return}
- try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);const r=await fetch("https://api.binance.com/api/v3/ticker/price?symbols="+encodeURIComponent(JSON.stringify(syms)),{signal:ctl.signal,cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();j.forEach(x=>{const v=parseFloat(x.price);if(isFinite(v)&&v>0)PX["B:"+x.symbol]=v});pxOK.bin=true;pxAt=Date.now();renderLive()}catch(e){pxOK.bin=false}}
+const CG={BTC:"bitcoin",ETH:"ethereum",SOL:"solana",XRP:"ripple",HYPE:"hyperliquid",ZEC:"zcash",BNB:"binancecoin",DOGE:"dogecoin",ADA:"cardano",AVAX:"avalanche-2",LINK:"chainlink",SUI:"sui",LTC:"litecoin",TRX:"tron",TON:"the-open-network"};
+const base=s=>s.replace(/USDT$|USDC$|USD$/,"");
+async function jget(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms||4000);try{const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return await r.json()}finally{clearTimeout(t)}}
+const binF=h=>async syms=>{const j=await jget(h+"/api/v3/ticker/price?symbols="+encodeURIComponent(JSON.stringify(syms)));const o={};j.forEach(x=>o[x.symbol]=parseFloat(x.price));return o};
+const SRC=[
+{n:"Binance mirror",ms:2000,f:binF("https://data-api.binance.vision")},
+{n:"Binance",ms:2000,f:binF("https://api.binance.com")},
+{n:"OKX",ms:2000,f:async syms=>{const j=await jget("https://www.okx.com/api/v5/market/tickers?instType=SPOT",5000);const m={};(j.data||[]).forEach(x=>m[x.instId]=parseFloat(x.last));const o={};syms.forEach(s=>{const v=m[base(s)+"-USDT"];if(v)o[s]=v});return o}},
+{n:"Bybit",ms:2000,f:async syms=>{const j=await jget("https://api.bybit.com/v5/market/tickers?category=spot",5000);const m={};((j.result||{}).list||[]).forEach(x=>m[x.symbol]=parseFloat(x.lastPrice));const o={};syms.forEach(s=>{if(m[s])o[s]=m[s]});return o}},
+{n:"Coinbase",ms:3000,f:async syms=>{const o={};await Promise.all(syms.map(async s=>{try{const j=await jget("https://api.exchange.coinbase.com/products/"+base(s)+"-USD/ticker");o[s]=parseFloat(j.price)}catch(e){}}));return o}},
+{n:"CoinGecko",ms:20000,f:async syms=>{const ids=syms.map(s=>CG[base(s)]).filter(Boolean);const j=await jget("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids="+ids.join(","),6000);const o={};syms.forEach(s=>{const k=CG[base(s)];if(k&&j[k])o[s]=j[k].usd});return o}}];
+let srcIdx=0,lastTry=0,lastProbe=0,pxSrc="",majBusy=false;
+async function pollBinance(){if(!DATA||majBusy)return;const syms=[...new Set(DATA.open.filter(o=>o.sym).map(o=>o.sym))];if(!syms.length){pxOK.bin=null;return}
+ const now=Date.now();let start=srcIdx;if(srcIdx>0&&now-lastProbe>60000){start=0;lastProbe=now}else if(now-lastTry<SRC[srcIdx].ms)return;
+ majBusy=true;lastTry=now;try{for(let i=start;i<SRC.length;i++){const need=new Set(syms);let got={};try{got=await SRC[i].f(syms)}catch(e){continue}
+  let n=0;for(const s in got){const v=got[s];if(isFinite(v)&&v>0){PX["B:"+s]=v;need.delete(s);n++}}
+  if(!n)continue;
+  // fill gaps (e.g. coin not listed here) from later sources, best effort
+  for(let k=i+1;k<SRC.length&&need.size&&k<i+3;k++){try{const g=await SRC[k].f([...need]);for(const s in g)if(isFinite(g[s])&&g[s]>0){PX["B:"+s]=g[s];need.delete(s)}}catch(e){}}
+  srcIdx=i;pxSrc=SRC[i].n;pxOK.bin=true;pxAt=Date.now();renderLive();return}
+  if(start>0){srcIdx=srcIdx}pxOK.bin=false}finally{majBusy=false}}
 async function pollDex(){if(!DATA)return;const mints=[...new Set(DATA.open.filter(o=>!o.sym&&o.mint).map(o=>o.mint))].slice(0,30);if(!mints.length){pxOK.dex=null;return}
  try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),6000);const r=await fetch("https://api.dexscreener.com/tokens/v1/solana/"+mints.join(","),{signal:ctl.signal,cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();const best={};(Array.isArray(j)?j:[]).forEach(p=>{const m=p.baseToken&&p.baseToken.address,liq=(p.liquidity&&p.liquidity.usd)||0,v=parseFloat(p.priceUsd);if(m&&isFinite(v)&&v>0&&(!best[m]||liq>best[m].l))best[m]={l:liq,v}});Object.entries(best).forEach(([m,b])=>PX["D:"+m]=b.v);pxOK.dex=true;pxAt=Date.now();renderLive()}catch(e){pxOK.dex=false}}
-function tickStatus(){const paused=pxOK.bin===false||pxOK.dex===false;const el=$("live");el.className="live"+(paused?" paused":"");$("livetxt").textContent=paused?"PRICE FEED PAUSED":"LIVE";
- const any=DATA&&DATA.open.length;$("pxage").textContent=!any?"prices: no open positions to price":pxAt?`prices updated ${Math.max(0,Math.round((Date.now()-pxAt)/1000))}s ago`+(paused?" · keeping last values":""):"prices: connecting…";
+function tickStatus(){const paused=pxOK.bin===false&&pxOK.dex!==true||pxOK.dex===false&&pxOK.bin!==true;const stale=pxOK.bin===false||pxOK.dex===false;const el=$("live");el.className="live"+(paused?" paused":"");$("livetxt").textContent=paused?"PRICE FEED PAUSED":"LIVE";
+ const any=DATA&&DATA.open.length;$("pxage").textContent=!any?"prices: no open positions to price":pxAt?`prices updated ${Math.max(0,Math.round((Date.now()-pxAt)/1000))}s ago`+(pxSrc?" · Prices: "+pxSrc:"")+(stale?" · some feeds stale, keeping last values":""):"prices: connecting…";
  if(DATA){const age=DATA.gen_ts?Math.round(Date.now()/1000-DATA.gen_ts):null;$("dataage").textContent=`desk snapshot ${DATA.updated}`+(age!=null?` · ${age<120?age+"s":Math.round(age/60)+"m"} old`:"");$("posage").textContent="prices tick live · entries from snapshot"}}
 loadData().then(()=>{pollBinance();pollDex()});
-setInterval(pollBinance,2000);setInterval(pollDex,10000);setInterval(loadData,30000);setInterval(tickStatus,1000);
+setInterval(pollBinance,1000);setInterval(pollDex,10000);setInterval(loadData,30000);setInterval(tickStatus,1000);
 </script>
 </body>
 </html>
