@@ -94,6 +94,7 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
 </header>
 <div class="warn"><b>PAPER ONLY.</b> Practice money: no real funds, no keys, no real trades. Prices stream live from Binance, with OKX, Bybit, Coinbase and CoinGecko as backups, plus DexScreener. Trades, agents and activity come from the desks' latest snapshot, re-checked every 30s. A score is a checklist rating, not a win chance.</div>
 <div class="tabs" id="tabs"></div>
+<div id="memerules" style="font-size:12px;opacity:.8;margin:6px 0 10px">Memecoin rules (paper, wide-open): skip a coin only if the <b>creator wallet is the #1 holder</b> (pools, burn &amp; lock accounts ignored) or pool liquidity &lt; $10K. Top-10 concentration is a warning only. Stops: -6% hard, 6% trail after +12%.</div>
 <div class="ticker" id="ticker"></div>
 <div class="hero">
   <div class="panel hl">
@@ -130,7 +131,7 @@ const wib=ts=>new Date((ts+7*3600)*1000).toISOString().slice(11,16);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cls=n=>n>0?"up":n<0?"dn":"nt";
 const key=o=>o.desk+"|"+o.a+"|"+o.t;
-const plainWhy=r=>String(r||"").replace("QUICK-FLIP wallet","Wallet flips too fast").replace("STALE SIGNAL","Signal too old").replace("unverifiable:","Couldn't verify").replace("(no longs in downtrend)","· falling trend").replace("liquidity","Too little money in pool:").replace("top 10 holders","Top 10 wallets hold");
+const plainWhy=r=>String(r||"").replace("QUICK-FLIP wallet","Wallet flips too fast").replace("STALE SIGNAL","Signal too old").replace("unverifiable:","Couldn't verify").replace("(no longs in downtrend)","· falling trend").replace("liquidity","Too little money in pool:").replace("top 10 holders","Top 10 wallets hold").replace(/largest holder \(ex-pool\/burn\/lock\) → KILL/,"creator is the #1 holder → skipped");
 
 function livePx(o){const k=o.sym?("B:"+o.sym):o.mint?("D:"+o.mint):null;return k&&PX[k]!=null?PX[k]:null}
 function posView(o){const lp=livePx(o);const p=lp??o.p;const qty=o.qty||(o.z/o.e);const sg=o.side==="short"?-1:1;const m=o.m||o.z;const u=sg*qty*(p-o.e)-(o.f||0);return {p,live:lp!=null,val:m+u,u,pc:u/m*100,mv:sg*(p/o.e-1)*100}}
