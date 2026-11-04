@@ -71,6 +71,13 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
 .empty{color:var(--t2);font-size:14px;padding:6px 0}
 .footer{margin-top:22px;font-size:11px;color:var(--t3);text-align:center;font-family:var(--mono)}
 .fadein{animation:slide .6s ease both}
+.wl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-top:1px solid var(--line)}.wl:first-child{border-top:0}
+.wl .ad{font:700 14px var(--mono);word-break:break-all}.wl .sub{display:block;margin-top:3px}
+.ws{font:700 11px var(--mono);padding:4px 9px;border-radius:999px;white-space:nowrap}.ws.ok{background:rgba(46,230,138,.14);color:var(--g)}.ws.sk{background:rgba(255,210,31,.14);color:var(--y)}.ws.dr{background:rgba(255,77,106,.14);color:var(--r)}.ws.nt{background:var(--panel2);color:var(--t2)}
+.wk{display:flex;gap:8px;width:100%}.wk a{flex:1;text-align:center;font:700 12px var(--mono);padding:9px 0;border-radius:10px;border:1px solid var(--line);color:var(--t);text-decoration:none;min-height:20px}
+@media(min-width:700px){.wk{width:auto}.wk a{padding:7px 14px}}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}@media(min-width:700px){.sg{grid-template-columns:repeat(5,1fr)}}
+.sg div{background:var(--panel2);border-radius:12px;padding:10px}.sg .l{font:600 11px var(--sans);color:var(--t2)}.sg .v{font:700 16px var(--mono);margin-top:3px}
 </style>
 </head>
 <body>
@@ -97,9 +104,11 @@ details{background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bot
 </div>
 <div class="panel section"><h2>Balance over time <span class="tf" id="tf"></span></h2><div id="chart"></div></div>
 <div class="section panel"><h2><span id="aghead">Agents</span><span class="tf" id="teamtabs"></span></h2><div class="grid g3" id="agents"></div></div>
-<div class="section"><div class="panel"><h2>Open positions <small id="posage"></small></h2><div class="grid g2" id="pos"></div></div></div>
+<div class="section"><div class="panel"><h2 id="sthead">Summary</h2><div class="sg" id="stats"></div></div>
+  <div class="panel"><h2>Open positions <small id="posage"></small></h2><div class="grid g2" id="pos"></div></div></div>
 <div class="section grid g2">
   <div class="panel"><h2>Activity <small>newest first</small></h2><ul class="feed" id="feed"></ul></div>
+  <div class="panel" id="walletsPanel"><h2>Tracked wallets <small>copy desk</small></h2><div id="wallets"></div></div>
   <div class="panel"><h2>Latest kills &amp; scores</h2><div id="latest"></div></div>
 </div>
 <div class="section grid g2">
@@ -187,8 +196,8 @@ function renderAgents(){const names=DATA.agents.map(a=>a.desk);if(!team||!names.
  const run=tm.rows.filter(r=>r.st==="active").length;$("aghead").textContent=`Agents · ${run}/${tm.rows.length} active · ${tn} cycle ${tm.cycle} @ ${tm.tm} WIB`;
  $("agents").innerHTML=tm.rows.map((a,i)=>`<div class="agent ${esc(a.st)} fadein" style="animation-delay:${i*60}ms">${face(a.n,a.st)}<div style="min-width:0;flex:1"><div style="display:flex;justify-content:space-between;gap:6px;align-items:center;flex-wrap:wrap"><span class="nm">${esc(a.n)}</span><span class="st ${esc(a.st)}">${esc(a.st)}</span></div><div class="rl">${esc(a.role)}</div><div class="did">${esc(plainWhy(a.did))}</div><div class="coin">On: ${esc(a.coin)}</div>${a.why?`<div class="why">${esc(plainWhy(a.why))}</div>`:""}</div></div>`).join("")}
 
-function renderPos(){const ops=DATA.open.filter(o=>inDesk(o.desk));
- $("pos").innerHTML=ops.length?ops.map(o=>{const v=posView(o);return `<div class="panel card" data-card="${esc(key(o))}" style="background:var(--panel2)"><div class="hd"><span class="pair">${esc(o.pair||o.a)}</span><span class="st active">${esc(o.desk)} · paper</span></div><div class="cg">
+function renderPos(){const ds=desk==="All"?["Memecoin","Majors","Copy"]:[desk];
+ $("pos").innerHTML=ds.map(dn=>{const ops=DATA.open.filter(o=>o.desk===dn);return `<h3 class="dh" style="font:700 14px var(--sans);margin:14px 2px 8px">${esc(dn)} desk · ${ops.length} open</h3>`+(ops.length?ops.map(o=>{const v=posView(o);return `<div class="panel card" data-card="${esc(key(o))}" style="background:var(--panel2)"><div class="hd"><span class="pair">${esc(o.pair||o.a)}</span><span class="st active">${esc(o.desk)} · paper</span></div><div class="cg">
  <div><div class="l">Direction</div><div class="v up">LONG</div></div>
  <div><div class="l">Signal score</div><div class="v">${o.sc==null?"N/A":o.sc+"/100"}</div></div>
  <div><div class="l">Entry price</div><div class="v">${price(o.e)} <span class="sub">${esc(o.t)} WIB</span></div></div>
@@ -199,7 +208,7 @@ function renderPos(){const ops=DATA.open.filter(o=>inDesk(o.desk));
  <div><div class="l">Take-profit</div><div class="v" style="font-size:13px">${esc(o.rule||"N/A")}${o.trail?" (trailing on)":""}</div></div>
  <div><div class="l">Current price · <span class="src">${v.live?"live":"snapshot"}</span></div><div class="v cur" data-v="${v.p}">${price(v.p)}</div></div>
  <div><div class="l">Unrealized P&amp;L</div><div class="v pnl ${cls(v.u)}">${signed(v.u)} · ${pct(v.pc)}</div></div>
- </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?(pxSrc||"exchange feed"):"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):'<div class="empty">No open paper trades right now. The agents are still scanning. New positions show up here as cards automatically.</div>'}
+ </div><div class="foot">Paper trade · entry/stop from desk snapshot ${esc(DATA.updated)} · live price from ${o.sym?(pxSrc||"exchange feed"):"DexScreener"} · P&amp;L excludes exit fees/slippage</div></div>`}).join(""):`<div class="empty">No open ${esc(dn)} positions right now. The agents are still scanning, and new trades show up here automatically.</div>`)}).join("")}
 
 function renderFeed(){const acts=DATA.act.filter(a=>inDesk(a.desk)).slice(0,12);const nowS=Date.now()/1000;
  $("feed").innerHTML=acts.length?acts.map(a=>{const k=a.ts+a.txt+a.desk;const isNew=!firstFeed&&!lastFeed.has(k);return `<li class="${isNew?"new":""} ${nowS-a.ts<3600?"fresh":""}"><span class="ic ${a.side==="b"?"b":"s"}">${a.side==="b"?"B":"S"}</span><span class="tx"><b>${esc(a.txt)}</b><span>${esc(a.role)} · ${esc(a.d)}</span></span><span class="tm">${wib(a.ts)} WIB<br>${esc(a.desk)}</span></li>`}).join(""):'<li class="empty">No trades yet on this desk.</li>';
@@ -211,7 +220,13 @@ function renderRest(){const lat=DATA.latest.filter(l=>inDesk(l.desk));
  $("closed").innerHTML=cl.length?cl.map(c=>`<div class="row"><span><b>${esc(c.a)}</b> <span class="sub">${esc(c.desk)} · ${esc(c.t)} · ${esc(String(c.r).split("_").join(" "))}</span></span><span class="${cls(c.u)}" style="font:700 13px var(--mono)">${signed(c.u)} · ${pct(c.pc)}</span></div>`).join(""):'<div class="empty">No closed trades on this desk yet.</div>';
  $("ready").innerHTML=DATA.desks.map(d=>`<div class="row"><span><b>${esc(d.name)}</b><br><span class="sub">${d.ready.met??0}/${d.ready.gates??0} checks · learning ${d.learn.train}/30 practice + ${d.learn.hold}/10 test · model ${esc(d.model)}</span></span><span class="st blocked">not yet</span></div>`).join("")+`<div class="foot">From READINESS.md as of ${esc(DATA.ready_asof)}. Going live always needs your explicit written go-ahead.</div>`}
 
-function renderAll(anim){if(!DATA)return;renderTabs();renderPos();renderAgents();renderFeed();renderRest();renderLive();drawChart(anim);
+function renderWallets(){const p=$("walletsPanel");if(!p)return;p.style.display=(desk==="All"||desk==="Copy")?"":"none";const W=DATA.wallets||[];
+ const sc=s=>s==="Copyable"?"ok":s==="Dropped"?"dr":s.startsWith("Skipped")?"sk":"nt";const hold=x=>x==null?"n/a":x<120?Math.round(x)+"s":Math.round(x/60)+"m";
+ $("wallets").innerHTML=W.length?W.map(w=>{const a=encodeURIComponent(w.addr);return `<div class="wl"><span><span class="ad">${esc(w.short)}</span><span class="sub">${w.roundtrips??0} round trips · median hold ${hold(w.median_hold_s)} · ${w.copies} copies${w.pnl_usd!=null?" · P&amp;L "+signed(w.pnl_usd):""}${w.dropped_at?" · dropped "+esc(w.dropped_at.slice(5,16)):""}</span></span><span class="ws ${sc(w.status)}">${esc(w.status)}</span><span class="wk"><a href="https://solscan.io/account/${a}" target="_blank" rel="noopener">Solscan</a><a href="https://gmgn.ai/sol/address/${a}" target="_blank" rel="noopener">GMGN</a></span></div>`}).join(""):'<div class="empty">No wallets tracked yet.</div>'}
+function renderStats(){const S=(DATA.stats||{})[desk];if(!S){$("stats").innerHTML='<div class="empty">No stats yet.</div>';return}
+ $("sthead").innerHTML=(desk==="All"?"Summary · all 3 desks":"Summary · "+esc(desk)+" desk");const c=(l,v,k)=>`<div><div class="l">${l}</div><div class="v ${k||""}">${v}</div></div>`;
+ $("stats").innerHTML=c(desk==="Copy"?"Wallet buys seen":"Scanned",S.scanned.toLocaleString())+c("Blocked",S.blocked.toLocaleString())+c("Entered",S.entered)+c("Open now",S.open)+c("Stopped out",S.stopped)+c("Closed",S.closed)+c("Realized P&amp;L",signed(S.real)+" ("+pct(S.real_pc)+")",cls(S.real))+c("Unrealized P&amp;L",signed(S.unreal),cls(S.unreal))+c("Win rate",S.win==null?"—":S.win+"%")+c("Wins",S.wins)}
+function renderAll(anim){if(!DATA)return;renderStats();renderWallets();renderTabs();renderPos();renderAgents();renderFeed();renderRest();renderLive();drawChart(anim);
  $("tf").innerHTML=["1H","4H","All"].map(t=>`<button class="${t===tf?"on":""}" data-t="${t}">${t}</button>`).join("");$("tf").querySelectorAll("button").forEach(b=>b.onclick=()=>{tf=b.dataset.t;drawChart(true);renderAll(true)})}
 
 async function loadData(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();const changed=!DATA||j.updated!==DATA.updated;DATA=j;dataAt=Date.now();if(changed)renderAll(!drawn);}catch(e){$("dataage").textContent="data: fetch failed, keeping last"}}
