@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Paper Desks · Run 2</title>
+<title>Paper Majors · Run 2</title>
 <meta name="robots" content="noindex">
 <style>
 :root{--bg:#0b0e14;--card:#121722;--line:#1f2633;--tx:#e6e9ef;--mu:#8a93a6;--up:#22c55e;--dn:#ef4444;--ac:#60a5fa;--wa:#f59e0b}
@@ -46,7 +46,7 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </style></head><body><div class="wrap">
 <header>
- <div><h1>Paper Desks <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
+ <div><h1>Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
   <div class="big" id="tot">—</div><div class="sub" id="totsub">loading…</div></div>
  <div class="sub" style="text-align:right"><div id="upd"></div><div id="livest"></div></div>
 </header>
@@ -59,7 +59,7 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 <footer id="foot">Simulated paper trading. No real money, no keys, no signing.</footer>
 </div>
 <script>
-const $=s=>document.getElementById(s),START=10000;let D=null,LIVE={},dfilter="all";
+const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";let D=null,LIVE={},dfilter="all";
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+n.toFixed(2)+"%";
 const cls=n=>n>0?"up":n<0?"dn":"mu";
@@ -72,10 +72,10 @@ function chart(pts){if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 30
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
  const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=START?"#22c55e":"#ef4444";
  return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(START)}" y2="${Y(START)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
-function render(){if(!D)return;const opens=D.open||[];
+function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
  const liveU={};opens.forEach(o=>{const p=LIVE[o.sym||o.mint];o._p=p??o.p;o._u=upnl(o,p??o.p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
- const act=(D.desks||[]).filter(d=>!d.paused);let tot=0;
- $("desks").innerHTML=(D.desks||[]).map(d=>{const eq=d.paused?START:d.eq+(liveU[d.name]||0);if(!d.paused)tot+=eq;const pl=(eq/START-1)*100;
+ const act=(D.desks||[]).filter(d=>!d.paused&&d.name===FOCUS);let tot=0;
+ $("desks").innerHTML=act.map(d=>{const eq=d.paused?START:d.eq+(liveU[d.name]||0);if(!d.paused)tot+=eq;const pl=(eq/START-1)*100;
   const full=((D.full||[]).find(f=>f.desk===d.name)||{}).pts||[];
   return`<div class="card"><h2>${esc(d.name)} ${d.paused?'<span class="badge b-paused">PAUSED</span>':'<span class="badge b-live">RUNNING</span>'}</h2>
   <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
@@ -86,7 +86,7 @@ function render(){if(!D)return;const opens=D.open||[];
   <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">Cycle</div></div></div>
   ${d.paused?'<div class="sub" style="margin-top:10px">Paused for run 2. No trades.</div>':chart(full)}</div>`}).join("");
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
- $("totsub").textContent=`Total paper equity, ${act.length} running desks ($${(base/1000)}K start) · Run ${D.run?.n||2} started ${D.run?.start||""} WIB`;
+ $("totsub").textContent=`Majors paper equity (from $10K) · Run ${D.run?.n||2} started ${D.run?.start||""} WIB`;
  $("upd").textContent="Data updated "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
  // open trades (top of page)
  const sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
@@ -102,13 +102,13 @@ function render(){if(!D)return;const opens=D.open||[];
   <div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div><div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
- const cl=D.closed||[];$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
+ const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
  // decisions
- const dec=D.dec||[],F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
+ const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
  $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div><div class="r">${esc(x.r)}</div>${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}${x.news?`<div class="news">📰 ${esc(x.news)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
- $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}.`}
+ $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();live()}catch(e){$("totsub").textContent="Could not load data.json"}}
 async function j(u){const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return r.json()}
 async function live(){if(!D)return;const os=D.open||[],mints=[...new Set(os.filter(o=>o.mint&&!o.sym).map(o=>o.mint))],syms=[...new Set(os.filter(o=>o.sym).map(o=>o.sym))];let n=0;
