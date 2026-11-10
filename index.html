@@ -39,7 +39,14 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .oc .t{display:flex;justify-content:space-between;align-items:center;gap:6px}.oc .t a,.oc .t b{font-weight:700;font-size:15px}
 .sd{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}.sd.L{background:#0f2e1c;color:var(--up)}.sd.S{background:#3a1212;color:var(--dn)}
 .oc .pl{font-size:20px;font-weight:700;margin:6px 0 4px}.oc .g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px}
-.oc .g span{color:var(--mu)}.oc .g div{display:flex;justify-content:space-between}
+.oc .g span{color:var(--mu)}.oc .g div{display:flex;justify-content:space-between;gap:8px}
+.oc .g span .tag{font-size:10px;font-weight:700;margin-left:4px;color:var(--wa)}
+.oc .g span .hit{color:var(--up);font-weight:700;margin-left:4px}
+.al{margin-top:8px;font-size:11px;line-height:1.4}
+.al summary{cursor:pointer;color:var(--mu);font-weight:600;user-select:none;padding:6px 0}
+.al div{display:flex;gap:8px;padding:3px 0;border-top:1px solid var(--line)}
+.al div:first-of-type{margin-top:4px}
+.al .tm{flex:0 0 36px;color:var(--mu)}
 .flash{animation:fl .8s}@keyframes fl{from{background:#1b2333}to{background:transparent}}
 .pat,.news{margin-top:6px;margin-right:6px;font-size:11px;border-radius:6px;padding:3px 7px;display:inline-block}
 .pat{color:#c4b5fd;background:#1a1530}.news{color:#99f6e4;background:#042f2e}
@@ -66,6 +73,10 @@ const cls=n=>n>0?"up":n<0?"dn":"mu";
 const px=n=>n==null?"—":n>=100?n.toLocaleString(undefined,{maximumFractionDigits:2}):n>=1?n.toFixed(4):Number(n).toPrecision(4);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"just now":m<60?m+"m ago":m<1440?Math.round(m/60)+"h ago":Math.round(m/1440)+"d ago"};
+const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String(t||"");};
+const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
+const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
+const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
 function chart(pts){if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([START]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
@@ -93,13 +104,18 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
  $("otn").textContent=opens.length;
  $("open").innerHTML=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
+  const tag=slTag(o);
   return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
   <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
   <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
   <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
-  <div><span>Stop</span>${px(o.s)}</div><div><span>To stop</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
-  <div><span>TP1</span>${o.tp1?px(o.tp1):(o.trail?"trailing":"—")}</div><div><span>Size</span>${money(sz)}</div>
-  <div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div><div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+  <div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div><div><span>Liq</span>${px(o.liq)}</div>
+  ${tpCell("TP1",o.tp1,o.tp1_hit,"50%")}
+  ${tpCell("TP2",o.tp2,o.tp2_hit,"25%")}
+  ${tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
+  <div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  <div><span>Margin</span>${money(sz)}</div><div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div>
+  <div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
  const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
