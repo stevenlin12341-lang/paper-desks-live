@@ -41,6 +41,7 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .oc .pl{font-size:20px;font-weight:700;margin:6px 0 4px}.oc .g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px}
 .oc .g span{color:var(--mu)}.oc .g div{display:flex;justify-content:space-between}
 .flash{animation:fl .8s}@keyframes fl{from{background:#1b2333}to{background:transparent}}
+.pat{margin-top:6px;font-size:11px;color:#c4b5fd;background:#1a1530;border-radius:6px;padding:3px 7px;display:inline-block}
 footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </style></head><body><div class="wrap">
 <header>
@@ -97,7 +98,7 @@ function render(){if(!D)return;const opens=D.open||[];
   <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
   <div><span>Stop</span>${px(o.s)}</div><div><span>To stop</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
   <div><span>TP1</span>${o.tp1?px(o.tp1):(o.trail?"trailing":"—")}</div><div><span>Size</span>${money(sz)}</div>
-  <div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div><div><span>Score</span>${o.sc??"—"}</div></div></div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+  <div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div><div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
  const cl=D.closed||[];$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
@@ -105,7 +106,7 @@ function render(){if(!D)return;const opens=D.open||[];
  const dec=D.dec||[],F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
- $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div><div class="r">${esc(x.r)}</div></div>`).join(""):'<div class="it mu">No decisions yet.</div>';
+ $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div><div class="r">${esc(x.r)}</div>${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
  $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}.`}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();live()}catch(e){$("totsub").textContent="Could not load data.json"}}
 async function j(u){const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return r.json()}
