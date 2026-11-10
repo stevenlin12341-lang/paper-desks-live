@@ -151,7 +151,7 @@ function renderLive(){if(!DATA)return;const ds=DATA.desks.filter(d=>inDesk(d.nam
  const diff=eq-base;$("gain").className="pill "+cls(diff);$("gain").textContent=signed(diff)+" · "+pct(diff/base*100);
  $("herolbl").textContent=desk==="All"?"Total paper balance":desk+" paper balance";$("herosub").textContent="since the "+money(base)+" start";
  const cash=ds.reduce((s,d)=>s+d.cash,0);setTxt("intr",money(eq-cash));setTxt("cash",money(cash));setTxt("nopen",String(DATA.open.filter(o=>inDesk(o.desk)).length));
- $("desks").innerHTML=DATA.desks.map(d=>{const e=deskLive(d),df=e-START;return `<div class="row"><span><b>${esc(d.name)}</b> <span class="sub">cycle ${d.cycle} · ${esc(d.last)}</span></span><span style="text-align:right"><b style="font-variant-numeric:tabular-nums">${money(e)}</b><br><span class="${cls(df)}" style="font:600 12px var(--mono)">${signed(df)} · ${pct(df/START*100)}</span></span></div>`}).join("");
+ $("desks").innerHTML=DATA.desks.map(d=>{const e=deskLive(d),df=e-START;const tag=d.paused?" · paused":"";return `<div class="row"><span><b>${esc(d.name)}</b> <span class="sub">cycle ${d.cycle} · ${esc(d.last)}${tag}</span></span><span style="text-align:right"><b style="font-variant-numeric:tabular-nums">${money(e)}</b><br><span class="${cls(df)}" style="font:600 12px var(--mono)">${signed(df)} · ${pct(df/START*100)}</span></span></div>`}).join("");
  const ops=DATA.open.filter(o=>inDesk(o.desk));
  $("ticker").innerHTML=ops.map(o=>{const v=posView(o);return `<span class="tk">${esc(o.a)} <span data-px="${esc(key(o))}">${price(v.p)}</span><span class="${cls(v.mv)}">${pct(v.mv)}</span></span>`}).join("");
  ops.forEach(o=>{const v=posView(o),k=key(o);const c=document.querySelector(`[data-card="${CSS.escape(k)}"]`);if(!c)return;
