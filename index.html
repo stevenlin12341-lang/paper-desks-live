@@ -31,6 +31,16 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.tabs button{background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
 .tabs button.on{color:var(--tx);border-color:var(--ac)}
 .two{display:grid;gap:12px;grid-template-columns:1fr 1fr}@media(max-width:860px){.two{grid-template-columns:1fr}.big{font-size:28px}}
+.oth{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px}.oth h3{margin:0}
+#otsum b{font-size:16px}
+.ogrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.oc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;border-left:3px solid var(--line)}
+.oc.pos{border-left-color:var(--up)}.oc.neg{border-left-color:var(--dn)}
+.oc .t{display:flex;justify-content:space-between;align-items:center;gap:6px}.oc .t a,.oc .t b{font-weight:700;font-size:15px}
+.sd{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}.sd.L{background:#0f2e1c;color:var(--up)}.sd.S{background:#3a1212;color:var(--dn)}
+.oc .pl{font-size:20px;font-weight:700;margin:6px 0 4px}.oc .g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px}
+.oc .g span{color:var(--mu)}.oc .g div{display:flex;justify-content:space-between}
+.flash{animation:fl .8s}@keyframes fl{from{background:#1b2333}to{background:transparent}}
 footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </style></head><body><div class="wrap">
 <header>
@@ -38,8 +48,8 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
   <div class="big" id="tot">—</div><div class="sub" id="totsub">loading…</div></div>
  <div class="sub" style="text-align:right"><div id="upd"></div><div id="livest"></div></div>
 </header>
-<div class="grid" id="desks"></div>
-<section><h3>Open positions</h3><div id="open"></div></section>
+<section id="ot"><div class="oth"><h3>Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
+<section><h3>Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two">
  <section><h3>Recent closed trades</h3><div class="tw" id="closed"></div></section>
  <section><h3>Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
@@ -76,12 +86,19 @@ function render(){if(!D)return;const opens=D.open||[];
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
  $("totsub").textContent=`Total paper equity, ${act.length} running desks ($${(base/1000)}K start) · Run ${D.run?.n||2} started ${D.run?.start||""} WIB`;
  $("upd").textContent="Data updated "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
- // open positions
- const by={};opens.forEach(o=>(by[o.desk]=by[o.desk]||[]).push(o));
- $("open").innerHTML=Object.keys(by).length?Object.entries(by).map(([k,os])=>`<div class="sub" style="margin:8px 0 4px">${esc(k)} · ${os.length}</div><div class="tw"><table><tr><th>Asset</th><th>Side</th><th>Entry</th><th>Mark</th><th>Stop</th><th>Size</th><th>P&amp;L</th><th>Score</th><th>Opened</th></tr>`+
-  os.sort((a,b)=>(b.ts||0)-(a.ts||0)).map(o=>{const sz=o.inst==="perp"?o.m:o.z,pc=sz?o._u/sz*100:0;return`<tr><td>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)}</a>`:esc(o.a)}</td>
-  <td>${o.inst==="perp"?`<span class="${o.side==="short"?"dn":"up"}">${o.side.toUpperCase()} ${o.lev}x</span>`:"SPOT"}</td><td>${px(o.e)}</td><td>${px(o._p)}</td><td>${px(o.s)}</td><td>${money(sz)}</td>
-  <td class="${cls(o._u)}">${money(o._u)} <span class="sub">${pct(pc)}</span></td><td>${o.sc??"—"}</td><td class="mu">${o.ts?ago(o.ts):esc(o.t)}</td></tr>`}).join("")+`</table></div>`).join(""):'<div class="tw"><div class="empty">No open positions.</div></div>';
+ // open trades (top of page)
+ const sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
+ $("otn").textContent=opens.length;
+ $("open").innerHTML=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
+  const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
+  <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
+  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
+  <div><span>Stop</span>${px(o.s)}</div><div><span>To stop</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  <div><span>TP1</span>${o.tp1?px(o.tp1):(o.trail?"trailing":"—")}</div><div><span>Size</span>${money(sz)}</div>
+  <div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div><div><span>Score</span>${o.sc??"—"}</div></div></div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+ $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
  const cl=D.closed||[];$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
  // decisions
@@ -96,5 +113,5 @@ async function live(){if(!D)return;const os=D.open||[],mints=[...new Set(os.filt
  for(let i=0;i<mints.length;i+=30){try{const a=await j("https://api.dexscreener.com/tokens/v1/solana/"+mints.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){LIVE[m]=best[m].p;n++}}catch(e){}}
  try{const a=await j("https://fapi.binance.com/fapi/v1/premiumIndex");(a||[]).forEach(x=>{if(syms.includes(x.symbol)){LIVE[x.symbol]=+x.markPrice;n++}})}catch(e){}
  $("livest").textContent=n?`Live marks: ${n} prices · ${new Date().toLocaleTimeString()}`:"Live marks unavailable, showing build prices";render()}
-load();setInterval(load,120000);setInterval(live,30000);
+load();setInterval(load,120000);setInterval(live,20000);
 </script></body></html>
