@@ -122,6 +122,8 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
   ${tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
   <div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
   <div><span>Margin</span>${money(sz)}</div><div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div>
+  <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
+  <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
   <div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
