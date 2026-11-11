@@ -27,6 +27,12 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .empty{padding:14px;color:var(--mu)}
 .feed{display:flex;flex-direction:column;gap:6px}.it{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px}
 .it .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.it .r{color:var(--mu);margin-top:2px;font-size:12px;word-break:break-word}
+.rd{margin-top:2px}
+.rd summary{cursor:pointer;color:var(--mu);font-size:12px;word-break:break-word;padding:6px 0;list-style:none;display:flex;align-items:flex-start;gap:6px;user-select:none}
+.rd summary::-webkit-details-marker{display:none}
+.rd summary::after{content:"▾";font-size:10px;color:#5a6478;flex:0 0 auto;margin-top:3px}
+.rd[open] summary::after{content:"▴"}
+.rd .rf{margin:0 0 4px;padding:6px 8px;background:#0b0e14;border-radius:6px;font-size:11px;color:#8a93a6;word-break:break-word;white-space:pre-wrap;line-height:1.4}
 .k-approved{color:var(--up)}.k-killed,.k-vetoed{color:var(--dn)}
 .tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.tabs button{background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
 .tabs button.on{color:var(--tx);border-color:var(--ac)}
@@ -77,6 +83,7 @@ const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String
 const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
 const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
+const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
 function chart(pts){if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([START]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
@@ -123,7 +130,7 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
  const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
- $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div><div class="r">${esc(x.r)}</div>${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}${x.news?`<div class="news">📰 ${esc(x.news)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
+ $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
  $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();live()}catch(e){$("totsub").textContent="Could not load data.json"}}
 async function j(u){const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return r.json()}
