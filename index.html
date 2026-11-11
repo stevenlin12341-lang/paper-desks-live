@@ -66,6 +66,16 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .lt .tag{font-size:9px;font-weight:700;margin-left:3px;color:var(--wa);text-transform:none;letter-spacing:0}
 .lnote{font-size:10px;color:var(--mu);margin-top:3px}
 footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
+.an{display:flex;align-items:center;gap:10px;margin-top:8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;color:var(--tx);text-decoration:none;background:#0b0e14;max-width:100%}
+.an:hover{text-decoration:none;border-color:var(--ac)}
+.an img{width:96px;height:67px;object-fit:cover;object-position:top left;border-radius:4px;flex:0 0 auto;background:#0b0e14;display:block}
+.an span{font-size:12px;font-weight:600;color:var(--ac)}
+@media(max-width:420px){.an img{width:84px;height:59px}}
+.lb{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.86);padding:10px;align-items:center;justify-content:center;overscroll-behavior:contain}
+.lb.on{display:flex !important}
+.lb .lbimg{max-width:100%;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:auto;height:auto;border-radius:8px;border:1px solid var(--line);background:#0b0e14}
+.lbx{position:absolute;top:8px;right:8px;width:44px;height:44px;border:0;border-radius:10px;background:#121722;color:var(--tx);font-size:24px;line-height:1;cursor:pointer}
+.lbopen{position:absolute;top:8px;right:58px;height:44px;padding:0 12px;border:0;border-radius:10px;background:#121722;color:var(--ac);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center}
 </style></head><body><div class="wrap">
 <header>
  <div><h1>Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
@@ -80,6 +90,7 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </div>
 <footer id="foot">Simulated paper trading. No real money, no keys, no signing.</footer>
 </div>
+<div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Open ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analysis"></div>
 <script>
 const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";let D=null,LIVE={},dfilter="all";
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -98,6 +109,9 @@ function levels(o){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
   return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
  return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${money(L.m)})</div>`}
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
+const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analysis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analysis" width="96" height="67" loading="lazy"><span>Analysis</span></a>`};
+function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analysis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
+function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
 const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
 function chart(pts){if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
@@ -137,7 +151,7 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
   <div><span>Margin</span>${money(sz)}</div><div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div>
   <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
   <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
  const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
@@ -153,5 +167,8 @@ async function live(){if(!D)return;const os=D.open||[],mints=[...new Set(os.filt
  for(let i=0;i<mints.length;i+=30){try{const a=await j("https://api.dexscreener.com/tokens/v1/solana/"+mints.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){LIVE[m]=best[m].p;n++}}catch(e){}}
  try{const a=await j("https://fapi.binance.com/fapi/v1/premiumIndex");(a||[]).forEach(x=>{if(syms.includes(x.symbol)){LIVE[x.symbol]=+x.markPrice;n++}})}catch(e){}
  $("livest").textContent=n?`Live marks: ${n} prices · ${new Date().toLocaleTimeString()}`:"Live marks unavailable, showing build prices";render()}
+$("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
+$("lbi").addEventListener("click",e=>e.stopPropagation());
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
 load();setInterval(load,120000);setInterval(live,20000);
 </script></body></html>
