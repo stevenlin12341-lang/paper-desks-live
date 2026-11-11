@@ -56,6 +56,15 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .flash{animation:fl .8s}@keyframes fl{from{background:#1b2333}to{background:transparent}}
 .pat,.news{margin-top:6px;margin-right:6px;font-size:11px;border-radius:6px;padding:3px 7px;display:inline-block}
 .pat{color:#c4b5fd;background:#1a1530}.news{color:#99f6e4;background:#042f2e}
+.lt{margin-top:8px;width:100%;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";-webkit-font-smoothing:antialiased}
+.lt .lh,.lt .lr{display:grid;grid-template-columns:58px minmax(58px,1.1fr) minmax(64px,1fr) minmax(58px,0.9fr) 22px;gap:4px;align-items:center;font-size:11px;line-height:1.3}
+.lt .lh{color:var(--mu);font-size:9px;text-transform:uppercase;letter-spacing:.03em;padding:0 0 3px;border-bottom:1px solid var(--line)}
+.lt .lh span,.lt .lr span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt .lh span:first-child,.lt .lr span:first-child{text-align:left;overflow:visible}
+.lt .lr{padding:3px 0;border-bottom:1px solid var(--line)}
+.lt .lr.tot{border-bottom:0;font-weight:700;padding-top:5px;border-top:1px solid var(--line);margin-top:1px}
+.lt .tag{font-size:9px;font-weight:700;margin-left:3px;color:var(--wa);text-transform:none;letter-spacing:0}
+.lnote{font-size:10px;color:var(--mu);margin-top:3px}
 footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </style></head><body><div class="wrap">
 <header>
@@ -82,6 +91,12 @@ const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"just now"
 const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String(t||"");};
 const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
 const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
+const pnl$=n=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function levels(o){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
+ const row=r=>{const hit=r.st==="hit",tot=r.k==="Full TP",tag=r.tag?` <span class="tag">${esc(r.tag)}</span>`:"";
+  const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
+  return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
+ return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${money(L.m)})</div>`}
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
@@ -116,15 +131,13 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
   <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
   <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
   <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
-  <div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div><div><span>Liq</span>${px(o.liq)}</div>
-  ${tpCell("TP1",o.tp1,o.tp1_hit,"50%")}
-  ${tpCell("TP2",o.tp2,o.tp2_hit,"25%")}
-  ${tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
-  <div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
+  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
   <div><span>Margin</span>${money(sz)}</div><div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div>
   <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
   <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>Score</span>${o.sc??"—"}</div></div>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
  const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
