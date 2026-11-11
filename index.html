@@ -48,11 +48,14 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .oc .g span{color:var(--mu)}.oc .g div{display:flex;justify-content:space-between;gap:8px}
 .oc .g span .tag{font-size:10px;font-weight:700;margin-left:4px;color:var(--wa)}
 .oc .g span .hit{color:var(--up);font-weight:700;margin-left:4px}
+.oc .when{margin:0 0 8px;font-size:11px;color:var(--mu);line-height:1.35}
+td.when{white-space:normal;font-size:11px;line-height:1.35;min-width:132px}
 .al{margin-top:8px;font-size:11px;line-height:1.4}
 .al summary{cursor:pointer;color:var(--mu);font-weight:600;user-select:none;padding:6px 0}
 .al div{display:flex;gap:8px;padding:3px 0;border-top:1px solid var(--line)}
 .al div:first-of-type{margin-top:4px}
-.al .tm{flex:0 0 36px;color:var(--mu)}
+.al div{align-items:flex-start}
+.al .tm{flex:0 0 auto;min-width:108px;color:var(--mu);white-space:nowrap}
 .flash{animation:fl .8s}@keyframes fl{from{background:#1b2333}to{background:transparent}}
 .pat,.news{margin-top:6px;margin-right:6px;font-size:11px;border-radius:6px;padding:3px 7px;display:inline-block}
 .pat{color:#c4b5fd;background:#1a1530}.news{color:#99f6e4;background:#042f2e}
@@ -108,7 +111,7 @@ function levels(o){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
   const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
   return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
  return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${money(L.m)})</div>`}
-const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
+const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analysis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analysis" width="96" height="67" loading="lazy"><span>Analysis</span></a>`};
 function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analysis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
 function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
@@ -144,17 +147,18 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
   return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
   <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
   <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}
   <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
   <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
   ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
   ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
-  <div><span>Margin</span>${money(sz)}</div><div><span>Open</span>${o.ts?ago(o.ts).replace(" ago",""):esc(o.t)}</div>
+  <div><span>Margin</span>${money(sz)}</div>
   <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
   <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
   <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
  // closed
- const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>When</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu">${c.ts?ago(c.ts):esc(c.t)}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
+ const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
  // decisions
  const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
