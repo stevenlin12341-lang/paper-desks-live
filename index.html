@@ -87,6 +87,17 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 .lb .lbimg{max-width:100%;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);width:auto;height:auto;border-radius:8px;border:1px solid var(--line);background:#0b0e14}
 .lbx{position:absolute;top:8px;right:8px;width:44px;height:44px;border:0;border-radius:10px;background:#121722;color:var(--tx);font-size:24px;line-height:1;cursor:pointer}
 .lbopen{position:absolute;top:8px;right:58px;height:44px;padding:0 12px;border:0;border-radius:10px;background:#121722;color:var(--ac);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center}
+
+#livest{margin-top:4px;font-variant-numeric:tabular-nums}
+#livest .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--up);margin-right:5px;vertical-align:middle;box-shadow:0 0 0 3px #22c55e33}
+#livest .dot.off{background:var(--wa);box-shadow:0 0 0 3px #f59e0b33}
+#livest .ok{color:var(--up)}#livest .off{color:var(--wa)}
+.oc.x-sl{box-shadow:0 0 0 1px #ef444455}.oc.x-tp{box-shadow:0 0 0 1px #22c55e55}
+.xflag{margin:4px 0 8px;font-size:11px;font-weight:700;border-radius:6px;padding:4px 8px;line-height:1.35}
+.xflag.sl{background:#3a1212;color:#fecaca}.xflag.tp{background:#0f2e1c;color:#bbf7d0}
+.lt .lr.x-sl span:first-child{color:var(--dn);font-weight:700}
+.lt .lr.x-tp span:first-child{color:var(--up);font-weight:700}
+tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
@@ -109,46 +120,64 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Open ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analysis"></div>
 <script>
-const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";let D=null,LIVE={},dfilter="all";
+const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";
+const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
+const WALLET_FALLBACK="0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b";
+let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,dfilter="all";
+let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
 let VIEW=(()=>{try{return localStorage.getItem("deskView")==="real"?"real":"paper"}catch(e){return"paper"}})();
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const moneyR=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
 const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+n.toFixed(2)+"%";
 const cls=n=>n>0?"up":n<0?"dn":"mu";
-const px=n=>n==null?"—":n>=100?n.toLocaleString(undefined,{maximumFractionDigits:2}):n>=1?n.toFixed(4):Number(n).toPrecision(4);
+const px=n=>n==null||isNaN(n)?"—":n>=100?n.toLocaleString(undefined,{maximumFractionDigits:2}):n>=1?n.toFixed(4):Number(n).toPrecision(4);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"just now":m<60?m+"m ago":m<1440?Math.round(m/60)+"h ago":Math.round(m/1440)+"d ago"};
 const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String(t||"");};
 const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
 const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
 const pnl$=(n,fine)=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:fine?4:2});
+const secAgo=ts=>{if(!ts)return"";const s=Math.max(0,Math.round((Date.now()-ts)/1000));return s<1?"just now":s+"s ago"};
+const walletAddr=()=>((D&&D.real&&D.real.wallet&&D.real.wallet.address)||WALLET_FALLBACK);
+const walletNow=()=>WALLET_LIVE||((D&&D.real&&D.real.wallet)||null);
+function posQty(o){if(o.qty!=null&&!isNaN(+o.qty))return +o.qty;if(o.e&&o.n)return o.n/o.e;return null}
+function livePx(o){if(!o)return o;const k=o.sym||o.mint||o.a;const p=k!=null?LIVE[k]:null;if(p!=null)return p;if(o.a&&LIVE[o.a+"USDT"]!=null)return LIVE[o.a+"USDT"];return o.p}
+function crossedSide(side,kind,level,p){if(level==null||p==null||isNaN(p)||isNaN(level))return false;const short=side==="short";return kind==="sl"?(short?p>=level:p<=level):(short?p<=level:p>=level)}
+function crossFlags(o,p){const out={sl:false,tp:false,html:""};if(p==null)return out;const msgs=[];
+ if(o.s!=null&&crossedSide(o.side,"sl",o.s,p)){out.sl=true;msgs.push(`<div class="xflag sl">Price crossed SL ${px(o.s)} — display only, the hourly cycle still decides the exit</div>`)}
+ [["TP1",o.tp1,o.tp1_hit],["TP2",o.tp2,o.tp2_hit],["TP3",o.tp3,o.tp3_hit]].forEach(([k,v,hit])=>{if(v==null||hit)return;if(crossedSide(o.side,"tp",v,p)){out.tp=true;msgs.push(`<div class="xflag tp">Price crossed ${k} ${px(v)} — display only, the hourly cycle still decides the exit</div>`)}});
+ out.html=msgs.join("");return out}
+function levelCrossClass(o,r){if(!r||r.px==null||r.st==="hit"||o._p==null)return"";const sl=r.k==="SL";if(crossedSide(o.side,sl?"sl":"tp",r.px,o._p))return sl?" x-sl":" x-tp";return""}
 function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
  const row=r=>{const hit=r.st==="hit",tot=r.k==="Full TP",tag=r.tag?` <span class="tag">${esc(r.tag)}</span>`:"";
   const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
-  return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
- return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${(fine?moneyR:money)(L.m)})</div>`}
+  const xc=levelCrossClass(o,r);
+  return `<div class="lr${tot?" tot":""}${xc}"><span>${esc(r.k)}${tag}${xc?` <span class="tag">${xc.includes("sl")?"crossed":"crossed"}</span>`:""}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
+ return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${(fine?moneyR:money)(L.m)}). Crossed flags are display only.</div>`}
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analysis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analysis" width="96" height="67" loading="lazy"><span>Analysis</span></a>`};
 function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analysis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
 function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
 const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
-function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
+function upnl(o,p){if(p==null||isNaN(p))return o.u||0;const q=posQty(o);if(q!=null&&o.e!=null){const sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-(o.z||0):(o.u||0)}
 function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([start]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
  const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=start?"#22c55e":"#ef4444";
  return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(start)}" y2="${Y(start)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
 function setView(v){VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
+function snapUi(){return{y:window.scrollY,open:[...document.querySelectorAll("details[open]")].map(d=>{const card=d.closest("[data-a]");return{a:card&&card.dataset.a,cls:d.className,sum:(d.querySelector("summary")||{}).textContent||""}})}}
+function restoreUi(s){if(!s)return;document.querySelectorAll(".oc[data-a],#wallet [data-a]").forEach(card=>{s.open.forEach(o=>{if(!o.a||card.dataset.a!==o.a)return;card.querySelectorAll("details").forEach(d=>{if(d.className===o.cls||((d.querySelector("summary")||{}).textContent||"")===o.sum)d.open=true})})});if(s.y!=null)window.scrollTo(0,s.y)}
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
-  const tag=slTag(o);
+  const tag=slTag(o),flags=crossFlags(o,p);
   const match=o.wallet_match?`<div class="when"><span class="badge match">On your live wallet</span></div>`:"";
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
   <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
   <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pct(pc)}</span></div>
-  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}
-  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
+  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
+  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':''}</div>
   <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
   ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
   ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
@@ -160,14 +189,16 @@ function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort(
 function closedTable(cl,fine){const $=fine?moneyR:money;
  return cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet.</div>'}
 function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
- if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing.</div></div>`;
+ if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`;
  const pos=(w.positions||[]),fills=w.fills||[];
  const rows=pos.length?`<div class="tw" style="margin-top:10px"><table><tr><th>Coin</th><th>Side</th><th>Size</th><th>Entry</th><th>Mark</th><th>uPnL</th><th>Lev</th><th>Liq</th><th>Desk</th></tr>`+pos.map(p=>{
   const short=p.side==="short";
-  return`<tr><td><b>${esc(p.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${p.qty??"—"}</td><td>${px(p.e)}</td><td>${px(p.p)}</td><td class="${cls(p.u)}">${moneyR(p.u)}</td><td>${p.lev!=null?p.lev+"x":"—"}</td><td>${px(p.liq)}</td><td>${p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">No open positions on the wallet.</div>';
+  const xc=crossFlags({side:p.side,s:p.sl,tp1:p.tp,_p:p.p},p.p);
+  return`<tr class="${xc.sl?"x-sl":xc.tp?"x-tp":""}" data-a="${esc(p.a)}"><td><b>${esc(p.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${p.qty??"—"}</td><td>${px(p.e)}</td><td>${px(p.p)}${p._live?' <span class="up">●</span>':''}</td><td class="${cls(p.u)}">${moneyR(p.u)}</td><td>${p.lev!=null?p.lev+"x":"—"}</td><td>${px(p.liq)}</td><td>${p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">No open positions on the wallet.</div>';
  const fillTbl=fills.length?`<div class="tw" style="margin-top:8px"><table><tr><th>Time</th><th>Coin</th><th>Action</th><th>Price</th><th>Size</th><th>Closed PnL</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${esc(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`:'<div class="empty">No recent fills.</div>';
  const shortAddr=w.address?w.address.slice(0,6)+"…"+w.address.slice(-4):"";
- return`<div class="oth"><h3>Live wallet (actual) <span class="badge b-wallet">READ-ONLY</span></h3><div class="sub">${esc(w.venue||"Hyperliquid")} · ${w.asof?esc(w.asof):""}</div></div>
+ const liveNote=w.live?"Live Hyperliquid read":(w.asof||"");
+ return`<div class="oth"><h3>Live wallet (actual) <span class="badge b-wallet">READ-ONLY</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h3><div class="sub">${esc(w.venue||"Hyperliquid")} · ${esc(liveNote)}</div></div>
  <div class="card">
   <h2>${esc(w.venue||"Hyperliquid")} <span class="badge b-wallet">NOT THE $37 MIRROR</span></h2>
   <div class="eq">${moneyR(w.eq)}</div>
@@ -180,7 +211,7 @@ function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div c
  </div>`}
 function renderPaper(){
  const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
- const liveU={};opens.forEach(o=>{const p=LIVE[o.sym||o.mint];o._p=p??o.p;o._u=upnl(o,p??o.p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
+ const liveU={};opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
  const act=(D.desks||[]).filter(d=>!d.paused&&d.name===FOCUS);let tot=0;
  $("desks").innerHTML=act.map(d=>{const eq=d.paused?START:d.eq+(liveU[d.name]||0);if(!d.paused)tot+=eq;const pl=(eq/START-1)*100;
   const full=((D.full||[]).find(f=>f.desk===d.name)||{}).pts||[];
@@ -209,11 +240,10 @@ function renderPaper(){
  $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`
 }
 function renderReal(){
- const R=D.real||{},M=R.mirror||{},W=R.wallet||{};
+ const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
  const start=M.start||37;
  const opens=[...(M.opens||[])];
- const liveAdj=0;
- opens.forEach(o=>{const p=LIVE[o.sym||o.mint];o._p=p??o.p;o._u=upnl(o,p??o.p);});
+ opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p)});
  const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
  const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
  const pl=(eq/start-1)*100;
@@ -244,23 +274,84 @@ function renderReal(){
  $("foot").innerHTML=`The $37 book is simulated paper, not live orders. The wallet section is a public Hyperliquid read. No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
 }
 function render(){if(!D)return;
+ const snap=snapUi();
  const real=VIEW==="real";
  $("v-paper").classList.toggle("on",!real);$("v-real").classList.toggle("on",real);
  $("banner").hidden=!real;$("wallet").hidden=!real;
- if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh.";return}renderReal()}
+ if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
  else renderPaper();
- $("upd").textContent="Data updated "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
+ $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
+ paintLive();
+ restoreUi(snap);
 }
-async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();live()}catch(e){$("totsub").textContent="Could not load data.json"}}
-async function j(u){const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return r.json()}
-async function live(){if(!D)return;const os=[...(D.open||[]),...((D.real&&D.real.mirror&&D.real.mirror.opens)||[])],mints=[...new Set(os.filter(o=>o.mint&&!o.sym).map(o=>o.mint))],syms=[...new Set(os.filter(o=>o.sym).map(o=>o.sym))];let n=0;
- for(let i=0;i<mints.length;i+=30){try{const a=await j("https://api.dexscreener.com/tokens/v1/solana/"+mints.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){LIVE[m]=best[m].p;n++}}catch(e){}}
- try{const a=await j("https://fapi.binance.com/fapi/v1/premiumIndex");(a||[]).forEach(x=>{if(syms.includes(x.symbol)){LIVE[x.symbol]=+x.markPrice;n++}})}catch(e){}
- $("livest").textContent=n?`Live marks: ${n} prices · ${new Date().toLocaleTimeString()}`:"Live marks unavailable, showing build prices";render()}
+function paintLive(){const el=$("livest");if(!el)return;
+ const t=marksAt||walletAt;
+ if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} marks`:"" ));if(VIEW==="real"&&walletAt)bits.push("wallet");
+  el.innerHTML=`<span class="dot"></span><span class="ok">${esc(bits.join(" · "))} · updated ${secAgo(t)}</span>`}
+ else if(t&&liveFail){el.innerHTML=`<span class="dot off"></span><span class="off">Live delayed · last ${secAgo(t)} · showing last marks or build prices</span>`}
+ else{el.innerHTML=`<span class="dot off"></span><span class="off">Showing build prices · live marks unavailable</span>`}
+}
+async function fetchJson(url,opt){const c=new AbortController(),t=setTimeout(()=>c.abort(),(opt&&opt.timeout)||8000);
+ try{const r=await fetch(url,Object.assign({signal:c.signal,cache:"no-store"},opt||{}));if(!r.ok)throw new Error("http "+r.status);return await r.json()}finally{clearTimeout(t)}}
+function hlBody(type,extra){return JSON.stringify(Object.assign({type},extra||{}))}
+async function hl(type,extra){return fetchJson(HL,{method:"POST",headers:{"Content-Type":"application/json"},body:hlBody(type,extra)})}
+function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).mirror||{}).opens||[])];
+ const w=((WALLET_LIVE||((D&&D.real)||{}).wallet)||{}).positions||[];
+ const syms=new Set(),coins=new Set(),mints=new Set();
+ os.forEach(o=>{if(o.sym)syms.add(o.sym);if(o.a)coins.add(o.a);if(o.mint&&!o.sym)mints.add(o.mint)});
+ w.forEach(p=>{if(p.a){coins.add(p.a);syms.add(p.a+"USDT")}});
+ return{syms,coins,mints,os}}
+async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
+ try{const {syms,coins,mints}=neededSymbols();const got={};let src="",n=0;
+  if(mints.size){const arr=[...mints];for(let i=0;i<arr.length;i+=30){try{const a=await fetchJson("https://api.dexscreener.com/tokens/v1/solana/"+arr.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){got[m]=best[m].p;n++}}catch(e){}}}
+  try{const a=await fetchJson(BN);(a||[]).forEach(x=>{if(syms.has(x.symbol)){got[x.symbol]=+x.markPrice;n++}});if([...syms].some(s=>got[s]!=null))src="Binance"}catch(e){}
+  const missing=[...syms].filter(s=>got[s]==null);
+  if(!src||missing.length){try{const mids=await hl("allMids");HLMIDS=mids||{};
+    const use=(c,sym)=>{const v=mids[c];if(v==null)return;const p=+v;if(sym&&got[sym]==null){got[sym]=p;n++}got[c]=p};
+    coins.forEach(c=>use(c,c+"USDT"));missing.forEach(s=>use(s.replace(/USDT$/,""),s));
+    if(!src)src="Hyperliquid";else if(missing.some(s=>got[s]!=null))src="Binance+HL"}catch(e){}}
+  if(n){Object.assign(LIVE,got);const wanted=[...syms,...mints];marksN=wanted.filter(k=>got[k]!=null).length;marksSrc=src||marksSrc;marksAt=Date.now();liveFail=false;render()}
+  else{liveFail=true;paintLive()}}
+ catch(e){liveFail=true;paintLive()}
+ finally{marksBusy=false}}
+function midPx(row,mids){if(!row)return row&&row.px;const c=(row.coin||"").toUpperCase();if(c==="USDC"||c==="USDH"||c==="USDT")return 1;
+ const key=row.mid_key;if(key&&mids&&mids[key]!=null){const p=+mids[key];return row.mid_inv&&p?1/p:p}
+ if(c==="USOL"&&mids&&mids.SOL!=null)return +mids.SOL;if(mids&&mids[row.coin]!=null)return +mids[row.coin];return row.px}
+function ordersByCoin(orders){const out={};(orders||[]).forEach(o=>{const coin=o.coin;if(!coin)return;const rec=out[coin]||(out[coin]={sl:null,tp:null});
+  const typ=(o.orderType||"").toLowerCase();let trig=o.triggerPx||o.limitPx,pxv=trig!=null?+trig:null;
+  if(String(typ).includes("stop"))rec.sl=pxv;else if(String(typ).includes("take profit")||String(typ).startsWith("tp"))rec.tp=pxv});return out}
+function tagMatches(positions){const desk={};((D&&D.open)||[]).forEach(o=>{const a=(o.a||"").toUpperCase();if(a)desk[a]=o.side||"long"});
+ (positions||[]).forEach(p=>{const a=(p.a||"").toUpperCase();if(a in desk){if(desk[a]===p.side){p.match=true;p.match_note="Matches desk "+p.side}else{p.match=false;p.match_note="Desk is "+desk[a]+", wallet is "+p.side}}else{p.match=false;p.match_note="Not on the paper desk"}});return positions}
+async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
+ try{const user=walletAddr();const prev=walletNow()||{};
+  const [ch,spot,orders]=await Promise.all([hl("clearinghouseState",{user}),hl("spotClearinghouseState",{user}),hl("frontendOpenOrders",{user}).catch(()=>[])]);
+  if(!HLMIDS||!Object.keys(HLMIDS).length){try{HLMIDS=await hl("allMids")||{}}catch(e){}}
+  const mids=HLMIDS||{},ms=ch.marginSummary||{},perps_eq=+(ms.accountValue||0),margin_used=+(ms.totalMarginUsed||0),notional=+(ms.totalNtlPos||0),withdrawable=+(ch.withdrawable||0);
+  let spot_total=0,usdc_total=0,usdc_hold=0;
+  const spot_rows=(spot.balances||[]).map(b=>{const coin=b.coin||"?",qty=+(b.total||0),hold=+(b.hold||0);const row={coin,qty,hold,mid_key:((prev.spot||[]).find(s=>s.coin===coin)||{}).mid_key,mid_inv:((prev.spot||[]).find(s=>s.coin===coin)||{}).mid_inv};
+   const p=midPx(row,mids);row.px=p;row.val=p!=null?qty*p:null;if(coin==="USDC"||coin==="USDH"||coin==="USDT"){usdc_total=qty;usdc_hold=hold}if(row.val!=null)spot_total+=row.val;return row});
+  const hold_adj=usdc_hold&&margin_used?Math.min(usdc_hold,margin_used):0,by=ordersByCoin(orders);
+  let unreal=0;
+  const positions=(ch.assetPositions||[]).map(ap=>{const p=(ap||{}).position||{},szi=+(p.szi||0);if(!szi)return null;const qty=Math.abs(szi),side=szi>0?"long":"short",entry=+(p.entryPx||0),u=+(p.unrealizedPnl||0),ntl=+(p.positionValue||0);
+   const mark=LIVE[p.coin]??LIVE[(p.coin||"")+"USDT"]??(mids[p.coin]!=null?+mids[p.coin]:(qty?ntl/qty:null));
+   const uu=mark!=null&&entry?((side==="short"?-1:1)*qty*(mark-entry)):u;unreal+=uu;
+   const ords=by[p.coin]||{};
+   return{a:p.coin||"?",side,qty,e:entry,p:mark,u:uu,lev:(p.leverage||{}).value,liq:p.liquidationPx!=null&&p.liquidationPx!==""?+p.liquidationPx:null,m:+(p.marginUsed||0),n:ntl,sl:ords.sl,tp:ords.tp,_live:mark!=null}}).filter(Boolean);
+  tagMatches(positions);
+  const equity=perps_eq+spot_total-hold_adj;
+  WALLET_LIVE={ok:true,live:true,venue:"Hyperliquid",address:user,url:prev.url||("https://app.hyperliquid.xyz/explorer/address/"+user),eq:equity,perps_eq,spot_eq:spot_total-hold_adj,spot_usdc:usdc_total,spot_usdc_free:usdc_total-usdc_hold,portfolio_eq:prev.portfolio_eq,withdrawable,margin:margin_used,notional,unreal,asof:"Live",spot:spot_rows,positions,fills:prev.fills||[]};
+  walletAt=Date.now();if(VIEW==="real")render();else paintLive()}
+ catch(e){/* keep last snapshot / data.json wallet */}
+ finally{walletBusy=false}}
+async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(VIEW==="real")fetchWallet()}catch(e){$("totsub").textContent="Could not load data.json"}}
 $("v-paper").addEventListener("click",()=>setView("paper"));
-$("v-real").addEventListener("click",()=>setView("real"));
+$("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
-load();setInterval(load,120000);setInterval(live,20000);
+load();
+setInterval(load,120000);
+setInterval(fetchMarks,5000);
+setInterval(()=>{if(VIEW==="real")fetchWallet()},10000);
+setInterval(paintLive,1000);
 </script></body></html>
