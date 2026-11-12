@@ -13,6 +13,7 @@ h1{font-size:15px;margin:0;color:var(--mu);font-weight:600;letter-spacing:.04em;
 .big{font-size:34px;font-weight:700;letter-spacing:-.02em}.sub{color:var(--mu);font-size:12px}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);color:var(--mu)}
 .b-paper{color:var(--wa);border-color:#5a4410}.b-paused{color:var(--mu)}.b-live{color:var(--up);border-color:#14532d}
+.b-real{color:#93c5fd;border-color:#1e3a5f}.b-wallet{color:#c4b5fd;border-color:#3b2a6e}
 .up{color:var(--up)}.dn{color:var(--dn)}.mu{color:var(--mu)}
 .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
@@ -36,6 +37,13 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .k-approved{color:var(--up)}.k-killed,.k-vetoed{color:var(--dn)}
 .tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.tabs button{background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
 .tabs button.on{color:var(--tx);border-color:var(--ac)}
+.views{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.views button{background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.views button.on{color:var(--tx);border-color:var(--ac);background:#152238}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--mu);margin-top:14px;line-height:1.45}
+.note b{color:var(--tx);font-weight:600}
+.addr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all}
+.match{color:#86efac;border-color:#14532d}.nomatch{color:var(--mu)}
 .two{display:grid;gap:12px;grid-template-columns:1fr 1fr}@media(max-width:860px){.two{grid-template-columns:1fr}.big{font-size:28px}}
 .oth{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px}.oth h3{margin:0}
 #otsum b{font-size:16px}
@@ -80,23 +88,31 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 .lbx{position:absolute;top:8px;right:8px;width:44px;height:44px;border:0;border-radius:10px;background:#121722;color:var(--tx);font-size:24px;line-height:1;cursor:pointer}
 .lbopen{position:absolute;top:8px;right:58px;height:44px;padding:0 12px;border:0;border-radius:10px;background:#121722;color:var(--ac);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center}
 </style></head><body><div class="wrap">
+<nav class="views" id="views" aria-label="Portfolio">
+ <button type="button" id="v-paper" class="on">Paper $10K</button>
+ <button type="button" id="v-real">Real $37</button>
+</nav>
 <header>
- <div><h1>Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
+ <div><h1 id="htitle">Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
   <div class="big" id="tot">—</div><div class="sub" id="totsub">loading…</div></div>
  <div class="sub" style="text-align:right"><div id="upd"></div><div id="livest"></div></div>
 </header>
-<section id="ot"><div class="oth"><h3>Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
-<section><h3>Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
+<section id="banner" class="note" hidden></section>
+<section id="ot"><div class="oth"><h3 id="ottitle">Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
+<section id="wallet" hidden></section>
+<section id="desksec"><h3 id="desktitle">Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two">
- <section><h3>Recent closed trades</h3><div class="tw" id="closed"></div></section>
- <section><h3>Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
+ <section><h3 id="cltitle">Recent closed trades</h3><div class="tw" id="closed"></div></section>
+ <section id="rightsec"><h3 id="righttitle">Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
 </div>
 <footer id="foot">Simulated paper trading. No real money, no keys, no signing.</footer>
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Open ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analysis"></div>
 <script>
 const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";let D=null,LIVE={},dfilter="all";
+let VIEW=(()=>{try{return localStorage.getItem("deskView")==="real"?"real":"paper"}catch(e){return"paper"}})();
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const moneyR=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
 const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+n.toFixed(2)+"%";
 const cls=n=>n>0?"up":n<0?"dn":"mu";
 const px=n=>n==null?"—":n>=100?n.toLocaleString(undefined,{maximumFractionDigits:2}):n>=1?n.toFixed(4):Number(n).toPrecision(4);
@@ -105,24 +121,65 @@ const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"just now"
 const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String(t||"");};
 const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
 const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
-const pnl$=n=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-function levels(o){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
+const pnl$=(n,fine)=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:fine?4:2});
+function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
  const row=r=>{const hit=r.st==="hit",tot=r.k==="Full TP",tag=r.tag?` <span class="tag">${esc(r.tag)}</span>`:"";
   const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
-  return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
- return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${money(L.m)})</div>`}
+  return `<div class="lr${tot?" tot":""}"><span>${esc(r.k)}${tag}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
+ return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${(fine?moneyR:money)(L.m)})</div>`}
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analysis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analysis" width="96" height="67" loading="lazy"><span>Analysis</span></a>`};
 function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analysis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
 function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
 const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null)return o.u||0;if(o.inst==="perp"){const q=o.n/o.e,sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-o.z:0}
-function chart(pts){if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
- const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([START]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
+function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
+ const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([start]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
- const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=START?"#22c55e":"#ef4444";
- return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(START)}" y2="${Y(START)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
-function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
+ const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=start?"#22c55e":"#ef4444";
+ return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(start)}" y2="${Y(start)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
+function setView(v){VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
+function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
+ const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
+  const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
+  const tag=slTag(o);
+  const match=o.wallet_match?`<div class="when"><span class="badge match">On your live wallet</span></div>`:"";
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
+  <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
+  <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}
+  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
+  <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
+  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
+  <div><span>Margin</span>${$(sz)}</div>
+  <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
+  <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
+  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+ return{html,tu,tm}}
+function closedTable(cl,fine){const $=fine?moneyR:money;
+ return cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet.</div>'}
+function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
+ if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing.</div></div>`;
+ const pos=(w.positions||[]),fills=w.fills||[];
+ const rows=pos.length?`<div class="tw" style="margin-top:10px"><table><tr><th>Coin</th><th>Side</th><th>Size</th><th>Entry</th><th>Mark</th><th>uPnL</th><th>Lev</th><th>Liq</th><th>Desk</th></tr>`+pos.map(p=>{
+  const short=p.side==="short";
+  return`<tr><td><b>${esc(p.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${p.qty??"—"}</td><td>${px(p.e)}</td><td>${px(p.p)}</td><td class="${cls(p.u)}">${moneyR(p.u)}</td><td>${p.lev!=null?p.lev+"x":"—"}</td><td>${px(p.liq)}</td><td>${p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">No open positions on the wallet.</div>';
+ const fillTbl=fills.length?`<div class="tw" style="margin-top:8px"><table><tr><th>Time</th><th>Coin</th><th>Action</th><th>Price</th><th>Size</th><th>Closed PnL</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${esc(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`:'<div class="empty">No recent fills.</div>';
+ const shortAddr=w.address?w.address.slice(0,6)+"…"+w.address.slice(-4):"";
+ return`<div class="oth"><h3>Live wallet (actual) <span class="badge b-wallet">READ-ONLY</span></h3><div class="sub">${esc(w.venue||"Hyperliquid")} · ${w.asof?esc(w.asof):""}</div></div>
+ <div class="card">
+  <h2>${esc(w.venue||"Hyperliquid")} <span class="badge b-wallet">NOT THE $37 MIRROR</span></h2>
+  <div class="eq">${moneyR(w.eq)}</div>
+  <div class="sub" style="margin-bottom:8px">Account value · perps ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}${w.margin!=null?` · margin used ${moneyR(w.margin)}`:""}${w.unreal!=null?` · uPnL <span class="${cls(w.unreal)}">${moneyR(w.unreal)}</span>`:""}</div>
+  <div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.address)} ↗</a>`:esc(w.address||shortAddr)}</div>
+  <div class="sub" style="margin-top:6px">Public lookup only. No keys, no signing, no orders from this page.</div>
+  ${rows}
+  <div class="sub" style="margin:12px 0 4px">Recent fills</div>
+  ${fillTbl}
+ </div>`}
+function renderPaper(){
+ const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
  const liveU={};opens.forEach(o=>{const p=LIVE[o.sym||o.mint];o._p=p??o.p;o._u=upnl(o,p??o.p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
  const act=(D.desks||[]).filter(d=>!d.paused&&d.name===FOCUS);let tot=0;
  $("desks").innerHTML=act.map(d=>{const eq=d.paused?START:d.eq+(liveU[d.name]||0);if(!d.paused)tot+=eq;const pl=(eq/START-1)*100;
@@ -136,41 +193,72 @@ function render(){if(!D)return;const deskOf=x=>x.desk||x.name,opens=(D.open||[])
   <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">Cycle</div></div></div>
   ${d.paused?'<div class="sub" style="margin-top:10px">Paused for run 2. No trades.</div>':chart(full)}</div>`}).join("");
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
+ $("htitle").innerHTML=`Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run ${D.run?.n||2}</span>`;
  $("totsub").textContent=`Majors paper equity (from $10K) · Run ${D.run?.n||2} started ${D.run?.start||""} WIB`;
- $("upd").textContent="Data updated "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
- // open trades (top of page)
- const sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
- $("otn").textContent=opens.length;
- $("open").innerHTML=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
-  const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
-  const tag=slTag(o);
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
-  <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
-  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
-  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}
-  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint]!=null?' <span class="up">●</span>':''}</div>
-  <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
-  ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
-  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
-  <div><span>Margin</span>${money(sz)}</div>
-  <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
-  <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
- $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(tu)}">${money(tu)}</b> <span class="${cls(tu)}">${pct(tm?tu/tm*100:0)}</span> on ${money(tm)} margin`:"";
- // closed
- const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${money(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet in run 2.</div>';
- // decisions
+ $("ottitle").innerHTML=`Open Trades <span class="badge" id="otn">0</span>`;
+ const cards=openCards(opens,false);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
+ $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(cards.tu)}">${money(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> on ${money(cards.tm)} margin`:"";
+ $("cltitle").textContent="Recent closed trades";
+ const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=closedTable(cl,false);
+ $("righttitle").textContent="Recent decisions";$("dtabs").style.display="";
  const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
  $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
- $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`}
+ $("desktitle").textContent="Desks";
+ $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`
+}
+function renderReal(){
+ const R=D.real||{},M=R.mirror||{},W=R.wallet||{};
+ const start=M.start||37;
+ const opens=[...(M.opens||[])];
+ const liveAdj=0;
+ opens.forEach(o=>{const p=LIVE[o.sym||o.mint];o._p=p??o.p;o._u=upnl(o,p??o.p);});
+ const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
+ const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
+ const pl=(eq/start-1)*100;
+ $("htitle").innerHTML=`Real $37 <span class="badge b-real">SIMULATED MIRROR</span> <span class="badge b-wallet">LIVE WALLET</span>`;
+ $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
+ $("totsub").textContent=`Simulated $37 book copying every Majors paper trade at 0.37% size. Started ${M.started||""}. Not the live wallet.`;
+ $("banner").hidden=false;
+ $("banner").innerHTML=`<b>Two things on this page.</b> The numbers above and the open trades below are a <b>simulated $37 paper mirror</b> — they copy the $10K desk, same coin, side, leverage and SL/TP, sized × 37/10,000. ${esc(M.init_note||"Started from then-open positions, no closed-trade backfill.")} The <b>Live wallet</b> section is your actual Hyperliquid account, read-only.`;
+ $("ottitle").innerHTML=`Mirror open trades <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULATED</span>`;
+ const cards=openCards(opens,true);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
+ $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> on ${moneyR(cards.tm)} margin · scaled from the $10K desk`:"";
+ $("wallet").hidden=false;$("wallet").innerHTML=walletHtml(W);
+ $("desktitle").innerHTML=`$37 mirror book <span class="badge b-real">SIMULATED</span>`;
+ $("desks").innerHTML=`<div class="card"><h2>Real $37 mirror <span class="badge b-paper">PAPER ONLY</span></h2>
+  <div class="eq">${moneyR(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
+  <div class="kpis"><div class="kpi"><div class="v">${M.win==null?"—":M.win+"%"}</div><div class="l">Win rate</div></div>
+  <div class="kpi"><div class="v">${M.open??opens.length}</div><div class="l">Open</div></div>
+  <div class="kpi"><div class="v">${M.closed??0}</div><div class="l">Closed</div></div>
+  <div class="kpi"><div class="v ${cls(M.real)}">${moneyR(M.real)}</div><div class="l">Realized</div></div>
+  <div class="kpi"><div class="v ${cls(unrealLive)}">${moneyR(unrealLive)}</div><div class="l">Unrealized</div></div>
+  <div class="kpi"><div class="v">${M.mdd==null?"—":pct(M.mdd)}</div><div class="l">Max DD</div></div></div>
+  ${chart(M.pts||[],start)}
+  <div class="sub" style="margin-top:8px">Cash ${moneyR(M.cash)} · margin ${moneyR(M.margin)} · scale ${esc(M.scale_label||"× 37/10,000")}. Win rate starts empty until a mirrored trade fully closes.</div></div>`;
+ $("cltitle").textContent="Mirror closed trades (from start only)";
+ $("closed").innerHTML=closedTable(M.closes||[],true);
+ $("righttitle").textContent="How this book works";$("dtabs").style.display="none";$("dtabs").innerHTML="";
+ $("dec").innerHTML=`<div class="it"><div class="r">The $37 book opens and closes in sync with the $10K Majors desk each cycle. New paper entries are copied automatically; closes and partial TPs after ${esc(M.started||"start")} are recorded here at 0.37% size. Older $10K results are not backfilled, so this win rate is this book's own record. The live wallet is separate — you entered LINK, XRP and TRX shorts yourself; those are tagged when they match a desk position. A LIT long on the wallet is yours only and is not on the paper desk.</div></div>`;
+ $("foot").innerHTML=`The $37 book is simulated paper, not live orders. The wallet section is a public Hyperliquid read. No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
+}
+function render(){if(!D)return;
+ const real=VIEW==="real";
+ $("v-paper").classList.toggle("on",!real);$("v-real").classList.toggle("on",real);
+ $("banner").hidden=!real;$("wallet").hidden=!real;
+ if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh.";return}renderReal()}
+ else renderPaper();
+ $("upd").textContent="Data updated "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
+}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();live()}catch(e){$("totsub").textContent="Could not load data.json"}}
 async function j(u){const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(u,{signal:c.signal,cache:"no-store"});if(!r.ok)throw 0;return r.json()}
-async function live(){if(!D)return;const os=D.open||[],mints=[...new Set(os.filter(o=>o.mint&&!o.sym).map(o=>o.mint))],syms=[...new Set(os.filter(o=>o.sym).map(o=>o.sym))];let n=0;
+async function live(){if(!D)return;const os=[...(D.open||[]),...((D.real&&D.real.mirror&&D.real.mirror.opens)||[])],mints=[...new Set(os.filter(o=>o.mint&&!o.sym).map(o=>o.mint))],syms=[...new Set(os.filter(o=>o.sym).map(o=>o.sym))];let n=0;
  for(let i=0;i<mints.length;i+=30){try{const a=await j("https://api.dexscreener.com/tokens/v1/solana/"+mints.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){LIVE[m]=best[m].p;n++}}catch(e){}}
  try{const a=await j("https://fapi.binance.com/fapi/v1/premiumIndex");(a||[]).forEach(x=>{if(syms.includes(x.symbol)){LIVE[x.symbol]=+x.markPrice;n++}})}catch(e){}
  $("livest").textContent=n?`Live marks: ${n} prices · ${new Date().toLocaleTimeString()}`:"Live marks unavailable, showing build prices";render()}
+$("v-paper").addEventListener("click",()=>setView("paper"));
+$("v-real").addEventListener("click",()=>setView("real"));
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
