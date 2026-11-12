@@ -188,8 +188,21 @@ function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort(
  return{html,tu,tm}}
 function closedTable(cl,fine){const $=fine?moneyR:money;
  return cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet.</div>'}
+
+function deskOpens(){const deskOf=x=>x.desk||x.name;return ((D&&D.open)||[]).filter(o=>deskOf(o)===FOCUS)}
+function walletHeld(w){const src=(w&&Array.isArray(w.positions)?w:null)||((D&&D.real)||{}).wallet||{};const set=new Set();
+ (src.positions||[]).forEach(p=>{if(p&&p.a)set.add((p.a||"").toUpperCase()+"|"+(p.side||""))});return set}
+function deskNotIn(w){const held=walletHeld(w);return deskOpens().filter(o=>!held.has((o.a||"").toUpperCase()+"|"+(o.side||"")))}
+function missingDeskHtml(w){const miss=deskNotIn(w).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+ const head=`<div class="oth" style="margin-top:16px"><h3>Desk trades you're not in <span class="badge">${miss.length}</span></h3><div class="sub">Open Majors paper trades with no matching coin+side on the live wallet</div></div>`;
+ if(!miss.length)return head+'<div class="empty">You\'re in all desk trades</div>';
+ const body=miss.map(o=>{const p=livePx(o)??o.p,u=upnl(o,p),sz=o.inst==="perp"?o.m:o.z,pc=sz?u/sz*100:null,short=o.side==="short";
+  const plan=[o.th?o.th.charAt(0).toUpperCase()+o.th.slice(1):"",o.tl||""].filter(Boolean).join(" · ");
+  const live=LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null;
+  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(p)}${live?' <span class="up">●</span>':""}</td><td class="${cls(pc)}">${pct(pc)}</td><td>${px(o.s)}</td><td>${px(o.tp1)}</td><td>${px(o.tp2)}</td><td>${px(o.tp3)}</td><td class="mu when">${esc(plan||"—")}</td><td class="mu when">${esc(o.entered||"—")}${o.ago?`<div>${esc(o.ago)}</div>`:""}</td></tr>`}).join("");
+ return head+`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>Desk uPnL %</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th><th>Plan</th><th>Entered</th></tr>${body}</table></div>`}
 function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
- if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`;
+ if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
  const pos=(w.positions||[]),fills=w.fills||[];
  const rows=pos.length?`<div class="tw" style="margin-top:10px"><table><tr><th>Coin</th><th>Side</th><th>Size</th><th>Entry</th><th>Mark</th><th>uPnL</th><th>Lev</th><th>Liq</th><th>Desk</th></tr>`+pos.map(p=>{
   const short=p.side==="short";
@@ -208,7 +221,7 @@ function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div c
   ${rows}
   <div class="sub" style="margin:12px 0 4px">Recent fills</div>
   ${fillTbl}
- </div>`}
+ </div>`+missingDeskHtml(w)}
 function renderPaper(){
  const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
  const liveU={};opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
