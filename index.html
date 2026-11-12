@@ -98,6 +98,10 @@ footer{margin:28px 0 10px;color:var(--mu);font-size:12px}
 .lt .lr.x-sl span:first-child{color:var(--dn);font-weight:700}
 .lt .lr.x-tp span:first-child{color:var(--up);font-weight:700}
 tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
+
+.subh{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px;font-weight:600}
+.subh:first-of-type{margin-top:2px}
+.card + .card{margin-top:12px}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
@@ -193,14 +197,33 @@ function deskOpens(){const deskOf=x=>x.desk||x.name;return ((D&&D.open)||[]).fil
 function walletHeld(w){const src=(w&&Array.isArray(w.positions)?w:null)||((D&&D.real)||{}).wallet||{};const set=new Set();
  (src.positions||[]).forEach(p=>{if(p&&p.a)set.add((p.a||"").toUpperCase()+"|"+(p.side||""))});return set}
 function deskNotIn(w){const held=walletHeld(w);return deskOpens().filter(o=>!held.has((o.a||"").toUpperCase()+"|"+(o.side||"")))}
+
+function tpProgress(o,p){const e=+o.e,t1=+o.tp1;if(p==null||isNaN(p)||o.e==null||o.tp1==null||isNaN(t1)||e===t1)return null;return o.side==="short"?(e-p)/(e-t1):(p-e)/(t1-e)}
+function rrToTp1(o,p){if(p==null||o.tp1==null||o.s==null)return null;const short=o.side==="short",reward=short?p-o.tp1:o.tp1-p,risk=short?o.s-p:p-o.s;return risk>0?reward/risk:null}
+function fmtRR(r){return r==null||!isFinite(r)?"—":(Math.round(r*100)/100).toFixed(2).replace(/\.00$/,"")+"R"}
+function enterability(o){const p=livePx(o)??o.p,reasons=[],short=o.side==="short";
+ if(String(o.tl||"").toLowerCase()==="expired")reasons.push("plan expired");
+ if(o.s!=null&&p!=null&&crossedSide(o.side,"sl",o.s,p))reasons.push("SL crossed");
+ if(o.tp1_hit)reasons.push("TP1 hit");
+ if(o.trail)reasons.push("trailing");
+ const prog=tpProgress(o,p);
+ if(p!=null&&o.e!=null&&o.tp1!=null){const e=+o.e,t1=+o.tp1,thresh=short?e-0.25*(e-t1):e+0.25*(t1-e);if(short?p<thresh:p>thresh)reasons.push(prog!=null?("already "+Math.round(prog*100)+"% to TP1"):"already past 25% to TP1")}
+ else if(o.tp1==null)reasons.push("no TP1");
+ if(p==null||isNaN(p))reasons.push("no live mark");
+ return{enterable:!reasons.length,reason:reasons[0]||"",reasons,p,prog}}
 function missingDeskHtml(w){const miss=deskNotIn(w).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
- const head=`<div class="oth" style="margin-top:16px"><h3>Desk trades you're not in <span class="badge">${miss.length}</span></h3><div class="sub">Open Majors paper trades with no matching coin+side on the live wallet</div></div>`;
- if(!miss.length)return head+'<div class="empty">You\'re in all desk trades</div>';
- const body=miss.map(o=>{const p=livePx(o)??o.p,u=upnl(o,p),sz=o.inst==="perp"?o.m:o.z,pc=sz?u/sz*100:null,short=o.side==="short";
-  const plan=[o.th?o.th.charAt(0).toUpperCase()+o.th.slice(1):"",o.tl||""].filter(Boolean).join(" · ");
-  const live=LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null;
-  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(p)}${live?' <span class="up">●</span>':""}</td><td class="${cls(pc)}">${pct(pc)}</td><td>${px(o.s)}</td><td>${px(o.tp1)}</td><td>${px(o.tp2)}</td><td>${px(o.tp3)}</td><td class="mu when">${esc(plan||"—")}</td><td class="mu when">${esc(o.entered||"—")}${o.ago?`<div>${esc(o.ago)}</div>`:""}</td></tr>`}).join("");
- return head+`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>Desk uPnL %</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th><th>Plan</th><th>Entered</th></tr>${body}</table></div>`}
+ const note=`<div class="sub" style="margin:0 0 10px">Open Majors paper trades with no matching coin+side on the live wallet. This is the desk's signal, not advice — you place any trades yourself.</div>`;
+ const head=`<div class="card"><h2>Desk trades you're not in <span class="badge">${miss.length}</span></h2>${note}`;
+ if(!miss.length)return head+`<div class="empty">You're in all desk trades</div></div>`;
+ const rows=miss.map(o=>Object.assign({o},enterability(o)));
+ const yes=rows.filter(r=>r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
+ const no=rows.filter(r=>!r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
+ const liveDot=o=>LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':"";
+ const yesTbl=yes.length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>From entry</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th><th>R:R</th></tr>`+yes.map(r=>{const o=r.o,short=o.side==="short",dist=o.e?(r.p-o.e)/o.e*100:null;
+  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="${cls(dist)}">${pct(dist)}</td><td>${px(o.s)}</td><td>${px(o.tp1)}</td><td>${px(o.tp2)}</td><td>${px(o.tp3)}</td><td>${fmtRR(rrToTp1(o,r.p))}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">None still enterable now.</div>';
+ const noTbl=no.length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>Why</th></tr>`+no.map(r=>{const o=r.o,short=o.side==="short";
+  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="mu when">${esc(r.reason)}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">None too late.</div>';
+ return head+`<div class="subh">Still enterable now <span class="badge b-live">${yes.length}</span></div>${yesTbl}<div class="subh">Too late / skip <span class="badge">${no.length}</span></div>${noTbl}</div>`}
 function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
  if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
  const pos=(w.positions||[]),fills=w.fills||[];
@@ -219,9 +242,12 @@ function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div c
   <div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.address)} ↗</a>`:esc(w.address||shortAddr)}</div>
   <div class="sub" style="margin-top:6px">Public lookup only. No keys, no signing, no orders from this page.</div>
   ${rows}
-  <div class="sub" style="margin:12px 0 4px">Recent fills</div>
+ </div>
+ ${missingDeskHtml(w)}
+ <div class="card">
+  <h2>Recent fills</h2>
   ${fillTbl}
- </div>`+missingDeskHtml(w)}
+ </div>`}
 function renderPaper(){
  const deskOf=x=>x.desk||x.name,opens=(D.open||[]).filter(o=>deskOf(o)===FOCUS);
  const liveU={};opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p);liveU[o.desk]=(liveU[o.desk]||0)+(o._u-(o.u||0))});
