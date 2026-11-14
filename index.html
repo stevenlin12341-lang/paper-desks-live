@@ -102,6 +102,21 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .subh{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px;font-weight:600}
 .subh:first-of-type{margin-top:2px}
 .card + .card{margin-top:12px}
+.wgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:10px}
+.wpos{background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:10px 12px;border-left:3px solid var(--line)}
+.wpos.pos{border-left-color:var(--up)}.wpos.neg{border-left-color:var(--dn)}
+.wpos .t{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.wpos .t b{font-size:15px}
+.wpos .pl{font-size:16px;font-weight:700;margin:0}
+.wpos .g{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px;margin-top:6px}
+.wpos .g span{color:var(--mu)}.wpos .g div{display:flex;justify-content:space-between;gap:8px}
+.wflags{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 4px}
+.wflags .xflag{margin:0}
+.xflag.diff{background:#3a2a10;color:#fde68a}
+.wlt .lh,.wlt .lr{grid-template-columns:52px minmax(64px,1fr) minmax(64px,1fr) 62px}
+.wpos .al{margin-top:6px}
+.wpos .al div span:last-child{white-space:normal;word-break:break-word}
+.wpos .badges{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;margin-left:2px}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
@@ -224,13 +239,35 @@ function missingDeskHtml(w){const miss=deskNotIn(w).slice().sort((a,b)=>(b.ts||0
  const noTbl=no.length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>Why</th></tr>`+no.map(r=>{const o=r.o,short=o.side==="short";
   return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="mu when">${esc(r.reason)}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">None too late.</div>';
  return head+`<div class="subh">Still enterable now <span class="badge b-live">${yes.length}</span></div>${yesTbl}<div class="subh">Too late / skip <span class="badge">${no.length}</span></div>${noTbl}</div>`}
+function deskOpenFor(p){const a=(p.a||"").toUpperCase(),side=p.side||"long";return ((D&&D.open)||[]).find(o=>(o.a||"").toUpperCase()===a&&(o.side||"long")===side)||null}
+function nearPx(a,b){if(a==null||b==null||isNaN(+a)||isNaN(+b))return false;a=+a;b=+b;const s=Math.max(Math.abs(a),Math.abs(b),1e-12);return Math.abs(a-b)<=Math.max(s*0.001,1e-8)}
+function orderList(p){if(p.orders&&p.orders.length)return p.orders;const out=[];if(p.sl!=null)out.push({kind:"sl",px:+p.sl,typ:"Stop"});if(p.tp!=null)out.push({kind:"tp",px:+p.tp,typ:"Take Profit"});return out}
+function takeYours(list,used,level,fallbackOne){const i=list.findIndex((o,idx)=>!used.has(idx)&&level!=null&&nearPx(o.px,level));if(i>=0){used.add(i);return list[i].px}if(fallbackOne&&list.length===1&&!used.has(0)){used.add(0);return list[0].px}return null}
+function lvStatus(o,kind,price,hit,mark){if(price==null)return{lab:"—",cls:"mu"};if(hit)return{lab:"✓ hit",cls:"hit"};if(mark!=null&&crossedSide(o.side,kind,price,mark))return{lab:kind==="sl"?"crossed":"passed",cls:kind==="sl"?"dn":"tag"};return{lab:"–",cls:"mu"}}
+function walletPosHtml(p){const desk=deskOpenFor(p),short=p.side==="short",ords=orderList(p),sls=ords.filter(o=>o.kind==="sl"),tps=ords.filter(o=>o.kind==="tp"),mark=p.p,flags=[];
+ if(!sls.length)flags.push(`<span class="xflag sl">No SL set</span>`);
+ if(!tps.length)flags.push(`<span class="xflag sl">No TP set</span>`);
+ if(desk&&desk.s!=null&&sls.length&&sls.every(s=>!nearPx(s.px,desk.s)))flags.push(`<span class="xflag diff">SL differs from desk (yours ${sls.map(s=>px(s.px)).join(", ")} · desk ${px(desk.s)})</span>`);
+ const badge=p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`;
+ const trail=desk&&desk.trail?`<span class="badge">trailing</span>`:"";
+ const be=desk&&slTag(desk)==="BE"?`<span class="badge">BE</span>`:"";
+ const row=(k,deskPx,yours,st,tag)=>`<div class="lr"><span>${esc(k)}${tag?` <span class="tag">${esc(tag)}</span>`:""}</span><span>${deskPx!=null?px(deskPx):"—"}</span><span>${yours!=null?px(yours):"—"}</span><span class="${st.cls}">${st.lab}</span></div>`;
+ let levels="";
+ if(desk){const usedSl=new Set(),usedTp=new Set(),rows=[];
+  rows.push(row("SL",desk.s,takeYours(sls,usedSl,desk.s,true),lvStatus(desk,"sl",desk.s,false,mark),slTag(desk)));
+  [["TP1","tp1","tp1_hit"],["TP2","tp2","tp2_hit"],["TP3","tp3","tp3_hit"]].forEach(([lab,k,hk])=>{const price=desk[k];rows.push(row(lab,price,takeYours(tps,usedTp,price,false),lvStatus(desk,"tp",price,!!desk[hk],mark),""))});
+  sls.forEach((o,i)=>{if(!usedSl.has(i))rows.push(row("Your SL",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
+  tps.forEach((o,i)=>{if(!usedTp.has(i))rows.push(row("Your TP",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
+  levels=`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Yours</span><span></span></div>${rows.join("")}</div><div class="lnote">Desk levels from the last hourly cycle. Yours are live Hyperliquid TP/SL (read-only). Passed = live mark already through that target; the cycle still decides the exit.</div>`}
+ else if(ords.length){levels=`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Yours</span><span></span></div>`+ords.map(o=>`<div class="lr"><span>${o.kind==="sl"?"SL":"TP"}</span><span>—</span><span>${px(o.px)}</span><span class="mu">${esc(o.typ||"")}</span></div>`).join("")+`</div>`}
+ return `<div class="wpos ${(p.u||0)>0?"pos":(p.u||0)<0?"neg":""}" data-a="${esc(p.a)}"><div class="t"><div><b>${esc(p.a)}</b> <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${p.lev!=null?" "+p.lev+"x":""}</span> <span class="badges">${badge}${trail}${be}</span></div><div class="pl ${cls(p.u)}">${moneyR(p.u)}</div></div>
+  <div class="g"><div><span>Size</span>${p.qty??"—"}</div><div><span>Entry</span>${px(p.e)}</div><div><span>Mark</span>${px(p.p)}${p._live?' <span class="up">●</span>':''}</div><div><span>Liq</span>${px(p.liq)}</div></div>
+  ${flags.length?`<div class="wflags">${flags.join("")}</div>`:""}${levels}${desk?activity(desk):""}</div>`}
+
 function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
  if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
  const pos=(w.positions||[]),fills=w.fills||[];
- const rows=pos.length?`<div class="tw" style="margin-top:10px"><table><tr><th>Coin</th><th>Side</th><th>Size</th><th>Entry</th><th>Mark</th><th>uPnL</th><th>Lev</th><th>Liq</th><th>Desk</th></tr>`+pos.map(p=>{
-  const short=p.side==="short";
-  const xc=crossFlags({side:p.side,s:p.sl,tp1:p.tp,_p:p.p},p.p);
-  return`<tr class="${xc.sl?"x-sl":xc.tp?"x-tp":""}" data-a="${esc(p.a)}"><td><b>${esc(p.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${p.qty??"—"}</td><td>${px(p.e)}</td><td>${px(p.p)}${p._live?' <span class="up">●</span>':''}</td><td class="${cls(p.u)}">${moneyR(p.u)}</td><td>${p.lev!=null?p.lev+"x":"—"}</td><td>${px(p.liq)}</td><td>${p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">No open positions on the wallet.</div>';
+ const rows=pos.length?`<div class="sub" style="margin-top:10px">Desk-matched coins show the paper SL/TP, trailing and activity. Your TP/SL are read live from Hyperliquid, read-only.</div><div class="wgrid">${pos.map(walletPosHtml).join("")}</div>`:'<div class="empty">No open positions on the wallet.</div>';
  const fillTbl=fills.length?`<div class="tw" style="margin-top:8px"><table><tr><th>Time</th><th>Coin</th><th>Action</th><th>Price</th><th>Size</th><th>Closed PnL</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${esc(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`:'<div class="empty">No recent fills.</div>';
  const shortAddr=w.address?w.address.slice(0,6)+"…"+w.address.slice(-4):"";
  const liveNote=w.live?"Live Hyperliquid read":(w.asof||"");
@@ -356,9 +393,11 @@ async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
 function midPx(row,mids){if(!row)return row&&row.px;const c=(row.coin||"").toUpperCase();if(c==="USDC"||c==="USDH"||c==="USDT")return 1;
  const key=row.mid_key;if(key&&mids&&mids[key]!=null){const p=+mids[key];return row.mid_inv&&p?1/p:p}
  if(c==="USOL"&&mids&&mids.SOL!=null)return +mids.SOL;if(mids&&mids[row.coin]!=null)return +mids[row.coin];return row.px}
-function ordersByCoin(orders){const out={};(orders||[]).forEach(o=>{const coin=o.coin;if(!coin)return;const rec=out[coin]||(out[coin]={sl:null,tp:null});
-  const typ=(o.orderType||"").toLowerCase();let trig=o.triggerPx||o.limitPx,pxv=trig!=null?+trig:null;
-  if(String(typ).includes("stop"))rec.sl=pxv;else if(String(typ).includes("take profit")||String(typ).startsWith("tp"))rec.tp=pxv});return out}
+function ordersByCoin(orders){const out={};(orders||[]).forEach(o=>{const coin=o.coin;if(!coin)return;
+  const typ=o.orderType||"",typL=typ.toLowerCase(),trig=o.triggerPx||o.limitPx,pxv=trig!=null?+trig:null;
+  let kind="";if(typL.includes("stop"))kind="sl";else if(typL.includes("take profit")||typL.startsWith("tp"))kind="tp";
+  if(!kind||pxv==null||isNaN(pxv))return;const rec=out[coin]||(out[coin]={sl:null,tp:null,orders:[]});
+  if(kind==="sl")rec.sl=pxv;else rec.tp=pxv;rec.orders.push({kind,typ,px:pxv})});return out}
 function tagMatches(positions){const desk={};((D&&D.open)||[]).forEach(o=>{const a=(o.a||"").toUpperCase();if(a)desk[a]=o.side||"long"});
  (positions||[]).forEach(p=>{const a=(p.a||"").toUpperCase();if(a in desk){if(desk[a]===p.side){p.match=true;p.match_note="Matches desk "+p.side}else{p.match=false;p.match_note="Desk is "+desk[a]+", wallet is "+p.side}}else{p.match=false;p.match_note="Not on the paper desk"}});return positions}
 async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
@@ -375,7 +414,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
    const mark=LIVE[p.coin]??LIVE[(p.coin||"")+"USDT"]??(mids[p.coin]!=null?+mids[p.coin]:(qty?ntl/qty:null));
    const uu=mark!=null&&entry?((side==="short"?-1:1)*qty*(mark-entry)):u;unreal+=uu;
    const ords=by[p.coin]||{};
-   return{a:p.coin||"?",side,qty,e:entry,p:mark,u:uu,lev:(p.leverage||{}).value,liq:p.liquidationPx!=null&&p.liquidationPx!==""?+p.liquidationPx:null,m:+(p.marginUsed||0),n:ntl,sl:ords.sl,tp:ords.tp,_live:mark!=null}}).filter(Boolean);
+   return{a:p.coin||"?",side,qty,e:entry,p:mark,u:uu,lev:(p.leverage||{}).value,liq:p.liquidationPx!=null&&p.liquidationPx!==""?+p.liquidationPx:null,m:+(p.marginUsed||0),n:ntl,sl:ords.sl,tp:ords.tp,orders:ords.orders||[],_live:mark!=null}}).filter(Boolean);
   tagMatches(positions);
   const equity=perps_eq+spot_total-hold_adj;
   WALLET_LIVE={ok:true,live:true,venue:"Hyperliquid",address:user,url:prev.url||("https://app.hyperliquid.xyz/explorer/address/"+user),eq:equity,perps_eq,spot_eq:spot_total-hold_adj,spot_usdc:usdc_total,spot_usdc_free:usdc_total-usdc_hold,portfolio_eq:prev.portfolio_eq,withdrawable,margin:margin_used,notional,unreal,asof:"Live",spot:spot_rows,positions,fills:prev.fills||[]};
