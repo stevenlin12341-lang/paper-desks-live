@@ -117,6 +117,10 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .wpos .al{margin-top:6px}
 .wpos .al div span:last-child{white-space:normal;word-break:break-word}
 .wpos .badges{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;margin-left:2px}
+.lrn{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.lrn .it{margin-top:6px}.lrn .chip{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--mu);margin:2px 4px 0 0}
+.lrn .cz{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line)}.lrn .cz:last-child{border-bottom:0}
+.lrn ul{margin:6px 0 0;padding-left:18px;font-size:12px;color:var(--mu)}.lrn .ok{color:var(--up)}.lrn .bl{color:var(--wa)}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
@@ -130,6 +134,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 <section id="banner" class="note" hidden></section>
 <section id="ot"><div class="oth"><h3 id="ottitle">Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
+<section id="learnsec"><h3>Loss review · what the desk learned</h3><div id="learn"></div></section>
 <section id="desksec"><h3 id="desktitle">Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two">
  <section><h3 id="cltitle">Recent closed trades</h3><div class="tw" id="closed"></div></section>
@@ -311,10 +316,27 @@ function renderPaper(){
  const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
+ $("learn").innerHTML=learnHtml(D.learn);
  $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
  $("desktitle").textContent="Desks";
  $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`
 }
+function learnHtml(L){
+ if(!L)return'<div class="card"><div class="sub">Loss review appears after the next data refresh.</div></div>';
+ if(L.error)return`<div class="card"><div class="sub">${esc(L.error)}</div></div>`;
+ const b=L.bounce,bt=b?(b.block_short?`<span class="bl">New shorts paused</span> — BTC recovered ${b.rec_up}pp toward its 4h EMA50 (now ${b.dist}%)`:b.block_long?`<span class="bl">New longs paused</span> — BTC fell ${b.rec_dn}pp off its 48h high`:`<span class="ok">Clear</span> — BTC ${b.dist}% vs 4h EMA50, recovered ${b.rec_up}pp`):"Not checked yet";
+ const cz=(L.causes||[]).map(c=>`<div class="cz"><span>${esc(c.c)}</span><span><span class="mu">${c.n}×</span> <b class="${cls(c.u)}">${money(c.u)}</b></span></div>`).join("");
+ const adj=(L.adj||[]).map(a=>`<div class="cz"><span>${esc(a.k)}<div class="sub">${esc(a.why||"")}</div></span><b style="text-align:right">${esc(a.v)}</b></div>`).join("")||'<div class="sub">No score nudges yet (needs 8+ trades per group).</div>';
+ const cd=(L.cooldowns||[]).length?(L.cooldowns||[]).map(c=>`<span class="chip">${esc(c.a)} ${esc(c.side)} until ${esc(c.until)}</span>`).join(""):'<span class="sub">None</span>';
+ const lev=L.lev_cap?`<div class="sub" style="margin-top:6px">Leverage cap <b style="color:var(--wa)">${L.lev_cap}x</b>: ${esc((L.lev_why||[]).join("; "))}</div>`:'<div class="sub" style="margin-top:6px">No leverage cap from losses right now.</div>';
+ const ls=(L.losses||[]).map(x=>`<div class="it"><div class="h"><b>${esc(x.a)}</b><span class="sd ${x.side==="short"?"S":"L"}">${x.side==="short"?"SHORT":"LONG"}</span><span class="badge">${x.lev}x</span><b class="${cls(x.u)}">${money(x.u)}</b>${x.R!=null?`<span class="sub">${x.R}R</span>`:""}<span class="sub">${esc(x.t||"")}${x.h!=null?" · held "+x.h+"h":""}</span></div><div class="r"><b style="color:var(--tx)">${esc(x.c)}</b> · ${esc(x.x)}${x.blk?' · <span class="bl">bounce filter would block</span>':""}</div>${(x.tags||[]).length?`<div>${x.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>`:""}<div class="r">${esc(x.l||"")}</div></div>`).join("")||'<div class="it mu">No losing trades reviewed yet.</div>';
+ return`<div class="lrn"><div class="card"><h2>What the desk learned <span class="badge">${L.n} losses reviewed</span></h2>
+ <div class="sub">Bounce filter: ${bt}</div>${lev}
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Active adjustments</div>${adj}</div>
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Cooldowns after a stop-out (12h)</div>${cd}</div>
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">All losses by cause (${money(L.u)})</div>${cz}</div>
+ <ul>${(L.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
+ <div class="card"><h2>Last ${Math.min(10,(L.losses||[]).length)} losses</h2><div class="feed">${ls}</div></div></div>`}
 function renderReal(){
  const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
  const start=M.start||37;
@@ -353,7 +375,7 @@ function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
  $("v-paper").classList.toggle("on",!real);$("v-real").classList.toggle("on",real);
- $("banner").hidden=!real;$("wallet").hidden=!real;
+ $("banner").hidden=!real;$("wallet").hidden=!real;$("learnsec").hidden=real;
  if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
  else renderPaper();
  $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
