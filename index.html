@@ -134,6 +134,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 <section id="banner" class="note" hidden></section>
 <section id="ot"><div class="oth"><h3 id="ottitle">Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
+<section id="shadowsec"><h3>Forward test · shadow strategy vs live desk</h3><div id="shadow"></div></section>
 <section id="learnsec"><h3>Loss review · what the desk learned</h3><div id="learn"></div></section>
 <section id="desksec"><h3 id="desktitle">Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two">
@@ -316,6 +317,7 @@ function renderPaper(){
  const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
+ $("shadow").innerHTML=shadowHtml(D.shadow);
  $("learn").innerHTML=learnHtml(D.learn);
  $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
  $("desktitle").textContent="Desks";
@@ -337,6 +339,20 @@ function learnHtml(L){
  <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">All losses by cause (${money(L.u)})</div>${cz}</div>
  <ul>${(L.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
  <div class="card"><h2>Last ${Math.min(10,(L.losses||[]).length)} losses</h2><div class="feed">${ls}</div></div></div>`}
+function shadowHtml(S){
+ if(!S)return'<div class="card mu">Shadow forward test starts at the next hourly cycle.</div>';
+ const pct=(a,b)=>b?((a/b-1)*100).toFixed(2)+"%":"–",cv=S.curve||[];
+ const sr=pct(S.eq,S.start),lr=(S.live&&S.live0)?pct(S.live,S.live0):"–";
+ let svg="";if(cv.length>1){const ys=[];cv.forEach(c=>{ys.push(c.eq/S.start);if(c.live&&S.live0)ys.push(c.live/S.live0)});
+  const mn=Math.min(...ys),mx=Math.max(...ys),r=(mx-mn)||0.01,X=i=>(i/(cv.length-1)*300).toFixed(1),Y=v=>(70-(v-mn)/r*64).toFixed(1);
+  const a=cv.map((c,i)=>`${X(i)},${Y(c.eq/S.start)}`).join(" "),b=cv.filter(c=>c.live).length>1?cv.map((c,i)=>c.live?`${X(i)},${Y(c.live/S.live0)}`:"").filter(Boolean).join(" "):"";
+  svg=`<svg viewBox="0 0 300 74" style="width:100%;height:90px"><polyline fill="none" stroke="var(--up)" stroke-width="2" points="${a}"/>${b?`<polyline fill="none" stroke="var(--mu)" stroke-width="1.5" stroke-dasharray="4 3" points="${b}"/>`:""}</svg>`}
+ const op=(S.open||[]).map(o=>`<span class="chip">${esc(o.c)} ${o.side.toUpperCase()} @ ${(+o.entry).toPrecision(5)} · stop ${(+o.stop).toPrecision(5)}</span>`).join("")||'<span class="mu">no open positions</span>';
+ const cl=(S.closed||[]).map(x=>`<div class="cz"><span>${esc(x.coin)} ${esc(x.side)} · ${esc(x.closed||"")}</span><b class="${x.pnl_usd>=0?"up":"dn"}">${money(x.pnl_usd)}</b></div>`).join("");
+ return`<div class="lrn"><div class="card"><h2>${esc(S.name)} <span class="badge">since ${esc(S.started||"")}</span></h2>
+ <div class="sub">Shadow (green) ${sr} · Live desk (dashed) ${lr} over the same period · both PAPER, $10K-style start</div>${svg}
+ <div style="margin-top:6px">${op}</div>${cl?`<div style="margin-top:8px">${cl}</div>`:""}
+ <ul><li>Daily 30-day breakout with the coin's trend, 2×ATR stop, 15-day channel exit, 2% risk</li><li>${esc(S.bt)}</li><li>Runs inside the hourly cycle; does not trade for the live desk</li></ul></div></div>`}
 function renderReal(){
  const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
  const start=M.start||37;
@@ -375,7 +391,7 @@ function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
  $("v-paper").classList.toggle("on",!real);$("v-real").classList.toggle("on",real);
- $("banner").hidden=!real;$("wallet").hidden=!real;$("learnsec").hidden=real;
+ $("banner").hidden=!real;$("wallet").hidden=!real;$("learnsec").hidden=real;$("shadowsec").hidden=real;
  if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
  else renderPaper();
  $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
