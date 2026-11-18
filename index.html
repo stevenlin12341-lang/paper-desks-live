@@ -121,10 +121,18 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .lrn .it{margin-top:6px}.lrn .chip{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--mu);margin:2px 4px 0 0}
 .lrn .cz{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line)}.lrn .cz:last-child{border-bottom:0}
 .lrn ul{margin:6px 0 0;padding-left:18px;font-size:12px;color:var(--mu)}.lrn .ok{color:var(--up)}.lrn .bl{color:var(--wa)}
+.tw2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.wl{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.wc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px}
+.wc .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.wc .bar{position:relative;height:6px;background:var(--line);border-radius:3px;margin:6px 0}
+.wc .bar i{position:absolute;top:-3px;width:3px;height:12px;background:var(--tx);border-radius:2px}
+.trk{display:flex;justify-content:space-between;color:var(--mu)}.tnote{font-size:12px;color:var(--wa);margin-top:6px}
+[hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
  <button type="button" id="v-real">Real $37</button>
+ <button type="button" id="v-trend">Trend (forward test)</button>
 </nav>
 <header>
  <div><h1 id="htitle">Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
@@ -134,10 +142,11 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 <section id="banner" class="note" hidden></section>
 <section id="ot"><div class="oth"><h3 id="ottitle">Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
-<section id="shadowsec"><h3>Forward test · shadow strategy vs live desk</h3><div id="shadow"></div></section>
+<section id="shadowsec"><div id="shadow"></div></section>
+<section id="trendsec" hidden></section>
 <section id="learnsec"><h3>Loss review · what the desk learned</h3><div id="learn"></div></section>
 <section id="desksec"><h3 id="desktitle">Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
-<div class="two">
+<div class="two" id="twosec">
  <section><h3 id="cltitle">Recent closed trades</h3><div class="tw" id="closed"></div></section>
  <section id="rightsec"><h3 id="righttitle">Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
 </div>
@@ -150,7 +159,7 @@ const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1
 const WALLET_FALLBACK="0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b";
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{return localStorage.getItem("deskView")==="real"?"real":"paper"}catch(e){return"paper"}})();
+let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="trend"?v:"paper"}catch(e){return"paper"}})();
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const moneyR=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
 const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+n.toFixed(2)+"%";
@@ -339,20 +348,50 @@ function learnHtml(L){
  <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">All losses by cause (${money(L.u)})</div>${cz}</div>
  <ul>${(L.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
  <div class="card"><h2>Last ${Math.min(10,(L.losses||[]).length)} losses</h2><div class="feed">${ls}</div></div></div>`}
+function trendLive(S){let u=0;const rows=(S.open||[]).map(o=>{const d=o.side==="short"?-1:1,m=LIVE[o.c+"USDT"]??o.px,pn=d*(o.qty||0)*(m-o.entry);u+=pn;return{o,m,pn:pn-(o.fee||0),live:LIVE[o.c+"USDT"]!=null}});
+ const eq=S.cash!=null?S.cash+u:S.eq;return{rows,eq}}
+function renderTrend(){const S=D.shadow;
+ $("htitle").innerHTML=`Trend forward test <span class="badge b-paper">PAPER ONLY</span> <span class="badge">UNPROVEN</span>`;
+ if(!S){$("tot").textContent="—";$("totsub").textContent="Shadow data not in this build yet.";$("trendsec").innerHTML="";return}
+ const {rows,eq}=trendLive(S),ret=(eq/S.start-1)*100,lr=(S.live&&S.live0)?((S.live/S.live0-1)*100):null;
+ $("tot").innerHTML=`${money(eq)} <span class="${cls(ret)}" style="font-size:15px">${ret>=0?"+":""}${ret.toFixed(2)}%</span>`;
+ $("totsub").textContent=`Shadow strategy from $10K, started ${S.started||""} · live desk over the same period ${lr==null?"—":(lr>=0?"+":"")+lr.toFixed(2)+"%"}`;
+ const cv=S.curve||[];let svg='<div class="mu" style="font-size:12px;padding:20px 0;text-align:center">Chart fills in as hourly cycles run.</div>';
+ if(cv.length>1){const ys=[];cv.forEach(c=>{ys.push(c.eq/S.start*100);if(c.live&&S.live0)ys.push(c.live/S.live0*100)});
+  const mn=Math.min(...ys,100),mx=Math.max(...ys,100),r=(mx-mn)||1,X=i=>(i/(cv.length-1)*320).toFixed(1),Y=v=>(118-(v-mn)/r*110).toFixed(1);
+  const a=cv.map((c,i)=>`${X(i)},${Y(c.eq/S.start*100)}`).join(" "),lp=cv.map((c,i)=>c.live&&S.live0?`${X(i)},${Y(c.live/S.live0*100)}`:"").filter(Boolean).join(" ");
+  svg=`<svg viewBox="0 0 320 122" style="width:100%;height:150px"><line x1="0" x2="320" y1="${Y(100)}" y2="${Y(100)}" stroke="var(--line)"/><polyline fill="none" stroke="var(--up)" stroke-width="2" points="${a}"/>${lp?`<polyline fill="none" stroke="var(--mu)" stroke-width="1.5" stroke-dasharray="4 3" points="${lp}"/>`:""}</svg>
+  <div class="trk"><span>${esc(cv[0].t)}</span><span>${esc(cv[cv.length-1].t)}</span></div>`}
+ const wr=S.n?Math.round(S.wins/S.n*100)+"%":"—";
+ const kp=`<div class="kpis" style="margin-top:8px"><div class="kpi"><div class="v">${money(eq)}</div><div class="l">Equity</div></div><div class="kpi"><div class="v ${cls(ret)}">${ret.toFixed(2)}%</div><div class="l">Return</div></div><div class="kpi"><div class="v dn">${(S.max_dd||0).toFixed(2)}%</div><div class="l">Max drawdown</div></div><div class="kpi"><div class="v">${S.n||0}</div><div class="l">Closed trades</div></div><div class="kpi"><div class="v">${wr}</div><div class="l">Win rate</div></div><div class="kpi"><div class="v">${S.pf??"—"}</div><div class="l">Profit factor</div></div></div>`;
+ const oc=rows.length?`<div class="ogrid">`+rows.map(({o,m,pn,live})=>{const sh=o.side==="short",trail=o.init_stop!=null&&Math.abs(o.stop-o.init_stop)>1e-12;
+  return`<div class="oc" style="border-left-color:${sh?"var(--dn)":"var(--up)"}"><div class="h" style="display:flex;justify-content:space-between;align-items:center"><b>${esc(o.c)}</b><span class="sd ${sh?"S":"L"}">${sh?"SHORT":"LONG"}</span></div>
+  <div class="sub">Entry ${px(o.entry)} · mark ${px(m)}${live?' <span class="ok">live</span>':""}</div>
+  <div class="sub">${trail?"Trailing stop (15-day channel)":"Stop (2×ATR)"} ${px(o.stop)}</div>
+  <div class="sub">Size ${money(o.notional)} notional · risk ${money(o.risk)}</div>
+  <div style="margin-top:4px"><b class="${cls(pn)}">${money(pn)}</b> <span class="sub">opened ${esc(o.opened||"")}</span></div></div>`}).join("")+`</div>`:'<div class="card mu" style="font-size:13px">No open trades. The strategy waits for a daily close beyond a 30-day high/low in the coin\'s trend direction — see the watchlist.</div>';
+ const wl=(S.watch||[]).map(w=>{const p=LIVE[w.c+"USDT"]??w.px,th=(w.hi/p-1)*100,tl=(w.lo/p-1)*100,pos=Math.max(0,Math.min(100,(p-w.lo)/((w.hi-w.lo)||1)*100));
+  const tag=w.trend==="up"?'<span class="sd L">TREND UP</span>':w.trend==="down"?'<span class="sd S">TREND DOWN</span>':'<span class="badge">NO TREND</span>';
+  const arm=w.armed==="long"?`Long if a daily close > ${px(w.hi)} (${th>=0?"+":""}${th.toFixed(1)}%)`:w.armed==="short"?`Short if a daily close < ${px(w.lo)} (${tl.toFixed(1)}%)`:"No trade until trend lines up";
+  return`<div class="wc"><div class="h"><b>${esc(w.c)}</b>${tag}</div><div class="trk"><span>30d low ${px(w.lo)}</span><span>high ${px(w.hi)}</span></div><div class="bar"><i style="left:calc(${pos.toFixed(1)}% - 1px)"></i></div><div class="trk"><span>${tl.toFixed(1)}%</span><span>${px(p)}</span><span>+${th.toFixed(1)}%</span></div><div style="margin-top:4px">${arm}</div></div>`}).join("")||'<div class="mu">Watchlist appears after the next cycle.</div>';
+ const cl=(S.closed||[]).length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Entry</th><th>Exit</th><th>Reason</th><th>P&amp;L</th><th>R</th><th>Opened / Closed</th></tr>`+S.closed.map(x=>`<tr><td><b>${esc(x.coin)}</b></td><td>${esc(x.side)}</td><td>${px(x.entry)}</td><td>${px(x.exit)}</td><td>${esc(x.why||"stop")}</td><td class="${cls(x.pnl_usd)}">${money(x.pnl_usd)}</td><td>${x.R??"—"}</td><td class="mu">${esc(x.opened||"")} → ${esc(x.closed||"")}</td></tr>`).join("")+`</table></div>`:'<div class="card mu" style="font-size:13px">No closed trades yet.</div>';
+ $("trendsec").innerHTML=`<div class="tw2"><div class="card"><h2>Equity vs live desk</h2><div class="sub">Green: trend strategy from $10K · dashed: live majors desk, rebased to the same start</div>${svg}${kp}</div>
+ <div class="card"><h2>How it trades</h2><ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.5">
+ <li>Looks at daily candles on 12 majors (BTC ETH BNB XRP SOL TRX HYPE ZEC DOGE LINK ADA XLM).</li>
+ <li>Goes long when a day closes above its 30-day high while the coin is in an uptrend (above its 200-day average); short on a close below the 30-day low in a downtrend.</li>
+ <li>First stop 2× daily ATR; then exits when price crosses the 15-day low (longs) / high (shorts). No fixed take-profit — winners run.</li>
+ <li>Risks 2% of equity per trade; max 1× equity per position, 3× in total. Fees, slippage and funding are charged.</li>
+ <li>Runs inside the hourly desk cycle. Separate $10K paper account; it does not change the live desk.</li></ul>
+ <div style="margin-top:8px;font-size:12px"><b>Backtest (Binance perps)</b><div class="sub">Dev ${esc(S.bt.dev)} · Holdout ${esc(S.bt.hold)} · Full year ${esc(S.bt.full)}<br>${esc(S.bt.live_split)}</div></div>
+ <div class="tnote">Paper only and unproven: few trades (~60/yr), backtest year was bearish, holdout drawdown −25%. Judge after ~3 months / 15+ trades.</div></div></div>
+ <h3 style="margin-top:14px">Open trades <span class="badge">${rows.length}</span></h3>${oc}
+ <h3 style="margin-top:14px">Watchlist · distance to breakout</h3><div class="wl">${wl}</div>
+ <h3 style="margin-top:14px">Closed trades</h3>${cl}`;
+ $("foot").innerHTML="Trend forward test: simulated paper trading, no real money, no keys, no signing, no orders.";
+}
 function shadowHtml(S){
- if(!S)return'<div class="card mu">Shadow forward test starts at the next hourly cycle.</div>';
- const pct=(a,b)=>b?((a/b-1)*100).toFixed(2)+"%":"–",cv=S.curve||[];
- const sr=pct(S.eq,S.start),lr=(S.live&&S.live0)?pct(S.live,S.live0):"–";
- let svg="";if(cv.length>1){const ys=[];cv.forEach(c=>{ys.push(c.eq/S.start);if(c.live&&S.live0)ys.push(c.live/S.live0)});
-  const mn=Math.min(...ys),mx=Math.max(...ys),r=(mx-mn)||0.01,X=i=>(i/(cv.length-1)*300).toFixed(1),Y=v=>(70-(v-mn)/r*64).toFixed(1);
-  const a=cv.map((c,i)=>`${X(i)},${Y(c.eq/S.start)}`).join(" "),b=cv.filter(c=>c.live).length>1?cv.map((c,i)=>c.live?`${X(i)},${Y(c.live/S.live0)}`:"").filter(Boolean).join(" "):"";
-  svg=`<svg viewBox="0 0 300 74" style="width:100%;height:90px"><polyline fill="none" stroke="var(--up)" stroke-width="2" points="${a}"/>${b?`<polyline fill="none" stroke="var(--mu)" stroke-width="1.5" stroke-dasharray="4 3" points="${b}"/>`:""}</svg>`}
- const op=(S.open||[]).map(o=>`<span class="chip">${esc(o.c)} ${o.side.toUpperCase()} @ ${(+o.entry).toPrecision(5)} · stop ${(+o.stop).toPrecision(5)}</span>`).join("")||'<span class="mu">no open positions</span>';
- const cl=(S.closed||[]).map(x=>`<div class="cz"><span>${esc(x.coin)} ${esc(x.side)} · ${esc(x.closed||"")}</span><b class="${x.pnl_usd>=0?"up":"dn"}">${money(x.pnl_usd)}</b></div>`).join("");
- return`<div class="lrn"><div class="card"><h2>${esc(S.name)} <span class="badge">since ${esc(S.started||"")}</span></h2>
- <div class="sub">Shadow (green) ${sr} · Live desk (dashed) ${lr} over the same period · both PAPER, $10K-style start</div>${svg}
- <div style="margin-top:6px">${op}</div>${cl?`<div style="margin-top:8px">${cl}</div>`:""}
- <ul><li>Daily 30-day breakout with the coin's trend, 2×ATR stop, 15-day channel exit, 2% risk</li><li>${esc(S.bt)}</li><li>Runs inside the hourly cycle; does not trade for the live desk</li></ul></div></div>`}
+ if(!S)return"";const r=((S.eq/S.start-1)*100);
+ return`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="sub">Trend forward test (shadow, paper): ${money(S.eq)} <span class="${cls(r)}">${r>=0?"+":""}${r.toFixed(2)}%</span> · ${(S.open||[]).length} open</span><button type="button" class="tabs" style="all:unset;cursor:pointer;color:var(--ac);font-size:13px" onclick="setView('trend')">Open Trend tab →</button></div>`}
 function renderReal(){
  const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
  const start=M.start||37;
@@ -390,9 +429,12 @@ function renderReal(){
 function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
- $("v-paper").classList.toggle("on",!real);$("v-real").classList.toggle("on",real);
- $("banner").hidden=!real;$("wallet").hidden=!real;$("learnsec").hidden=real;$("shadowsec").hidden=real;
- if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
+ const trend=VIEW==="trend";
+ $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-trend").classList.toggle("on",trend);
+ $("banner").hidden=!real;$("wallet").hidden=!real;$("learnsec").hidden=real||trend;$("shadowsec").hidden=real||trend;
+ $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend);
+ if(trend)renderTrend();
+ else if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
  else renderPaper();
  $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
  paintLive();
@@ -414,6 +456,7 @@ function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).m
  const syms=new Set(),coins=new Set(),mints=new Set();
  os.forEach(o=>{if(o.sym)syms.add(o.sym);if(o.a)coins.add(o.a);if(o.mint&&!o.sym)mints.add(o.mint)});
  w.forEach(p=>{if(p.a){coins.add(p.a);syms.add(p.a+"USDT")}});
+ const S=(D&&D.shadow)||{};(S.open||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});(S.watch||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});
  return{syms,coins,mints,os}}
 async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
  try{const {syms,coins,mints}=neededSymbols();const got={};let src="",n=0;
@@ -462,6 +505,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(VIEW==="real")fetchWallet()}catch(e){$("totsub").textContent="Could not load data.json"}}
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
+$("v-trend").addEventListener("click",()=>setView("trend"));
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
