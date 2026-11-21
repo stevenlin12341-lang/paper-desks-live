@@ -137,6 +137,20 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 #dcapwerr{color:var(--dn);font-size:12px;margin-top:6px}
 .dca-why{margin:8px 0 0;padding-left:18px;color:var(--mu);font-size:12px}
 .dca-why li{margin:3px 0}
+.dca-verdict{border-radius:12px;padding:16px;border:1px solid var(--line);margin:0 0 12px;background:var(--card)}
+.dca-verdict.go{background:#0f2e1c;border-color:#14532d}
+.dca-verdict.week{background:#3a2a10;border-color:#5a4410}
+.dca-verdict.skip{background:#1a1d24}
+.dca-verdict .vd{font-size:22px;font-weight:800;letter-spacing:.04em;margin:0 0 4px}
+.dca-verdict.go .vd{color:var(--up)}.dca-verdict.week .vd{color:var(--wa)}.dca-verdict.skip .vd{color:var(--mu)}
+.dca-verdict .vr{font-size:13px;margin:0 0 8px}
+.dca-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--mu);margin:6px 0 0}
+.dca-leg i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.dca-chart{width:100%;height:auto;display:block;background:#0b0e14;border-radius:8px;border:1px solid var(--line)}
+.dca-notes{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:10px}
+.dca-notes .nc{background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:10px}
+.dca-notes .nc b{display:block;font-size:12px;margin:0 0 4px}
+.dca-notes .nc p{margin:0;font-size:12px;color:var(--mu)}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
@@ -527,6 +541,28 @@ function makeDcaTicket(){const A=D.dca||{},amt=parseFloat(($("dcaamt")||{}).valu
   lines.push("Jumlah awal: "+fmtAmt(amt,"USDT")+(idr!=null?" (perkiraan "+fmtAmt(idr,"IDR")+")":""),"Harga perkiraan BTC/USDT: "+(px0!=null?n2(px0):"—"),"Simpan sebagai USDT: "+keep+"%","","Langkah 1 — BUY BTC","Pair: BTC/USDT (btcusdt)","Side: BUY","USDT dipakai beli BTC: "+n2(useU)+" USDT","USDT disimpan (exposure dollar): "+n2(keepU)+" USDT","Perkiraan BTC setelah fee ~"+feePct+"%: "+(btc!=null?n8(btc)+" BTC":"—"),"","Catatan:","- Sudah dalam USDT, jadi cuma 1 langkah (fee ~"+feePct+"% taker). Kalau dananya masih IDR, pilih IDR biar tiketnya 2 langkah (USDT/IDR lalu BTC/USDT).","- Mungkin ada sisa USDT kecil karena pembulatan.","- Belum dieksekusi. Kirim tiket ini ke Grok Bot di chat buat dieksekusi.");
  }
  if(box)box.hidden=false;out.textContent=lines.join("\n")}
+function idr(n){if(n==null||isNaN(n))return "Rp —";return "Rp "+Math.round(Number(n)).toLocaleString("id-ID")}
+function dcaChart(ch){if(!ch||!ch.c||ch.c.length<10)return '<div class="empty">Grafik belum tersedia.</div>';
+ const W=640,H=220,pL=50,pR=12,pT=14,pB=28,n=ch.c.length;
+ let lo=Infinity,hi=-Infinity;
+ for(let i=0;i<n;i++){[ch.c[i],ch.ma50&&ch.ma50[i],ch.ma200&&ch.ma200[i],ch.ma200w&&ch.ma200w[i]].forEach(v=>{if(v!=null&&!isNaN(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}})}
+ const pad=(hi-lo)*0.06||1;lo-=pad;hi+=pad;
+ const x=i=>pL+i*(W-pL-pR)/Math.max(1,n-1),y=v=>pT+(1-(v-lo)/(hi-lo))*(H-pT-pB);
+ const path=arr=>{let d="",on=false;for(let i=0;i<n;i++){const v=arr&&arr[i];if(v==null||isNaN(v)){on=false;continue}d+=(on?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)+" ";on=true}return d};
+ const ticks=5,grid=[];
+ for(let i=0;i<ticks;i++){const v=lo+(hi-lo)*i/(ticks-1),yy=y(v).toFixed(1);grid.push(`<line x1="${pL}" x2="${W-pR}" y1="${yy}" y2="${yy}" stroke="#1f2633"/><text x="${pL-6}" y="${(+yy+4).toFixed(1)}" text-anchor="end" fill="#8a93a6" font-size="9">${Math.round(v).toLocaleString("id-ID")}</text>`)}
+ const t0=ch.t[0]||"",t1=ch.t[n-1]||"",tm=ch.t[Math.floor((n-1)/2)]||"";
+ return `<svg class="dca-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik BTC harian sekitar 1 tahun">
+  ${grid.join("")}
+  <path d="${path(ch.ma200w)}" fill="none" stroke="#a78bfa" stroke-width="1.4"/>
+  <path d="${path(ch.ma200)}" fill="none" stroke="#f59e0b" stroke-width="1.4"/>
+  <path d="${path(ch.ma50)}" fill="none" stroke="#60a5fa" stroke-width="1.4"/>
+  <path d="${path(ch.c)}" fill="none" stroke="#e6e9ef" stroke-width="1.8"/>
+  <text x="${pL}" y="${H-8}" fill="#8a93a6" font-size="9">${esc(t0)}</text>
+  <text x="${(W/2).toFixed(0)}" y="${H-8}" text-anchor="middle" fill="#8a93a6" font-size="9">${esc(tm)}</text>
+  <text x="${W-pR}" y="${H-8}" text-anchor="end" fill="#8a93a6" font-size="9">${esc(t1)}</text>
+ </svg>
+ <div class="dca-leg"><span><i style="background:#e6e9ef"></i>Harga</span><span><i style="background:#60a5fa"></i>MA50 harian</span><span><i style="background:#f59e0b"></i>MA200 harian</span><span><i style="background:#a78bfa"></i>MA 200 minggu</span></div>`}
 function renderDca(){const A=D.dca||{};
  $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
  $("banner").hidden=false;
@@ -538,32 +574,54 @@ function renderDca(){const A=D.dca||{};
   $("foot").innerHTML=`Kunci lunak di halaman publik bukan keamanan. Tidak ada kunci exchange dan tidak ada order dari halaman ini.`;
   const inp=$("dcapw");if(inp)inp.focus();return}
  const ok=A.ok!==false&&A.price!=null,z=A.zone||"—",zcls=z==="MURAH"||z==="AGAK MURAH"?"up":z==="MAHAL"?"dn":"wa";
+ const B=A.budget||{},ver=B.verdict||"";
  $("tot").textContent=ok?px(A.price)+" USDT":"—";
- $("totsub").textContent=ok?(`${esc(z)} · saran cicilan ${A.mult!=null?A.mult+"×":"—"} · ${esc(A.asof||"")}`):esc(A.error||"Analisis belum tersedia");
+ $("totsub").textContent=ok?(`${esc(ver||z)} · ${esc(z)} skor ${A.score??"—"} · ${B.suggest?idr(B.suggest)+" · ":""}${esc(A.asof||"")}`):esc(A.error||"Analisis belum tersedia");
  $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini. Tombol di bawah cuma bikin tiket teks 2 langkah (USDT/IDR lalu BTC/USDT) — tidak ada order ke exchange. Salin tiketnya, lalu kirim ke Grok Bot di chat buat dieksekusi. ${esc((A.pairs&&A.pairs.note)||"Indodax punya BTC/USDT, BTC/IDR, dan USDT/IDR.")}`;
  const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
+ const na=v=>v==null||v===""?"N/A":v;
  const kpis=ok?`<div class="dca-kpis">
   ${kpi("Harga BTC/USDT",px(A.price)+" USDT")}
-  ${kpi("Vs low 50 hari",pct(A.from_low50),cls(A.from_low50))}
-  ${kpi("Vs high 50 hari",pct(A.from_high50),cls(A.from_high50))}
-  ${kpi("Vs MA200",pct(A.vs_ma200),cls(A.vs_ma200))}
+  ${kpi("Mayer Multiple",A.mayer!=null?Number(A.mayer).toFixed(2):"N/A",A.mayer!=null&&A.mayer<=0.8?"up":A.mayer>=2.4?"dn":"")}
+  ${kpi("Vs MA200 harian",pct(A.vs_ma200),cls(A.vs_ma200))}
+  ${kpi("MA 200 minggu",A.ma200w!=null?px(A.ma200w):"N/A")}
+  ${kpi("Vs MA 200 minggu",A.vs_ma200w==null?"N/A":pct(A.vs_ma200w),cls(A.vs_ma200w))}
   ${kpi("RSI harian",A.rsi_d!=null?A.rsi_d:"—",A.rsi_d!=null&&A.rsi_d<30?"up":A.rsi_d>70?"dn":"")}
   ${kpi("RSI mingguan",A.rsi_w!=null?A.rsi_w:"—",A.rsi_w!=null&&A.rsi_w<35?"up":A.rsi_w>70?"dn":"")}
+  ${kpi("Fear & Greed",A.fng!=null?`${A.fng}${A.fng_label?" · "+esc(A.fng_label):""}`:"N/A",A.fng!=null&&A.fng<=24?"up":A.fng>=75?"dn":"")}
+  ${kpi("Funding perp",A.funding_pct==null?"N/A":(A.funding_pct>0?"+":"")+Number(A.funding_pct).toFixed(4)+"%",cls(A.funding_pct))}
+  ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2)+(A.mvrv_date?" · "+esc(A.mvrv_date):""):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
+  ${kpi("Silang MA50/200",esc(A.ma_cross_label||"—"))}
   ${kpi("Drawdown dari puncak data",pct(A.dd_ath),cls(A.dd_ath))}
-  ${kpi("Zona / saran",esc(z)+" · "+(A.mult!=null?A.mult+"×":"—"),zcls)}
+  ${kpi("Zona / skor",esc(z)+" · "+(A.score??"—")+" · "+(A.mult!=null?A.mult+"×":"—"),zcls)}
  </div>`:'<div class="empty">Analisis belum tersedia. Tiket tetap bisa dibuat manual.</div>';
+ const vcls=ver==="BELI SEKARANG"?"go":ver==="BELI MINGGU INI"?"week":"skip";
+ const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(ver||"—")}</div>
+  <p class="vr">${esc(B.reason||"Rencana anggaran belum tersedia.")}</p>
+  <div class="dca-kpis">
+   ${kpi("Minggu (WIB)",esc(B.week_label||"—"))}
+   ${kpi("Saran minggu ini",B.suggest!=null?idr(B.suggest):"—")}
+   ${kpi("Sudah terpakai / sisa",`${idr(B.spent||0)} / ${idr(B.remaining!=null?B.remaining:B.monthly)}`)}
+   ${kpi("Anggaran bulan ini",idr(B.monthly||1000000))}
+  </div>
+  <p class="sub" style="margin:10px 0 0">Skor indikator ${A.score??"—"} · zona ${esc(z)}. Aturan anggaran ada di kartu bawah.</p>
+ </div>`;
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
+ const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
  const ords=A.orders||[];
  const hist=ords.length?`<div class="tw"><table><tr><th>Waktu</th><th>Pair</th><th>Side</th><th>Jumlah</th><th>Harga</th><th>BTC</th><th>Status</th></tr>`+ords.map(o=>{
   const amt=o.amount_usdt!=null?fmtAmt(o.amount_usdt,"USDT"):(o.amount_idr!=null?fmtAmt(o.amount_idr,"IDR"):"—");
   return `<tr><td class="mu when">${esc(o.time||"")}</td><td>${esc(o.pair||"BTC/USDT")}</td><td>${esc(o.side||"BUY")}</td><td>${esc(amt)}</td><td>${px(o.price)}</td><td>${o.btc!=null?Number(o.btc).toFixed(8):"—"}</td><td class="mu">${esc(o.status||"")}${o.note?" · "+esc(o.note):""}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat. Nanti isi dari tiket yang sudah dieksekusi.</div>';
  $("dcasec").innerHTML=`
+  ${bud}
   <div class="card">${kpis}
    <p style="margin:12px 0 0;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
-   <p class="sub" style="margin:10px 0 0">${esc(A.ath_note||"")} Low 50 hari ${px(A.low50)} · high 50 hari ${px(A.high50)} · MA200 ${px(A.ma200)} · puncak data ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. Sumber: ${esc(A.src||"Binance spot BTCUSDT")}${A.stale?" · data cache":""}.</p>
+   <p class="sub" style="margin:10px 0 0">${esc(A.ath_note||"")} Low 50 hari ${px(A.low50)} · high 50 hari ${px(A.high50)} · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak data ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. Sumber: ${esc(A.src||"Binance spot BTCUSDT")}${A.stale?" · data cache":""}.</p>
   </div>
-  <div class="card"><h2>Aturan zona</h2><p class="sub" style="margin:0 0 6px">Aturan ini tetap, biar ratingnya transparan. Skor makin tinggi = makin menarik buat nyicil.</p>${rules}</div>
+  <div class="card"><h2>Grafik harian ~1 tahun</h2>${dcaChart(A.chart)}</div>
+  <div class="card"><h2>Penjelasan indikator</h2>${notes}</div>
+  <div class="card"><h2>Aturan zona &amp; anggaran</h2><p class="sub" style="margin:0 0 6px">Aturan ini tetap, biar rating dan keputusan minggu ini transparan. Skor makin tinggi = makin menarik buat nyicil.</p>${rules}</div>
   <div class="card"><h2>Buat tiket Buy</h2>
    <p class="sub" style="margin:0 0 10px">Halaman ini tidak mengirim order ke Indodax atau exchange lain. Isi jumlah IDR, buat tiket 2 langkah (beli USDT di usdtidr, lalu beli BTC di btcusdt), salin, lalu kirim ke Grok Bot di chat buat dieksekusi. Boleh sisain sebagian sebagai USDT biar ada exposure ke dollar. Kalau dananya sudah USDT, pilih USDT (1 langkah).</p>
    <div class="dca-form">
@@ -581,6 +639,7 @@ function renderDca(){const A=D.dca||{};
    </div>
   </div>
   <section style="margin-top:22px"><h3>Riwayat beli DCA</h3>${hist}</section>`;
+ const amtEl=$("dcaamt");if(amtEl&&B.suggest>0){amtEl.value=B.suggest;const cur=$("dcacur");if(cur)cur.value="IDR"}
  $("foot").innerHTML=`Spot DCA adalah analisis dan tiket teks saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
