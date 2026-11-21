@@ -223,11 +223,29 @@ h1{text-transform:none;letter-spacing:0}
 .dca-week .wn{font-weight:700;font-size:13px}
 .dca-week .ws{color:var(--mu);font-size:11px}
 @media(max-width:420px){.dca-weeks{gap:6px}.dca-week{padding:7px 4px}}
+
+.metode{margin-top:14px;text-align:left}
+.metode h3{margin:0 0 6px;font-size:16px}
+.metode .mnote{font-size:13px;color:var(--mu);margin:0 0 10px;line-height:1.45}
+.metode .mgroup{margin:0 0 12px}
+.metode .mgroup h4{margin:0 0 6px;font-size:13px;color:var(--mu);font-weight:600}
+.metode table{width:100%;border-collapse:collapse;font-size:13px}
+.metode th,.metode td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+.metode th{color:var(--mu);font-weight:600;font-size:11px}
+.metode td.n,.metode th.n{text-align:right;white-space:nowrap}
+.mbar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:#1f2633;min-width:64px;max-width:140px}
+.mbar i{display:block;height:100%}
+.mbar .w{background:#22c55e}
+.mbar .l{background:#ef4444}
+.mbar-lg{height:12px;max-width:100%;margin:8px 0 12px}
+.mover{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:0 0 4px;font-size:13px}
+@media(max-width:520px){.metode td,.metode th{padding:6px 5px;font-size:12px}.mbar{min-width:48px}}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
  <button type="button" id="v-real">Target $37</button>
+ <button type="button" id="v-signals">$37 Semua Sinyal</button>
  <button type="button" id="v-steven">Dompet Steven</button>
  <button type="button" id="v-russel">Dompet Russel</button>
  <button type="button" id="v-trend">Tes tren</button>
@@ -261,7 +279,7 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="trend"||v==="steven"||v==="russel"||v==="dca"?v:"paper"}catch(e){return"paper"}})();
+let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="signals"||v==="trend"||v==="steven"||v==="russel"||v==="dca"?v:"paper"}catch(e){return"paper"}})();
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
 const walletViewName=()=>VIEW==="steven"?"Steven":VIEW==="russel"?"Russel":"";
 const wantsWallet=()=>VIEW==="real"||isWalletView();
@@ -572,25 +590,72 @@ function renderWallet(){
  $("wallet").hidden=false;$("wallet").innerHTML=walletHtml(w);
  $("foot").innerHTML=`Tab ini bacaan publik Hyperliquid untuk dompet ${esc(name)}. Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
 }
-function renderReal(){
- const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
+
+function metodeBar(wins,losses,clsName){
+  const w=Math.max(0,Number(wins)||0), l=Math.max(0,Number(losses)||0), t=w+l;
+  const wp=t? (w/t*100):0, lp=t?(l/t*100):0;
+  return `<div class="mbar${clsName?" "+clsName:""}" role="img" aria-label="${w} menang, ${l} kalah"><i class="w" style="width:${wp.toFixed(1)}%"></i><i class="l" style="width:${lp.toFixed(1)}%"></i></div>`;
+}
+function metodeSection(M){
+  const S=M&&M.methods, o=S&&S.overall;
+  if(!S||!S.groups||!S.groups.length){
+    return `<div class="metode"><h3>Metode</h3><p class="mnote">Belum ada transaksi ditutup di buku ini, jadi belum ada ringkasan menang/kalah per metode.</p></div>`;
+  }
+  const ov=o?`<div class="mover"><b>${o.n||0} transaksi utuh</b><span class="${cls(o.pnl)}">${moneyR(o.pnl)}</span><span>${o.win==null?"—":o.win+"% menang"}</span><span>rata-rata R ${o.avg_r==null?"—":o.avg_r}</span></div>${metodeBar(o.wins,o.losses,"mbar-lg")}`:"";
+  const groups=(S.groups||[]).map(g=>{
+    const rows=(g.rows||[]).map(r=>`<tr>
+      <td>${esc(r.label||r.k||"")}</td>
+      <td class="n">${r.n??0}</td>
+      <td class="n">${r.wins??0}</td>
+      <td class="n">${r.losses??0}</td>
+      <td class="n">${r.win==null?"—":r.win+"%"}</td>
+      <td class="n ${cls(r.pnl)}">${moneyR(r.pnl)}</td>
+      <td class="n">${r.avg_r==null?"—":r.avg_r}</td>
+      <td>${metodeBar(r.wins,r.losses)}</td>
+    </tr>`).join("");
+    return `<div class="mgroup"><h4>${esc(g.title||"")}</h4>
+      <div class="tw"><table><tr><th>Metode</th><th class="n">Transaksi</th><th class="n">Menang</th><th class="n">Kalah</th><th class="n">${tip("% menang",TIPS.wr)}</th><th class="n">${tip("Total PnL",TIPS.pnl)}</th><th class="n">Rata-rata R</th><th>Bar</th></tr>${rows}</table></div></div>`;
+  }).join("");
+  return `<div class="metode"><h3>Metode</h3><p class="mnote">${esc(S.note||"Ringkasan hasil per cara masuk dan cara keluar di buku ini.")}</p>${ov}${groups}</div>`;
+}
+function renderGoal(kind){
+ const all=kind==="signals";
+ const M=all?((D.real_all)||{}):(((D.real)||{}).mirror||{});
  const start=M.start||37;
  const opens=[...(M.opens||[])];
  opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p)});
  const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
  const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
  const pl=(eq/start-1)*100;
- $("htitle").innerHTML=`Target $37 → $1000K <span class="badge b-real">MIRROR SIMULASI</span>`;
+ if(all){
+  $("htitle").innerHTML=`$37 → $1000K (Semua Sinyal) <span class="badge b-real">MIRROR SIMULASI</span>`;
+  $("totsub").textContent=`Buku simulasi $37 yang mengambil semua sinyal desk yang lolos filter, tanpa batas slot, imbal long/short, atau limit kas. Mulai ${M.started||""}. Bukan dompet live.`;
+  $("banner").hidden=false;
+  $("banner").innerHTML=`<b>Buku $37 semua sinyal (simulasi).</b> Filter skor, rezim, bounce, dan gate tetap sama dengan desk. Yang dilepas hanya batas eksekusi. ${esc(M.init_note||"Buku ini baru mulai; transaksi lama yang tertahan limit tidak diisi mundur.")}`;
+  $("ottitle").innerHTML=`Posisi terbuka semua sinyal <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULASI</span>`;
+  $("desktitle").innerHTML=`Buku $37 semua sinyal <span class="badge b-real">SIMULASI</span>`;
+  $("cltitle").textContent="Transaksi yang sudah ditutup (sejak buku ini mulai)";
+  $("righttitle").textContent="Cara kerja buku ini";
+  $("dec").innerHTML=`<div class="it"><div class="r">Setiap siklus, sinyal yang lolos filter desk dicatat. Kalau desk tidak masuk karena posisi sudah penuh, imbal long/short, koin sudah terisi, atau kas tidak cukup, buku ini tetap mencoba masuk dengan ukuran 0,5% risiko modal. Posisi yang sama dengan desk mengikuti harga dan keluar desk; posisi extra memakai aturan keluar yang sama (TP, trailing, SL, waktu rencana). Tidak ada order live dari halaman ini.</div></div>`;
+ }else{
+  $("htitle").innerHTML=`Target $37 → $1000K <span class="badge b-real">MIRROR SIMULASI</span>`;
+  $("totsub").textContent=`Buku simulasi $37 yang meniru setiap transaksi paper Majors dengan ukuran 0,37%. Mulai ${M.started||""}. Bukan dompet live.`;
+  $("banner").hidden=false;
+  $("banner").innerHTML=`<b>Mirror paper $37 (simulasi).</b> Angka di atas dan posisi terbuka di bawah meniru desk $10K: koin, arah, ${tip("leverage",TIPS.lev)}, serta ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} yang sama, ukurannya × 37/10.000. ${esc(M.init_note||"Dimulai dari posisi yang saat itu terbuka, tanpa mengisi transaksi lama.")} Dompet Hyperliquid live ada di tab Steven dan Russel, hanya lihat.`;
+  $("ottitle").innerHTML=`Posisi terbuka mirror <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULASI</span>`;
+  $("desktitle").innerHTML=`Buku mirror $37 <span class="badge b-real">SIMULASI</span>`;
+  $("cltitle").textContent="Transaksi mirror yang sudah ditutup (sejak mulai saja)";
+  $("righttitle").textContent="Cara kerja buku ini";
+  $("dec").innerHTML=`<div class="it"><div class="r">Buku $37 buka dan tutup bersamaan dengan desk Majors $10K setiap ${tip("siklus",TIPS.cycle)}. Entri paper baru disalin otomatis; penutupan dan ${tip("TP",TIPS.tp)} sebagian setelah ${esc(M.started||"mulai")} dicatat di sini dengan ukuran 0,37%. Hasil lama $10K tidak diisi mundur, jadi ${tip("menang",TIPS.wr)} ini catatan buku ini sendiri. Dompet live ada di tab Steven dan Russel — posisi yang Anda buka sendiri ditandai di sini kalau cocok dengan transaksi desk.</div></div>`;
+ }
  $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
- $("totsub").textContent=`Buku simulasi $37 yang meniru setiap transaksi paper Majors dengan ukuran 0,37%. Mulai ${M.started||""}. Bukan dompet live.`;
- $("banner").hidden=false;
- $("banner").innerHTML=`<b>Mirror paper $37 (simulasi).</b> Angka di atas dan posisi terbuka di bawah meniru desk $10K: koin, arah, ${tip("leverage",TIPS.lev)}, serta ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} yang sama, ukurannya × 37/10.000. ${esc(M.init_note||"Dimulai dari posisi yang saat itu terbuka, tanpa mengisi transaksi lama.")} Dompet Hyperliquid live ada di tab Steven dan Russel, hanya lihat.`;
- $("ottitle").innerHTML=`Posisi terbuka mirror <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULASI</span>`;
  const cards=openCards(opens,true);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
- $("otsum").innerHTML=opens.length?`${tip("Untung/rugi terbuka",TIPS.upnl)} <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> dari ${tip("modal",TIPS.margin)} ${moneyR(cards.tm)} · disesuaikan dari desk $10K`:"";
+ const extraNote=all?(M.open_extra?` · ${M.open_desk||0} dari desk, ${M.open_extra} tanpa limit`:""):"";
+ $("otsum").innerHTML=opens.length?`${tip("Untung/rugi terbuka",TIPS.upnl)} <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> dari ${tip("modal",TIPS.margin)} ${moneyR(cards.tm)}${all?extraNote:" · disesuaikan dari desk $10K"}`:"";
  $("wallet").hidden=true;$("wallet").innerHTML="";
- $("desktitle").innerHTML=`Buku mirror $37 <span class="badge b-real">SIMULASI</span>`;
- $("desks").innerHTML=`<div class="card"><h2>Mirror $37 <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span></h2>
+ const subAll=all?`Kas ${moneyR(M.cash)} · ${tip("modal",TIPS.margin)} ${moneyR(M.margin)}. ${M.open_extra!=null?`${M.open_desk||0} posisi dari desk, ${M.open_extra||0} dari sinyal yang sebelumnya tertahan limit. `:""}${tip("Menang",TIPS.wr)} masih kosong sampai ada transaksi yang benar-benar ditutup.`
+  :`Kas ${moneyR(M.cash)} · ${tip("modal",TIPS.margin)} ${moneyR(M.margin)} · skala ${esc(M.scale_label||"× 37/10.000")}. ${tip("Menang",TIPS.wr)} masih kosong sampai ada transaksi mirror yang benar-benar ditutup.`;
+ $("desks").innerHTML=`<div class="card"><h2>${all?"$37 Semua Sinyal":"Mirror $37"} <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span></h2>
   <div class="eq">${moneyR(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
   <div class="kpis"><div class="kpi"><div class="v">${M.win==null?"—":M.win+"%"}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div>
   <div class="kpi"><div class="v">${M.open??opens.length}</div><div class="l">Terbuka</div></div>
@@ -599,13 +664,14 @@ function renderReal(){
   <div class="kpi"><div class="v ${cls(unrealLive)}">${moneyR(unrealLive)}</div><div class="l">${tip("Belum dikunci",TIPS.upnl)}</div></div>
   <div class="kpi"><div class="v">${M.mdd==null?"—":pct(M.mdd)}</div><div class="l">Turun terdalam</div></div></div>
   ${chart(M.pts||[],start)}
-  <div class="sub" style="margin-top:8px">Kas ${moneyR(M.cash)} · ${tip("modal",TIPS.margin)} ${moneyR(M.margin)} · skala ${esc(M.scale_label||"× 37/10.000")}. ${tip("Menang",TIPS.wr)} masih kosong sampai ada transaksi mirror yang benar-benar ditutup.</div></div>`;
- $("cltitle").textContent="Transaksi mirror yang sudah ditutup (sejak mulai saja)";
+  <div class="sub" style="margin-top:8px">${subAll}</div>
+  ${metodeSection(M)}</div>`;
  $("closed").innerHTML=closedTable(M.closes||[],true);
- $("righttitle").textContent="Cara kerja buku ini";$("dtabs").style.display="none";$("dtabs").innerHTML="";
- $("dec").innerHTML=`<div class="it"><div class="r">Buku $37 buka dan tutup bersamaan dengan desk Majors $10K setiap ${tip("siklus",TIPS.cycle)}. Entri paper baru disalin otomatis; penutupan dan ${tip("TP",TIPS.tp)} sebagian setelah ${esc(M.started||"mulai")} dicatat di sini dengan ukuran 0,37%. Hasil lama $10K tidak diisi mundur, jadi ${tip("menang",TIPS.wr)} ini catatan buku ini sendiri. Dompet live ada di tab Steven dan Russel — posisi yang Anda buka sendiri ditandai di sini kalau cocok dengan transaksi desk.</div></div>`;
+ $("dtabs").style.display="none";$("dtabs").innerHTML="";
  $("foot").innerHTML=`Buku $37 adalah simulasi, bukan order live. Dompet live ada di tab Steven dan Russel (bacaan publik Hyperliquid). Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
 }
+function renderReal(){renderGoal("real")}
+function renderSignals(){renderGoal("signals")}
 function dcaUnlocked(){try{return sessionStorage.getItem("dcaSoftUnlock")==="1"}catch(e){return false}}
 function unlockDca(ev){if(ev)ev.preventDefault();const v=(($("dcapw")||{}).value||"");if(v==="1234"){try{sessionStorage.setItem("dcaSoftUnlock","1")}catch(e){}render()}else{const e=$("dcapwerr");if(e)e.textContent="Salah. Ingat, ini cuma kunci lunak, bukan keamanan."}}
 function nowWibLabel(){try{return new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date())+" WIB"}catch(e){const d=new Date(Date.now()+7*3600*1000);return d.toISOString().slice(0,16).replace("T"," ")+" WIB"}}
@@ -834,16 +900,18 @@ function renderDca(){const A=D.dca||{};
 function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
+ const signals=VIEW==="signals";
  const trend=VIEW==="trend";
  const dca=VIEW==="dca";
  const walt=isWalletView();
- $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-trend").classList.toggle("on",trend);
+ $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-signals")&&$("v-signals").classList.toggle("on",signals);$("v-trend").classList.toggle("on",trend);
  $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);
- $("banner").hidden=!(real||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("learnsec").hidden=real||trend||walt||dca;$("shadowsec").hidden=real||trend||walt||dca;
+ $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("learnsec").hidden=real||signals||trend||walt||dca;$("shadowsec").hidden=real||signals||trend||walt||dca;
  $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca);
  if(trend)renderTrend();
  else if(walt)renderWallet();
  else if(dca)renderDca();
+ else if(signals){if(!D.real_all){$("totsub").textContent="Data $37 Semua Sinyal belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Semua Sinyal muncul setelah data diperbarui."}else renderSignals()}
  else if(real){if(!D.real){$("totsub").textContent="Data Target $37 belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Target $37 muncul setelah data diperbarui."}else renderReal()}
  else renderPaper();
  $("upd").textContent="Data desk per jam "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
@@ -861,7 +929,7 @@ async function fetchJson(url,opt){const c=new AbortController(),t=setTimeout(()=
  try{const r=await fetch(url,Object.assign({signal:c.signal,cache:"no-store"},opt||{}));if(!r.ok)throw new Error("http "+r.status);return await r.json()}finally{clearTimeout(t)}}
 function hlBody(type,extra){return JSON.stringify(Object.assign({type},extra||{}))}
 async function hl(type,extra){return fetchJson(HL,{method:"POST",headers:{"Content-Type":"application/json"},body:hlBody(type,extra)})}
-function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).mirror||{}).opens||[])];
+function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).mirror||{}).opens||[]),...(((D&&D.real_all)||{}).opens||[])];
  const wpos=[];const addW=w=>{(w&&w.positions||[]).forEach(p=>wpos.push(p))};Object.values(WALLETS_LIVE||{}).forEach(addW);(((D&&D.real)||{}).wallets||[]).forEach(addW);addW(((D&&D.real)||{}).wallet);
  const syms=new Set(),coins=new Set(),mints=new Set();
  os.forEach(o=>{if(o.sym)syms.add(o.sym);if(o.a)coins.add(o.a);if(o.mint&&!o.sym)mints.add(o.mint)});
@@ -923,6 +991,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
+$("v-signals").addEventListener("click",()=>setView("signals"));
 $("v-steven").addEventListener("click",()=>{setView("steven");fetchWallet()});
 $("v-russel").addEventListener("click",()=>{setView("russel");fetchWallet()});
 $("v-trend").addEventListener("click",()=>setView("trend"));
