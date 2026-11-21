@@ -156,8 +156,9 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 <script>
 const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";
 const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
-const WALLET_FALLBACK="0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b";
-let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,dfilter="all";
+const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b",url:"https://app.hyperliquid.xyz/explorer/address/0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b"},{name:"Russel",address:"0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB",url:"https://app.hyperliquid.xyz/explorer/address/0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB"}];
+const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
+let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
 let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="trend"?v:"paper"}catch(e){return"paper"}})();
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -172,8 +173,32 @@ const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o
 const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
 const pnl$=(n,fine)=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:fine?4:2});
 const secAgo=ts=>{if(!ts)return"";const s=Math.max(0,Math.round((Date.now()-ts)/1000));return s<1?"just now":s+"s ago"};
-const walletAddr=()=>((D&&D.real&&D.real.wallet&&D.real.wallet.address)||WALLET_FALLBACK);
-const walletNow=()=>WALLET_LIVE||((D&&D.real&&D.real.wallet)||null);
+const walletAddr=()=>{const s=walletSpecs();return (s[0]&&s[0].address)||WALLET_FALLBACK};
+function walletSpecs(){const seen=new Set(),out=[];
+ const add=w=>{if(!w||!w.address)return;const k=w.address.toLowerCase();if(seen.has(k))return;seen.add(k);out.push({name:w.name||"",address:w.address,url:w.url||("https://app.hyperliquid.xyz/explorer/address/"+w.address)})};
+ ((D&&D.real&&D.real.wallets)||[]).forEach(add);
+ add((D&&D.real&&D.real.wallet)||null);
+ WALLETS_FALLBACK.forEach(add);
+ return out}
+function walletNow(addr){if(!addr){const s=walletSpecs();addr=s[0]&&s[0].address}if(!addr)return (WALLET_LIVE||((D&&D.real&&D.real.wallet)||null));
+ const k=addr.toLowerCase();
+ if(WALLETS_LIVE[k])return WALLETS_LIVE[k];
+ if(WALLET_LIVE&&(WALLET_LIVE.address||"").toLowerCase()===k)return WALLET_LIVE;
+ const list=((D&&D.real&&D.real.wallets)||[]);
+ const found=list.find(w=>(w.address||"").toLowerCase()===k);
+ if(found)return found;
+ const one=((D&&D.real)||{}).wallet;
+ if(one&&(one.address||"").toLowerCase()===k)return one;
+ return null}
+function walletsNow(){return walletSpecs().map(s=>{const w=walletNow(s.address)||{};return Object.assign({},w,{name:w.name||s.name,address:w.address||s.address,url:w.url||s.url,venue:w.venue||"Hyperliquid"})})}
+function walletTitle(w){const name=w&&w.name,venue=(w&&w.venue)||"Hyperliquid";return name?name+" · "+venue:venue}
+function shortAddr(a){return a&&a.length>10?a.slice(0,6)+"…"+a.slice(-4):(a||"")}
+function walletNamesLabel(names){if(!names||!names.length)return"";const poss=names.map(n=>n+"'s");return poss.length===1?poss[0]+" wallet":poss.length===2?poss[0]+" and "+poss[1]+" wallets":poss.slice(0,-1).join(", ")+" and "+poss[poss.length-1]+" wallets"}
+function walletsHolding(o){const a=(o.a||"").toUpperCase(),side=o.side||"",names=[];
+ walletsNow().forEach(w=>{(w.positions||[]).some(p=>{if((p.a||"").toUpperCase()===a&&(p.side||"")===side){if(w.name&&!names.includes(w.name))names.push(w.name);return true}return false})});
+ if(!names.length&&Array.isArray(o.wallet_names))o.wallet_names.forEach(n=>{if(n&&!names.includes(n))names.push(n)});
+ return names}
+function walletMatchBadge(o){const names=walletsHolding(o);if(!names.length&&!o.wallet_match)return"";const label=walletNamesLabel(names);return `<div class="when"><span class="badge match">${esc(label?"On "+label:(o.wallet_note||"On your live wallet"))}</span></div>`}
 function posQty(o){if(o.qty!=null&&!isNaN(+o.qty))return +o.qty;if(o.e&&o.n)return o.n/o.e;return null}
 function livePx(o){if(!o)return o;const k=o.sym||o.mint||o.a;const p=k!=null?LIVE[k]:null;if(p!=null)return p;if(o.a&&LIVE[o.a+"USDT"]!=null)return LIVE[o.a+"USDT"];return o.p}
 function crossedSide(side,kind,level,p){if(level==null||p==null||isNaN(p)||isNaN(level))return false;const short=side==="short";return kind==="sl"?(short?p>=level:p<=level):(short?p<=level:p>=level)}
@@ -206,7 +231,7 @@ function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort(
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
   const tag=slTag(o),flags=crossFlags(o,p);
-  const match=o.wallet_match?`<div class="when"><span class="badge match">On your live wallet</span></div>`:"";
+  const match=walletMatchBadge(o);
   return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
   <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
   <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pct(pc)}</span></div>
@@ -224,7 +249,7 @@ function closedTable(cl,fine){const $=fine?moneyR:money;
  return cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet.</div>'}
 
 function deskOpens(){const deskOf=x=>x.desk||x.name;return ((D&&D.open)||[]).filter(o=>deskOf(o)===FOCUS)}
-function walletHeld(w){const src=(w&&Array.isArray(w.positions)?w:null)||((D&&D.real)||{}).wallet||{};const set=new Set();
+function walletHeld(w){const src=(w&&typeof w==="object"?w:{});const set=new Set();
  (src.positions||[]).forEach(p=>{if(p&&p.a)set.add((p.a||"").toUpperCase()+"|"+(p.side||""))});return set}
 function deskNotIn(w){const held=walletHeld(w);return deskOpens().filter(o=>!held.has((o.a||"").toUpperCase()+"|"+(o.side||"")))}
 
@@ -242,9 +267,9 @@ function enterability(o){const p=livePx(o)??o.p,reasons=[],short=o.side==="short
  if(p==null||isNaN(p))reasons.push("no live mark");
  return{enterable:!reasons.length,reason:reasons[0]||"",reasons,p,prog}}
 function missingDeskHtml(w){const miss=deskNotIn(w).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
- const note=`<div class="sub" style="margin:0 0 10px">Open Majors paper trades with no matching coin+side on the live wallet. This is the desk's signal, not advice — you place any trades yourself.</div>`;
- const head=`<div class="card"><h2>Desk trades you're not in <span class="badge">${miss.length}</span></h2>${note}`;
- if(!miss.length)return head+`<div class="empty">You're in all desk trades</div></div>`;
+ const note=`<div class="sub" style="margin:0 0 10px">Open Majors paper trades with no matching coin+side on this wallet. This is the desk's signal, not advice — you place any trades yourself.</div>`;
+ const head=`<div class="card"><h2>Desk trades not on this wallet <span class="badge">${miss.length}</span></h2>${note}`;
+ if(!miss.length)return head+`<div class="empty">All desk trades are on this wallet</div></div>`;
  const rows=miss.map(o=>Object.assign({o},enterability(o)));
  const yes=rows.filter(r=>r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
  const no=rows.filter(r=>!r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
@@ -280,18 +305,18 @@ function walletPosHtml(p){const desk=deskOpenFor(p),short=p.side==="short",ords=
   ${flags.length?`<div class="wflags">${flags.join("")}</div>`:""}${levels}${desk?activity(desk):""}</div>`}
 
 function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
- if(!w.ok)return`<div class="card"><h2>Live wallet <span class="badge b-wallet">READ-ONLY</span></h2><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
+ const title=walletTitle(w),addr=shortAddr(w.address);
+ if(!w.ok)return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">READ-ONLY</span></h3></div><div class="card"><h2>${esc(title)} <span class="badge b-wallet">READ-ONLY</span></h2><div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" title="${esc(w.address||"")}">${esc(addr||w.address||"")} ↗</a>`:esc(addr||w.address||"")}</div><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
  const pos=(w.positions||[]),fills=w.fills||[];
- const rows=pos.length?`<div class="sub" style="margin-top:10px">Desk-matched coins show the paper SL/TP, trailing and activity. Your TP/SL are read live from Hyperliquid, read-only.</div><div class="wgrid">${pos.map(walletPosHtml).join("")}</div>`:'<div class="empty">No open positions on the wallet.</div>';
+ const rows=pos.length?`<div class="sub" style="margin-top:10px">Desk-matched coins show the paper SL/TP, trailing and activity. Your TP/SL are read live from Hyperliquid, read-only.</div><div class="wgrid">${pos.map(walletPosHtml).join("")}</div>`:'<div class="empty">No open positions on this wallet.</div>';
  const fillTbl=fills.length?`<div class="tw" style="margin-top:8px"><table><tr><th>Time</th><th>Coin</th><th>Action</th><th>Price</th><th>Size</th><th>Closed PnL</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${esc(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`:'<div class="empty">No recent fills.</div>';
- const shortAddr=w.address?w.address.slice(0,6)+"…"+w.address.slice(-4):"";
  const liveNote=w.live?"Live Hyperliquid read":(w.asof||"");
- return`<div class="oth"><h3>Live wallet (actual) <span class="badge b-wallet">READ-ONLY</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h3><div class="sub">${esc(w.venue||"Hyperliquid")} · ${esc(liveNote)}</div></div>
+ return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">READ-ONLY</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h3><div class="sub">${esc(liveNote)}</div></div>
  <div class="card">
-  <h2>${esc(w.venue||"Hyperliquid")} <span class="badge b-wallet">NOT THE $37 MIRROR</span></h2>
+  <h2>${esc(title)} <span class="badge b-wallet">NOT THE $37 MIRROR</span></h2>
   <div class="eq">${moneyR(w.eq)}</div>
   <div class="sub" style="margin-bottom:8px">Account value · perps ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}${w.margin!=null?` · margin used ${moneyR(w.margin)}`:""}${w.unreal!=null?` · uPnL <span class="${cls(w.unreal)}">${moneyR(w.unreal)}</span>`:""}</div>
-  <div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.address)} ↗</a>`:esc(w.address||shortAddr)}</div>
+  <div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" title="${esc(w.address||"")}">${esc(addr||w.address||"")} ↗</a>`:esc(addr||w.address||"")}</div>
   <div class="sub" style="margin-top:6px">Public lookup only. No keys, no signing, no orders from this page.</div>
   ${rows}
  </div>
@@ -426,15 +451,15 @@ function renderReal(){
  const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
  const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
  const pl=(eq/start-1)*100;
- $("htitle").innerHTML=`Real $37 <span class="badge b-real">SIMULATED MIRROR</span> <span class="badge b-wallet">LIVE WALLET</span>`;
+ $("htitle").innerHTML=`Real $37 <span class="badge b-real">SIMULATED MIRROR</span> <span class="badge b-wallet">LIVE WALLETS</span>`;
  $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
- $("totsub").textContent=`Simulated $37 book copying every Majors paper trade at 0.37% size. Started ${M.started||""}. Not the live wallet.`;
+ $("totsub").textContent=`Simulated $37 book copying every Majors paper trade at 0.37% size. Started ${M.started||""}. Not a live wallet.`;
  $("banner").hidden=false;
- $("banner").innerHTML=`<b>Two things on this page.</b> The numbers above and the open trades below are a <b>simulated $37 paper mirror</b> — they copy the $10K desk, same coin, side, leverage and SL/TP, sized × 37/10,000. ${esc(M.init_note||"Started from then-open positions, no closed-trade backfill.")} The <b>Live wallet</b> section is your actual Hyperliquid account, read-only.`;
+ $("banner").innerHTML=`<b>Two things on this page.</b> The numbers above and the open trades below are a <b>simulated $37 paper mirror</b> — they copy the $10K desk, same coin, side, leverage and SL/TP, sized × 37/10,000. ${esc(M.init_note||"Started from then-open positions, no closed-trade backfill.")} The <b>Live wallet</b> sections are your actual Hyperliquid accounts, read-only.`;
  $("ottitle").innerHTML=`Mirror open trades <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULATED</span>`;
  const cards=openCards(opens,true);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
  $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> on ${moneyR(cards.tm)} margin · scaled from the $10K desk`:"";
- $("wallet").hidden=false;$("wallet").innerHTML=walletHtml(W);
+ $("wallet").hidden=false;$("wallet").innerHTML=walletsNow().map(walletHtml).join("");
  $("desktitle").innerHTML=`$37 mirror book <span class="badge b-real">SIMULATED</span>`;
  $("desks").innerHTML=`<div class="card"><h2>Real $37 mirror <span class="badge b-paper">PAPER ONLY</span></h2>
   <div class="eq">${moneyR(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
@@ -449,8 +474,8 @@ function renderReal(){
  $("cltitle").textContent="Mirror closed trades (from start only)";
  $("closed").innerHTML=closedTable(M.closes||[],true);
  $("righttitle").textContent="How this book works";$("dtabs").style.display="none";$("dtabs").innerHTML="";
- $("dec").innerHTML=`<div class="it"><div class="r">The $37 book opens and closes in sync with the $10K Majors desk each cycle. New paper entries are copied automatically; closes and partial TPs after ${esc(M.started||"start")} are recorded here at 0.37% size. Older $10K results are not backfilled, so this win rate is this book's own record. The live wallet is separate — you entered LINK, XRP and TRX shorts yourself; those are tagged when they match a desk position. A LIT long on the wallet is yours only and is not on the paper desk.</div></div>`;
- $("foot").innerHTML=`The $37 book is simulated paper, not live orders. The wallet section is a public Hyperliquid read. No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
+ $("dec").innerHTML=`<div class="it"><div class="r">The $37 book opens and closes in sync with the $10K Majors desk each cycle. New paper entries are copied automatically; closes and partial TPs after ${esc(M.started||"start")} are recorded here at 0.37% size. Older $10K results are not backfilled, so this win rate is this book's own record. The live wallets are separate — positions you open yourself are tagged when they match a desk trade, and stays that are only on a wallet are marked as not on the paper desk.</div></div>`;
+ $("foot").innerHTML=`The $37 book is simulated paper, not live orders. The wallet sections are public Hyperliquid reads. No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
 }
 function render(){if(!D)return;
  const snap=snapUi();
@@ -468,7 +493,7 @@ function render(){if(!D)return;
 }
 function paintLive(){const el=$("livest");if(!el)return;
  const t=marksAt||walletAt;
- if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} marks`:"" ));if(VIEW==="real"&&walletAt)bits.push("wallet");
+ if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} marks`:"" ));if(VIEW==="real"&&walletAt)bits.push("wallets");
   el.innerHTML=`<span class="dot"></span><span class="ok">${esc(bits.join(" · "))} · updated ${secAgo(t)}</span>`}
  else if(t&&liveFail){el.innerHTML=`<span class="dot off"></span><span class="off">Live delayed · last ${secAgo(t)} · showing last marks or build prices</span>`}
  else{el.innerHTML=`<span class="dot off"></span><span class="off">Showing build prices · live marks unavailable</span>`}
@@ -478,10 +503,10 @@ async function fetchJson(url,opt){const c=new AbortController(),t=setTimeout(()=
 function hlBody(type,extra){return JSON.stringify(Object.assign({type},extra||{}))}
 async function hl(type,extra){return fetchJson(HL,{method:"POST",headers:{"Content-Type":"application/json"},body:hlBody(type,extra)})}
 function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).mirror||{}).opens||[])];
- const w=((WALLET_LIVE||((D&&D.real)||{}).wallet)||{}).positions||[];
+ const wpos=[];const addW=w=>{(w&&w.positions||[]).forEach(p=>wpos.push(p))};Object.values(WALLETS_LIVE||{}).forEach(addW);(((D&&D.real)||{}).wallets||[]).forEach(addW);addW(((D&&D.real)||{}).wallet);
  const syms=new Set(),coins=new Set(),mints=new Set();
  os.forEach(o=>{if(o.sym)syms.add(o.sym);if(o.a)coins.add(o.a);if(o.mint&&!o.sym)mints.add(o.mint)});
- w.forEach(p=>{if(p.a){coins.add(p.a);syms.add(p.a+"USDT")}});
+ wpos.forEach(p=>{if(p.a){coins.add(p.a);syms.add(p.a+"USDT")}});
  const S=(D&&D.shadow)||{};(S.open||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});(S.watch||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});(((D&&D.combo)||{}).open||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});
  return{syms,coins,mints,os}}
 async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
@@ -507,10 +532,8 @@ function ordersByCoin(orders){const out={};(orders||[]).forEach(o=>{const coin=o
   if(kind==="sl")rec.sl=pxv;else rec.tp=pxv;rec.orders.push({kind,typ,px:pxv})});return out}
 function tagMatches(positions){const desk={};((D&&D.open)||[]).forEach(o=>{const a=(o.a||"").toUpperCase();if(a)desk[a]=o.side||"long"});
  (positions||[]).forEach(p=>{const a=(p.a||"").toUpperCase();if(a in desk){if(desk[a]===p.side){p.match=true;p.match_note="Matches desk "+p.side}else{p.match=false;p.match_note="Desk is "+desk[a]+", wallet is "+p.side}}else{p.match=false;p.match_note="Not on the paper desk"}});return positions}
-async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
- try{const user=walletAddr();const prev=walletNow()||{};
+async function fetchOneWallet(spec){const user=spec.address,prev=walletNow(user)||spec||{};
   const [ch,spot,orders]=await Promise.all([hl("clearinghouseState",{user}),hl("spotClearinghouseState",{user}),hl("frontendOpenOrders",{user}).catch(()=>[])]);
-  if(!HLMIDS||!Object.keys(HLMIDS).length){try{HLMIDS=await hl("allMids")||{}}catch(e){}}
   const mids=HLMIDS||{},ms=ch.marginSummary||{},perps_eq=+(ms.accountValue||0),margin_used=+(ms.totalMarginUsed||0),notional=+(ms.totalNtlPos||0),withdrawable=+(ch.withdrawable||0);
   let spot_total=0,usdc_total=0,usdc_hold=0;
   const spot_rows=(spot.balances||[]).map(b=>{const coin=b.coin||"?",qty=+(b.total||0),hold=+(b.hold||0);const row={coin,qty,hold,mid_key:((prev.spot||[]).find(s=>s.coin===coin)||{}).mid_key,mid_inv:((prev.spot||[]).find(s=>s.coin===coin)||{}).mid_inv};
@@ -524,9 +547,19 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
    return{a:p.coin||"?",side,qty,e:entry,p:mark,u:uu,lev:(p.leverage||{}).value,liq:p.liquidationPx!=null&&p.liquidationPx!==""?+p.liquidationPx:null,m:+(p.marginUsed||0),n:ntl,sl:ords.sl,tp:ords.tp,orders:ords.orders||[],_live:mark!=null}}).filter(Boolean);
   tagMatches(positions);
   const equity=perps_eq+spot_total-hold_adj;
-  WALLET_LIVE={ok:true,live:true,venue:"Hyperliquid",address:user,url:prev.url||("https://app.hyperliquid.xyz/explorer/address/"+user),eq:equity,perps_eq,spot_eq:spot_total-hold_adj,spot_usdc:usdc_total,spot_usdc_free:usdc_total-usdc_hold,portfolio_eq:prev.portfolio_eq,withdrawable,margin:margin_used,notional,unreal,asof:"Live",spot:spot_rows,positions,fills:prev.fills||[]};
+  return{ok:true,live:true,name:spec.name||prev.name,venue:"Hyperliquid",address:user,url:prev.url||spec.url||("https://app.hyperliquid.xyz/explorer/address/"+user),eq:equity,perps_eq,spot_eq:spot_total-hold_adj,spot_usdc:usdc_total,spot_usdc_free:usdc_total-usdc_hold,portfolio_eq:prev.portfolio_eq,withdrawable,margin:margin_used,notional,unreal,asof:"Live",spot:spot_rows,positions,fills:prev.fills||[]}}
+async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
+ try{if(!HLMIDS||!Object.keys(HLMIDS).length){try{HLMIDS=await hl("allMids")||{}}catch(e){}}
+  const specs=walletSpecs();
+  const results=await Promise.all(specs.map(s=>fetchOneWallet(s).then(w=>{WALLETS_LIVE[(w.address||s.address).toLowerCase()]=w;return w}).catch(()=>{
+   const prev=walletNow(s.address),k=(s.address||"").toLowerCase();
+   if(prev&&prev.ok)return prev;
+   const err={ok:false,name:s.name,venue:"Hyperliquid",address:s.address,url:s.url,error:"wallet lookup failed",asof:(prev&&prev.asof)||""};
+   if(!WALLETS_LIVE[k]||!WALLETS_LIVE[k].ok)WALLETS_LIVE[k]=err;
+   return WALLETS_LIVE[k]||err})));
+  WALLET_LIVE=results[0]||WALLET_LIVE;
   walletAt=Date.now();if(VIEW==="real")render();else paintLive()}
- catch(e){/* keep last snapshot / data.json wallet */}
+ catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(VIEW==="real")fetchWallet()}catch(e){$("totsub").textContent="Could not load data.json"}}
 $("v-paper").addEventListener("click",()=>setView("paper"));
