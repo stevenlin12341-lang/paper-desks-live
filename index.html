@@ -170,11 +170,13 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-row .nm .q{font-size:12px;color:var(--mu)}
 .dca-row .rv{text-align:right}
 .dca-row .rv b{display:block;font-size:13px;font-weight:700}
+.dca-row .rv .pnl{display:block;font-size:12px;font-weight:700;margin-top:1px}
 .dca-row .rv .p{font-size:11px;color:var(--mu)}
+.dca-buys .st + .st{margin-top:-6px}
 .dca-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
 .dca-basis{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 .dca-brow{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:12px;margin:4px 0;align-items:center}
-.dca-brow.lama{color:var(--mu)}
+.dca-brow.lama .lbl{color:var(--mu)}
 .dca-buys{margin:0 0 12px}
 .dca-buyrow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
 .dca-buyrow:last-child{border-bottom:0}
@@ -819,10 +821,17 @@ function dcaAmt(asset,n){if(n==null||isNaN(n))return "—";const x=Number(n);
  if(asset==="IDR")return idr(x);
  if(asset==="BTC")return x.toLocaleString("id-ID",{minimumFractionDigits:8,maximumFractionDigits:8});
  return x.toLocaleString("id-ID",{maximumFractionDigits:8})}
-function dcaHoldAssets(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{};
+function dcaPnl(n,pct){if(n==null||isNaN(n))return "";
+ const x=Math.round(Number(n)),sign=x>0?"+":x<0?"−":"",cls=x>0?"up":x<0?"dn":"";
+ const body="Rp "+Math.abs(x).toLocaleString("id-ID");
+ const p=(pct==null||isNaN(pct))?"":" ("+(Number(pct)>0?"+":Number(pct)<0?"−":"")+Math.abs(Number(pct)).toFixed(2).replace(".",",")+"%)";
+ return `<span class="pnl ${cls}">${sign}${body}${p}</span>`}
+function dcaHoldAssets(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{},btc=P.btc||{};
  let rows=(P.assets&&P.assets.length?P.assets:(Bal.assets||[])).filter(a=>a&&a.asset).map(a=>{
   const amount=a.amount!=null?a.amount:(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
-  return {asset:a.asset,amount,idr:a.idr,pct:a.pct};});
+  const row={asset:a.asset,amount,idr:a.idr,pct:a.pct,pnl_idr:a.pnl_idr,pnl_pct:a.pnl_pct};
+  if(row.asset==="BTC"){if(row.pnl_idr==null)row.pnl_idr=btc.pnl_idr;if(row.pnl_pct==null)row.pnl_pct=btc.pnl_pct}
+  return row});
  const tot=Number((P.total_idr!=null?P.total_idr:Bal.idr_est)||0);
  if(tot>0)rows=rows.map(r=>{const v=r.idr!=null?Number(r.idr):null;return Object.assign({},r,{pct:r.pct!=null?r.pct:(v!=null?v/tot*100:null)})});
  return {rows,tot,asof:P.asof||Bal.asof,err:Bal.ok===false?Bal.error:null}}
@@ -838,14 +847,17 @@ function dcaHoldRows(rows){
  return `<div class="dca-rows">${(rows||[]).map(a=>{
   const asset=a.asset||"",col=HOLD_COL[asset]||"#8a93a6";
   const p=a.pct,pS=p==null||isNaN(p)?"—":Number(p).toFixed(1).replace(".",",")+"%";
-  return `<div class="dca-row">${coinIcon(asset)}<div class="nm"><b>${esc(asset)}</b><span class="q">${dcaAmt(asset,a.amount)}</span></div><div class="rv"><b>${a.idr!=null?idr(a.idr):"Rp —"}</b><span class="p"><i class="dca-dot" style="background:${col}"></i>${pS}</span></div></div>`}).join("")}</div>`}
+  const pnl=asset==="BTC"?dcaPnl(a.pnl_idr,a.pnl_pct):"";
+  return `<div class="dca-row">${coinIcon(asset)}<div class="nm"><b>${esc(asset)}</b><span class="q">${dcaAmt(asset,a.amount)}</span></div><div class="rv"><b>${a.idr!=null?idr(a.idr):"Rp —"}</b>${pnl}<span class="p"><i class="dca-dot" style="background:${col}"></i>${pS}</span></div></div>`}).join("")}</div>`}
 function dcaBasisHtml(P){
  const known=(P.btc||{}).known,lama=(P.btc||{}).lama,bits=[];
  const q=n=>dcaAmt("BTC",n)+" BTC";
- if(known&&known.qty){const pnl=known.pnl_idr,pc=known.pnl_pct,pnlCls=pnl==null?"":(pnl>0?"up":pnl<0?"dn":"");
-  const pnlS=pnl==null?"P/L —":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
-  bits.push(`<div class="dca-brow">${coinIcon("BTC","sm")}<span>Cicilan <b>${q(known.qty)}</b></span><span>${known.invested_idr!=null?"modal "+idr(known.invested_idr)+" · ":""}<span class="${pnlCls}">${pnlS}</span></span></div>`)}
- if(lama&&lama.qty)bits.push(`<div class="dca-brow lama">${coinIcon("BTC","sm")}<span>BTC lama <b>${q(lama.qty)}</b></span><span>${lama.value_idr!=null?idr(lama.value_idr)+" · ":""}P/L —</span></div>`);
+ if(known&&known.qty){const pnlS=dcaPnl(known.pnl_idr,known.pnl_pct)||"P/L —";
+  bits.push(`<div class="dca-brow">${coinIcon("BTC","sm")}<span>Cicilan <b>${q(known.qty)}</b></span><span>${known.invested_idr!=null?"modal "+idr(known.invested_idr)+" · ":""}${pnlS}</span></div>`)}
+ if(lama&&lama.qty){const pnlS=dcaPnl(lama.pnl_idr,lama.pnl_pct)||"P/L —";
+  const avg=[];if(lama.avg_price_usdt!=null)avg.push("~"+Number(lama.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
+  if(lama.avg_price_idr!=null)avg.push(idr(lama.avg_price_idr));
+  bits.push(`<div class="dca-brow lama">${coinIcon("BTC","sm")}<span class="lbl">BTC lama <b>${q(lama.qty)}</b>${avg.length?" · "+avg.join(" · "):""}</span><span>${lama.invested_idr!=null?"modal "+idr(lama.invested_idr)+" · ":""}${pnlS}</span></div>`)}
  return bits.length?`<div class="dca-basis">${bits.join("")}</div>`:""}
 function dcaWhen(s){if(!s)return "";const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/);
  if(!m)return String(s);const mo=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -859,16 +871,25 @@ function dcaBuysFromOrders(orders,lama){
  if(lama&&lama.qty)rows.unshift({kind:"lama",label:"BTC lama",note:"harga tidak diketahui",qty:lama.qty,value_idr:lama.value_idr});
  return rows}
 function dcaAvgUsdt(rows,given){if(given!=null&&!isNaN(given))return Number(given);
- let q=0,s=0;(rows||[]).forEach(r=>{if(r.kind!=="lama"&&r.qty&&r.price_usdt){q+=Number(r.qty);s+=Number(r.qty)*Number(r.price_usdt)}});return q?s/q:null}
+ let q=0,s=0;(rows||[]).forEach(r=>{if(r.qty&&r.price_usdt!=null){q+=Number(r.qty);s+=Number(r.qty)*Number(r.price_usdt)}});return q?s/q:null}
 function dcaBuysHtml(P,orders){
- const H=P.buys||{};
+ const H=P.buys||{},btc=P.btc||{},lama=btc.lama||{};
  let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
- if(!rows.length)rows=dcaBuysFromOrders(orders,(P.btc||{}).lama);
- const hasLama=rows.some(r=>r.kind==="lama");
- const avg=dcaAvgUsdt(rows,H.avg_price_usdt);
- const avgS=avg==null?"":`<div class="st">Rata-rata ${Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})} USDT${hasLama||H.avg_excludes_lama?" · tanpa BTC lama":""}</div>`;
+ if(!rows.length)rows=dcaBuysFromOrders(orders,lama);
+ const avg=dcaAvgUsdt(rows,H.avg_price_usdt!=null?H.avg_price_usdt:btc.avg_price_usdt);
+ const cic=H.avg_cicilan_usdt!=null?Number(H.avg_cicilan_usdt):null;
+ let avgS="";
+ if(avg!=null)avgS+=`<div class="st">Rata-rata ${Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})} USDT${H.avg_price_idr!=null?" · "+idr(H.avg_price_idr):""}</div>`;
+ if(cic!=null)avgS+=`<div class="st">Cicilan saja ${cic.toLocaleString("id-ID",{maximumFractionDigits:2})} USDT</div>`;
  const body=rows.length?rows.map(r=>{
-  if(r.kind==="lama")return `<div class="dca-buyrow"><div class="when">${esc(r.label||"BTC lama")}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${esc(r.note||"harga tidak diketahui")}</div><div class="meta"></div><div class="note">${r.value_idr!=null?"nilai "+idr(r.value_idr):""}</div></div>`;
+  if(r.kind==="lama"){const px=[];
+   if(r.price_usdt!=null)px.push("~"+Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
+   if(r.price_idr!=null)px.push(idr(r.price_idr));
+   if(r.usdt_idr!=null)px.push("kurs "+Number(r.usdt_idr).toLocaleString("id-ID"));
+   const right=dcaPnl(r.pnl_idr,r.pnl_pct)||esc(r.note||"harga tidak diketahui");
+   const meta=px.join(" · ")|| (r.note&&!r.price_usdt?esc(r.note):"");
+   const note=r.idr!=null?"modal "+idr(r.idr):(r.value_idr!=null?"nilai "+idr(r.value_idr):"");
+   return `<div class="dca-buyrow"><div class="when">${esc(r.label||"BTC lama")}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${right}</div><div class="meta">${meta}</div><div class="note">${note}</div></div>`}
   const pxS=r.price_usdt!=null?Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":"—";
   const kurs=r.usdt_idr!=null?" · kurs "+Number(r.usdt_idr).toLocaleString("id-ID"):"";
   return `<div class="dca-buyrow"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${r.idr!=null?idr(r.idr):"Rp —"}</div><div class="meta">${pxS}${kurs}</div><div class="note"></div></div>`}).join(""):`<div class="empty">Belum ada pembelian yang dicatat.</div>`;
