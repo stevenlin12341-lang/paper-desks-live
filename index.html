@@ -160,6 +160,10 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-saldo .sh{font-size:11px;color:var(--mu);letter-spacing:.04em;font-weight:600}
 .dca-saldo .sv{font-size:26px;font-weight:800;margin:0 0 2px}
 .dca-saldo .st,.dca-buys .st{font-size:11px;color:var(--mu);margin:0 0 10px}
+.dca-live{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;color:var(--tx)}
+.dca-live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #22c55e33;flex:0 0 auto}
+.dca-live.off{color:var(--mu)}
+.dca-live.off .dca-live-dot{background:#64748b;box-shadow:none}
 .dca-hold{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:4px 0 8px}
 .dca-hold-donut{width:min(148px,40vw);height:auto;flex:0 0 auto}
 .dca-rows{flex:1 1 220px;min-width:200px}
@@ -826,15 +830,54 @@ function dcaPnl(n,pct){if(n==null||isNaN(n))return "";
  const body="Rp "+Math.abs(x).toLocaleString("id-ID");
  const p=(pct==null||isNaN(pct))?"":" ("+(Number(pct)>0?"+":Number(pct)<0?"−":"")+Math.abs(Number(pct)).toFixed(2).replace(".",",")+"%)";
  return `<span class="pnl ${cls}">${sign}${body}${p}</span>`}
-function dcaHoldAssets(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{},btc=P.btc||{};
+let DCA_LIVE=null,dcaLiveBusy=false,dcaSkipIndodax=0;
+function dcaDataRate(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{},R=P.rates||Bal.rates||{};
+ const n=Number(R.usdt_idr||A.usdt_idr||0);return n>0?n:null}
+function dcaLivePx(){const L=DCA_LIVE;return(L&&L.ok&&L.btc_idr>0)?L:null}
+function dcaHms(ts){try{const p=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).formatToParts(new Date(ts));
+ const g=t=>(p.find(x=>x.type===t)||{}).value||"00";return `${g("hour")}:${g("minute")}:${g("second")} WIB`}catch(e){return ""}}
+function dcaAsOfHtml(){const L=dcaLivePx();
+ if(L)return `<div class="st dca-asof"><span class="dca-live" title="${esc(L.src||"")}"><i class="dca-live-dot"></i>Live · ${esc(dcaHms(L.at))}</span></div>`;
+ const asof=((D.dca||{}).portfolio||{}).asof||((D.dca||{}).balances||{}).asof||"";
+ const m=String(asof).match(/(\d{1,2}:\d{2})/);
+ const label=m?("data jam "+m[1]):(asof?("data jam "+asof):"data jam —");
+ return `<div class="st dca-asof"><span class="dca-live off">${esc(label)}</span></div>`}
+function dcaRevalLeg(leg,px){if(!leg||!leg.qty||!(px>0))return leg;const o=Object.assign({},leg);
+ o.value_idr=Math.round(Number(o.qty)*px);
+ if(o.invested_idr!=null){o.pnl_idr=o.value_idr-Number(o.invested_idr);o.pnl_pct=Number(o.invested_idr)?o.pnl_idr/Number(o.invested_idr)*100:null}
+ return o}
+function dcaLivePortfolio(){const src=(D.dca||{}).portfolio||{},P=Object.assign({},src),btc=Object.assign({},P.btc||{}),live=dcaLivePx();
+ const px=live?live.btc_idr:btc.price_idr;
+ if(px>0){btc.known=dcaRevalLeg(btc.known,px);btc.lama=dcaRevalLeg(btc.lama,px);
+  const q=btc.total!=null?Number(btc.total):((btc.known&&btc.known.qty||0)+(btc.lama&&btc.lama.qty||0));
+  if(q)btc.value_idr=Math.round(q*px);
+  if(btc.invested_idr!=null&&btc.value_idr!=null){btc.pnl_idr=btc.value_idr-Number(btc.invested_idr);btc.pnl_pct=Number(btc.invested_idr)?btc.pnl_idr/Number(btc.invested_idr)*100:null}
+  if(live){btc.price_idr=live.btc_idr;if(live.btc_usdt)btc.price_usdt=live.btc_usdt}}
+ P.btc=btc;
+ if(P.buys&&P.buys.rows)P.buys=Object.assign({},P.buys,{rows:P.buys.rows.map(r=>{
+  if(r.kind!=="lama")return r;const o=Object.assign({},r);
+  if(px>0&&o.qty)o.value_idr=Math.round(Number(o.qty)*px);
+  const cost=o.idr!=null?Number(o.idr):(btc.lama&&btc.lama.invested_idr);
+  if(cost!=null&&o.value_idr!=null){o.pnl_idr=o.value_idr-cost;o.pnl_pct=cost?o.pnl_idr/cost*100:null}
+  return o})});
+ return P}
+function dcaHoldAssets(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{},btc=P.btc||{},live=dcaLivePx();
+ const usdt_idr=live&&live.usdt_idr>0?live.usdt_idr:dcaDataRate();
+ const btc_idr=live&&live.btc_idr>0?live.btc_idr:(btc.price_idr||((P.rates||Bal.rates||{}).btc_idr));
  let rows=(P.assets&&P.assets.length?P.assets:(Bal.assets||[])).filter(a=>a&&a.asset).map(a=>{
   const amount=a.amount!=null?a.amount:(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
-  const row={asset:a.asset,amount,idr:a.idr,pct:a.pct,pnl_idr:a.pnl_idr,pnl_pct:a.pnl_pct};
-  if(row.asset==="BTC"){if(row.pnl_idr==null)row.pnl_idr=btc.pnl_idr;if(row.pnl_pct==null)row.pnl_pct=btc.pnl_pct}
-  return row});
- const tot=Number((P.total_idr!=null?P.total_idr:Bal.idr_est)||0);
- if(tot>0)rows=rows.map(r=>{const v=r.idr!=null?Number(r.idr):null;return Object.assign({},r,{pct:r.pct!=null?r.pct:(v!=null?v/tot*100:null)})});
- return {rows,tot,asof:P.asof||Bal.asof,err:Bal.ok===false?Bal.error:null}}
+  return {asset:a.asset,amount,idr:a.idr,pct:a.pct,pnl_idr:a.pnl_idr,pnl_pct:a.pnl_pct}});
+ rows=rows.map(r=>{const amt=Number(r.amount)||0;let v=r.idr;
+  if(r.asset==="BTC"&&btc_idr>0)v=Math.round(amt*btc_idr);
+  else if(r.asset==="USDT"&&usdt_idr>0)v=Math.round(amt*usdt_idr);
+  else if(r.asset==="IDR")v=Math.round(amt);
+  return Object.assign({},r,{idr:v})});
+ const tot=rows.reduce((s,r)=>s+(Number(r.idr)||0),0);
+ rows=rows.map(r=>Object.assign({},r,{pct:tot&&r.idr!=null?Number(r.idr)/tot*100:null}));
+ const invested=btc.invested_idr!=null?Number(btc.invested_idr):null;
+ const btcRow=rows.find(r=>r.asset==="BTC");
+ if(btcRow&&invested){btcRow.pnl_idr=Number(btcRow.idr)-invested;btcRow.pnl_pct=invested?btcRow.pnl_idr/invested*100:null}
+ return {rows,tot,asof:P.asof||Bal.asof,err:Bal.ok===false?Bal.error:null,live:!!live}}
 function dcaHoldDonut(rows,tot){
  const r=54,cx=80,cy=80,sw=22,C=2*Math.PI*r;
  let acc=0;const segs=[`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1f2633" stroke-width="${sw}"/>`];
@@ -849,7 +892,7 @@ function dcaHoldRows(rows){
   const p=a.pct,pS=p==null||isNaN(p)?"—":Number(p).toFixed(1).replace(".",",")+"%";
   const pnl=asset==="BTC"?dcaPnl(a.pnl_idr,a.pnl_pct):"";
   return `<div class="dca-row">${coinIcon(asset)}<div class="nm"><b>${esc(asset)}</b><span class="q">${dcaAmt(asset,a.amount)}</span></div><div class="rv"><b>${a.idr!=null?idr(a.idr):"Rp —"}</b>${pnl}<span class="p"><i class="dca-dot" style="background:${col}"></i>${pS}</span></div></div>`}).join("")}</div>`}
-function dcaBasisHtml(P){
+function dcaBasisHtml(P){P=P||dcaLivePortfolio();
  const known=(P.btc||{}).known,lama=(P.btc||{}).lama,bits=[];
  const q=n=>dcaAmt("BTC",n)+" BTC";
  if(known&&known.qty){const pnlS=dcaPnl(known.pnl_idr,known.pnl_pct)||"P/L —";
@@ -872,7 +915,7 @@ function dcaBuysFromOrders(orders,lama){
  return rows}
 function dcaAvgUsdt(rows,given){if(given!=null&&!isNaN(given))return Number(given);
  let q=0,s=0;(rows||[]).forEach(r=>{if(r.qty&&r.price_usdt!=null){q+=Number(r.qty);s+=Number(r.qty)*Number(r.price_usdt)}});return q?s/q:null}
-function dcaBuysHtml(P,orders){
+function dcaBuysHtml(P,orders){P=dcaLivePortfolio();
  const H=P.buys||{},btc=P.btc||{},lama=btc.lama||{};
  let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
  if(!rows.length)rows=dcaBuysFromOrders(orders,lama);
@@ -893,10 +936,38 @@ function dcaBuysHtml(P,orders){
   const pxS=r.price_usdt!=null?Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":"—";
   const kurs=r.usdt_idr!=null?" · kurs "+Number(r.usdt_idr).toLocaleString("id-ID"):"";
   return `<div class="dca-buyrow"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${r.idr!=null?idr(r.idr):"Rp —"}</div><div class="meta">${pxS}${kurs}</div><div class="note"></div></div>`}).join(""):`<div class="empty">Belum ada pembelian yang dicatat.</div>`;
- return `<div class="card dca-buys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
-function dcaSaldoCard(){const A=D.dca||{},P=A.portfolio||{},h=dcaHoldAssets();
- if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
- return `<div class="card dca-saldo"><h2>Saldo Indodax</h2><div class="sv">${h.tot?idr(h.tot):"Rp —"}</div>${h.asof?`<div class="st">${esc(h.asof)}</div>`:""}${h.err?`<div class="st">${esc(h.err)}</div>`:""}<div class="dca-hold">${dcaHoldDonut(h.rows,h.tot)}${dcaHoldRows(h.rows)}</div>${dcaBasisHtml(P)}</div>`}
+ return `<div class="card dca-buys" id="dcabuys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
+function dcaSaldoCard(){const P=dcaLivePortfolio(),h=dcaHoldAssets();
+ if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
+ return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="sv">${h.tot?idr(h.tot):"Rp —"}</div>${dcaAsOfHtml()}${h.err?`<div class="st">${esc(h.err)}</div>`:""}<div class="dca-hold">${dcaHoldDonut(h.rows,h.tot)}${dcaHoldRows(h.rows)}</div>${dcaBasisHtml(P)}</div>`}
+function dcaTickerLast(j){const t=(j&&j.ticker)||j||{},n=Number(t.last||t.sell||t.buy||t.price||0);return n>0?n:null}
+async function fetchDcaIndodax(){const [b,u]=await Promise.all([
+  fetchJson("https://indodax.com/api/ticker/btcidr"),
+  fetchJson("https://indodax.com/api/ticker/usdtidr")]);
+ const btc_idr=dcaTickerLast(b),usdt_idr=dcaTickerLast(u);
+ if(!btc_idr||!usdt_idr)throw new Error("indodax empty");
+ return {btc_idr,usdt_idr,btc_usdt:btc_idr/usdt_idr,src:"Indodax"}}
+async function fetchDcaBinance(){const j=await fetchJson("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+ const btc_usdt=Number(j&&j.price),usdt_idr=dcaDataRate();
+ if(!(btc_usdt>0)||!(usdt_idr>0))throw new Error("binance fallback missing");
+ return {btc_idr:btc_usdt*usdt_idr,usdt_idr,btc_usdt,src:"Binance × kurs data"}}
+async function fetchDcaCoinGecko(){const j=await fetchJson("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,tether&vs_currencies=idr,usd");
+ const btc_idr=Number(j&&j.bitcoin&&j.bitcoin.idr),usdt_idr=Number(j&&j.tether&&j.tether.idr)||dcaDataRate(),btc_usdt=Number(j&&j.bitcoin&&j.bitcoin.usd);
+ if(!(btc_idr>0))throw new Error("coingecko empty");
+ return {btc_idr,usdt_idr,btc_usdt:btc_usdt||(usdt_idr?btc_idr/usdt_idr:null),src:"CoinGecko"}}
+function paintDcaLive(){if(VIEW!=="dca"||!dcaUnlocked())return;
+ const put=(id,html)=>{const el=$(id);if(!el)return;const tmp=document.createElement("div");tmp.innerHTML=html;const n=tmp.firstElementChild;if(n)el.replaceWith(n)};
+ put("dcasaldo",dcaSaldoCard());put("dcabuys",dcaBuysHtml());}
+async function fetchDcaLive(){if(dcaLiveBusy||!D)return;dcaLiveBusy=true;
+ try{let got=null;
+  if(!dcaSkipIndodax||Date.now()-dcaSkipIndodax>300000){
+   try{got=await fetchDcaIndodax();dcaSkipIndodax=0}catch(e){dcaSkipIndodax=Date.now()}}
+  if(!got){try{got=await fetchDcaBinance()}catch(e){}}
+  if(!got){try{got=await fetchDcaCoinGecko()}catch(e){}}
+  if(got&&got.btc_idr>0){DCA_LIVE=Object.assign({ok:true,at:Date.now()},got);paintDcaLive()}
+  else{const age=DCA_LIVE&&DCA_LIVE.at?(Date.now()-DCA_LIVE.at):1e15;
+   if(age>60000){if(DCA_LIVE)DCA_LIVE.ok=false;paintDcaLive()}}}
+ finally{dcaLiveBusy=false}}
 
 function renderDca(){const A=D.dca||{};
  $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
@@ -975,6 +1046,7 @@ function renderDca(){const A=D.dca||{};
   <section style="margin-top:16px"><h3>Catatan order</h3>${hist}</section>
  </details>`;
  const hero=dcaBudgetHero(B,A.orders||[]);$("dcasec").innerHTML=hero+bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
+ if(!DCA_LIVE||!DCA_LIVE.ok||Date.now()-(DCA_LIVE.at||0)>10000)fetchDcaLive();
  $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
@@ -1074,7 +1146,7 @@ $("v-signals").addEventListener("click",()=>setView("signals"));
 $("v-steven").addEventListener("click",()=>{setView("steven");fetchWallet()});
 $("v-russel").addEventListener("click",()=>{setView("russel");fetchWallet()});
 $("v-trend").addEventListener("click",()=>setView("trend"));
-$("v-dca").addEventListener("click",()=>setView("dca"));
+$("v-dca").addEventListener("click",()=>{setView("dca");fetchDcaLive()});
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
@@ -1083,4 +1155,5 @@ setInterval(load,120000);
 setInterval(fetchMarks,5000);
 setInterval(()=>{if(wantsWallet())fetchWallet()},10000);
 setInterval(paintLive,1000);
+setInterval(()=>{if(VIEW==="dca"&&dcaUnlocked())fetchDcaLive()},10000);
 </script></body></html>
