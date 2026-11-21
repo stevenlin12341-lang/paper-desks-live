@@ -131,7 +131,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
- <button type="button" id="v-real">Real $37</button>
+ <button type="button" id="v-real">$37 → $1000K Goal</button>
  <button type="button" id="v-steven">Steven</button>
  <button type="button" id="v-russel">Russel</button>
  <button type="button" id="v-trend">Trend (forward test)</button>
@@ -467,7 +467,7 @@ function renderReal(){
  const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
  const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
  const pl=(eq/start-1)*100;
- $("htitle").innerHTML=`Real $37 <span class="badge b-real">SIMULATED MIRROR</span>`;
+ $("htitle").innerHTML=`$37 → $1000K Goal <span class="badge b-real">SIMULATED MIRROR</span>`;
  $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
  $("totsub").textContent=`Simulated $37 book copying every Majors paper trade at 0.37% size. Started ${M.started||""}. Not a live wallet.`;
  $("banner").hidden=false;
