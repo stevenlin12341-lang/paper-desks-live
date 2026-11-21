@@ -160,6 +160,24 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-saldo .sv{font-size:20px;font-weight:700;margin:2px 0 4px}
 .dca-saldo .sa{font-size:12px;color:var(--mu);line-height:1.45}
 .dca-saldo .sw{font-size:11px;color:var(--wa);margin:8px 0 0;line-height:1.4}
+.dca-port{margin:0 0 12px}
+.dca-port h2{margin:0 0 8px;font-size:15px}
+.dca-port .tw{overflow:auto}
+.dca-basis{margin-top:10px;font-size:13px;line-height:1.5}
+.dca-basis p{margin:6px 0 0}
+.dca-basis .lama{color:var(--mu)}
+.dca-buypad{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.dca-buypad .sh{font-size:11px;color:var(--mu);letter-spacing:.04em;font-weight:600}
+.dca-buybtns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.dca-buybtns button,.dca-copybtn{background:#152238;color:var(--ac);border:1px solid var(--ac);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.dca-buyin{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:8px 0}
+.dca-buyin label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mu)}
+.dca-buyin input{background:#0b0e14;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;width:160px}
+.dca-buymsg{font-size:26px;font-weight:800;letter-spacing:.02em;margin:8px 0;word-break:break-word}
+.dca-buyhint{margin:6px 0 0;font-size:13px}
+.dca-buywarn{margin:8px 0 0;font-size:12px;color:var(--wa);line-height:1.4}
+.dca-buyfree{margin:4px 0 0;font-size:12px;color:var(--mu)}
+
 
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
@@ -573,6 +591,32 @@ function dcaChart(ch){if(!ch||!ch.c||ch.c.length<10)return '<div class="empty">G
   <text x="${W-pR}" y="${H-8}" text-anchor="end" fill="#8a93a6" font-size="9">${esc(t1)}</text>
  </svg>
  <div class="dca-leg"><span><i style="background:#e6e9ef"></i>Harga</span><span><i style="background:#60a5fa"></i>MA50 harian</span><span><i style="background:#f59e0b"></i>MA200 harian</span><span><i style="background:#a78bfa"></i>MA 200 minggu</span></div>`}
+
+let dcaBuyAmt=null;
+function dcaIdrFree(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{};
+ if(P.idr_free!=null&&!isNaN(P.idr_free))return Math.max(0,Math.floor(Number(P.idr_free)));
+ if(Bal.idr_free!=null&&!isNaN(Bal.idr_free))return Math.max(0,Math.floor(Number(Bal.idr_free)));
+ const a=(Bal.assets||[]).find(x=>x&&x.asset==="IDR");
+ return Math.max(0,Math.floor(Number((a&&a.free)!=null?a.free:0)+1e-9))}
+function dcaUsdtIdr(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{},R=P.rates||Bal.rates||{};
+ const n=Number(R.usdt_idr||A.usdt_idr||0);return n>0?n:null}
+function dcaShowBuy(n){n=Math.floor(Number(n)||0);if(n<0)n=0;dcaBuyAmt=n;
+ const inp=$("dcaidr");if(inp)inp.value=n?String(n):"";
+ const text="beli Rp"+n;
+ const msg=$("dcabuymsg");if(msg)msg.textContent=text;
+ const box=$("dcabuybox");if(box)box.hidden=false;
+ const rate=dcaUsdtIdr(),usdt=rate?n/rate*(1-0.002):null,free=dcaIdrFree(),warns=[];
+ if(n<10000)warns.push("Minimum order USDTIDR adalah Rp 10.000. Jumlah ini di bawah minimum.");
+ if(usdt!=null&&usdt<1)warns.push("Setelah langkah 1 (beli USDT, fee ~0,2%) kira-kira "+usdt.toFixed(2)+" USDT, di bawah minimum 1 USDT untuk beli BTC/USDT.");
+ if(n>free)warns.push("Jumlah ini lebih besar dari IDR bebas saat ini ("+idr(free)+").");
+ const w=$("dcabuywarn");if(w){w.textContent=warns.join(" ");w.hidden=!warns.length}
+ return text}
+function dcaBuyPct(p){dcaShowBuy(Math.floor(dcaIdrFree()*Number(p)/100))}
+function dcaBuyTyped(){const raw=String((($("dcaidr")||{}).value)||"").replace(/[^\d]/g,"");dcaShowBuy(raw?parseInt(raw,10):0)}
+function copyDcaBuy(){const el=$("dcabuymsg");if(!el)return;const t=el.textContent||"";
+ const done=()=>{const b=$("dcacopybuy");if(b){b.textContent="Tersalin";setTimeout(()=>{if($("dcacopybuy"))$("dcacopybuy").textContent="Salin"},1200)}};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done).catch(()=>fb());else fb();
+ function fb(){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){}document.body.removeChild(a)}}
 function renderDca(){const A=D.dca||{};
  $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
  $("banner").hidden=false;
@@ -598,6 +642,7 @@ function renderDca(){const A=D.dca||{};
   return `${q} ${esc(a.asset)}`;};
  const aset=(Bal.assets||[]).filter(a=>a&&a.asset).map(fmtBal).join(" · ")||"—";
  const warn=Bal.warning||"Saldo di kartu ini juga tercatat di data publik. Siapa pun yang membuka sumber halaman ini bisa melihatnya.";
+ const idrFree=(A.portfolio&&A.portfolio.idr_free!=null)?Math.floor(Number(A.portfolio.idr_free)):(Bal.idr_free!=null?Math.floor(Number(Bal.idr_free)):Math.floor(Number(((Bal.assets||[]).find(x=>x&&x.asset==="IDR")||{}).free||0)));
  const saldoBox=`<div class="dca-saldo"><div class="sh">Saldo Indodax</div>
   <div class="sv">${Bal.idr_est!=null?idr(Bal.idr_est):"Rp —"}</div>
   <div class="sa">${aset}${Bal.asof?` · ${esc(Bal.asof)}`:""}${Bal.ok===false&&Bal.error?" · "+esc(Bal.error):""}</div>
@@ -611,7 +656,24 @@ function renderDca(){const A=D.dca||{};
    ${kpi("Anggaran",idr(B.monthly||1000000))}
    ${kpi("Minggu (WIB)",esc((B.week_label||"—").replace(/^Minggu /,"M")))}
   </div>
-  <p class="dca-buyline">Mau beli? Kirim "beli ${B.suggest>0?B.suggest:"<jumlah>"}" ke Grok Bot</p>
+  <div class="dca-buypad">
+   <div class="sh">Beli BTC</div>
+   <p class="dca-buyfree">Persen dihitung dari saldo IDR bebas (${idr(idrFree)}), bukan dari BTC atau USDT. Tombol ini hanya merangkai pesan; halaman ini tidak memasang order.</p>
+   <div class="dca-buybtns">
+    <button type="button" onclick="dcaBuyPct(25)">25%</button>
+    <button type="button" onclick="dcaBuyPct(50)">50%</button>
+    <button type="button" onclick="dcaBuyPct(75)">75%</button>
+    <button type="button" onclick="dcaBuyPct(100)">100%</button>
+   </div>
+   <div class="dca-buyin"><label>Atau jumlah IDR <input id="dcaidr" inputmode="numeric" autocomplete="off" placeholder="contoh 500000" oninput="dcaBuyTyped()"></label>
+    <button type="button" class="dca-copybtn" onclick="dcaBuyTyped()">Buat pesan</button></div>
+   <div id="dcabuybox" hidden>
+    <div id="dcabuymsg" class="dca-buymsg"></div>
+    <button type="button" class="dca-copybtn" id="dcacopybuy" onclick="copyDcaBuy()">Salin</button>
+    <p class="dca-buyhint">Kirim ke Grok Bot buat langsung dieksekusi</p>
+    <p class="dca-buywarn" id="dcabuywarn" hidden></p>
+   </div>
+  </div>
   ${saldoBox}
  </div>`;
  const keys=`<div class="card"><div class="dca-kpis compact">
@@ -621,6 +683,28 @@ function renderDca(){const A=D.dca||{};
   ${kpi("RSI harian",A.rsi_d!=null?A.rsi_d:"N/A",A.rsi_d!=null&&A.rsi_d<30?"up":A.rsi_d>70?"dn":"")}
   ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
  </div></div>`;
+ const P=A.portfolio||{};
+ const fmtA=(asset,n)=>{if(n==null||isNaN(n))return "—";if(asset==="IDR")return Number(n).toLocaleString("id-ID",{maximumFractionDigits:0});if(asset==="BTC")return Number(n).toFixed(8);return Number(n).toLocaleString("id-ID",{maximumFractionDigits:8})};
+ const fmtPx=(row)=>{const a=row.asset;if(a==="BTC"&&row.price_usdt!=null)return Number(row.price_usdt).toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2})+" USDT";if(row.price==null||isNaN(row.price))return "—";if(a==="IDR")return idr(1);return idr(row.price)};
+ const rows=(P.assets||[]).map(r=>`<tr><td>${esc(r.asset)}</td><td>${esc(fmtA(r.asset,r.amount))}</td><td>${esc(fmtPx(r))}</td><td>${r.idr!=null?idr(r.idr):"—"}</td><td>${r.pct!=null?Number(r.pct).toFixed(2).replace(".",",")+"%":"—"}</td></tr>`).join("");
+ const tot=P.total_idr!=null?P.total_idr:Bal.idr_est;
+ const known=(P.btc||{}).known,lama=(P.btc||{}).lama;
+ let basis="";
+ if(known&&known.qty){
+  const pnl=known.pnl_idr,pc=known.pnl_pct,pnlCls=pnl==null?"":(pnl>0?"up":pnl<0?"dn":"");
+  const pnlS=pnl==null?"P/L tidak dihitung":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
+  basis+=`<p>BTC dari cicilan tercatat: <b>${fmtA("BTC",known.qty)}</b>${known.avg_price_usdt!=null?" · rata-rata "+Number(known.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT":""}${known.invested_idr!=null?" · modal "+idr(known.invested_idr):""}${known.value_idr!=null?" · nilai sekarang "+idr(known.value_idr):""} · <span class="${pnlCls}">${pnlS}</span>.</p>`;
+ }
+ if(lama&&lama.qty){
+  basis+=`<p class="lama">${esc(lama.label||"BTC lama (modal tidak diketahui)")}: <b>${fmtA("BTC",lama.qty)}</b>${lama.value_idr!=null?" · nilai sekarang "+idr(lama.value_idr):""}. P/L tidak dihitung — modal tidak diketahui, tidak dikarang.</p>`;
+ }else if(!known){
+  basis+=`<p class="lama">Belum ada isi BTC yang tercatat untuk menghitung modal.</p>`;
+ }
+ const port=(P.assets||[]).length?`<div class="card dca-port"><h2>Portofolio</h2>
+  <div class="tw"><table><tr><th>Aset</th><th>Jumlah</th><th>Harga</th><th>Nilai IDR</th><th>%</th></tr>${rows}<tr><th colspan="3">Total</th><th>${tot!=null?idr(tot):"—"}</th><th>100%</th></tr></table></div>
+  <div class="dca-basis"><b>Modal BTC</b>${basis}</div>
+  ${P.asof?`<p class="sub" style="margin:8px 0 0">Harga dan nilai per ${esc(P.asof)}.</p>`:""}
+ </div>`:`<div class="card dca-port"><h2>Portofolio</h2><div class="empty">Saldo belum tersedia.</div></div>`;
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
@@ -640,7 +724,7 @@ function renderDca(){const A=D.dca||{};
   <div class="card"><h2>Aturan zona &amp; anggaran</h2>${rules}</div>
   <section style="margin-top:16px"><h3>Riwayat beli DCA</h3>${hist}</section>
  </details>`;
- $("dcasec").innerHTML=bud+keys+detail;
+ $("dcasec").innerHTML=bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
  $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
