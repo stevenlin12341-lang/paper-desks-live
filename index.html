@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Paper Majors · Run 2</title>
+<title>Desk Majors (simulasi) · Sesi 2</title>
 <meta name="robots" content="noindex">
 <style>
 :root{--bg:#0b0e14;--card:#121722;--line:#1f2633;--tx:#e6e9ef;--mu:#8a93a6;--up:#22c55e;--dn:#ef4444;--ac:#60a5fa;--wa:#f59e0b}
@@ -179,36 +179,81 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-buyfree{margin:4px 0 0;font-size:12px;color:var(--mu)}
 
 
+
+.help-hint{margin:0 0 12px;font-size:13px;line-height:1.45}
+.coin{display:inline-flex;align-items:center;gap:6px;font-weight:700;vertical-align:middle;color:inherit}
+a.coin{color:inherit;text-decoration:none}a.coin:hover{text-decoration:none}a.coin:hover span:last-child{text-decoration:underline}
+.coin-logo{width:20px;height:20px;border-radius:50%;object-fit:cover;background:#0b0e14;flex:0 0 auto}
+.coin-logo.sm{width:16px;height:16px}
+abbr.tip,.tip{text-decoration:underline dotted;text-underline-offset:3px;cursor:help;font:inherit;color:inherit;border:0;letter-spacing:0;text-transform:none}
+.more{margin-top:8px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:2px 12px 10px}
+.more>summary{cursor:pointer;color:var(--mu);font-weight:600;padding:10px 0;user-select:none;font-size:14px;list-style:none}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after{content:" ▾";color:#5a6478;font-size:11px}
+.more[open]>summary::after{content:" ▴"}
+.views button{min-height:44px}
+.kpi .v{font-size:18px}
+.oc .pl{font-size:24px}
+.wpos .pl{font-size:22px}
+.eq{font-size:28px}
+h1{text-transform:none;letter-spacing:0}
+@media(max-width:640px){
+  body{font-size:15px}
+  .wrap{padding:10px}
+  .big{font-size:32px}
+  .eq{font-size:24px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .ogrid,.wgrid,.wl,.lrn,.tw2,.grid{grid-template-columns:1fr}
+  header{flex-direction:column;align-items:flex-start}
+  header .sub[style*="text-align:right"]{text-align:left !important}
+  .views{gap:6px}
+  .views button{padding:10px 12px;font-size:13px}
+  .two{grid-template-columns:1fr}
+}
+
+.dca-hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 14px;text-align:center}
+.dca-donut-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.dca-donut{width:min(240px,72vw);height:auto;display:block}
+.dca-hero .sent{font-size:15px;line-height:1.45;margin:6px 0 0;max-width:34rem;color:var(--tx)}
+.dca-hero .dca-leg{justify-content:center;margin-top:2px}
+.dca-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:520px;margin:10px auto 0}
+.dca-week{border:1px solid var(--line);border-radius:10px;padding:8px 6px;background:#0b0e14;font-size:12px;line-height:1.35}
+.dca-week.now{border-color:var(--ac);box-shadow:0 0 0 1px #60a5fa55}
+.dca-week.buy{background:#0f2e1c;border-color:#14532d}
+.dca-week .wn{font-weight:700;font-size:13px}
+.dca-week .ws{color:var(--mu);font-size:11px}
+@media(max-width:420px){.dca-weeks{gap:6px}.dca-week{padding:7px 4px}}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
-<nav class="views" id="views" aria-label="Portfolio">
+<nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-paper" class="on">Paper $10K</button>
- <button type="button" id="v-real">$37 → $1000K Goal</button>
- <button type="button" id="v-steven">Steven</button>
- <button type="button" id="v-russel">Russel</button>
- <button type="button" id="v-trend">Trend (forward test)</button>
- <button type="button" id="v-dca">Spot DCA</button>
+ <button type="button" id="v-real">Target $37</button>
+ <button type="button" id="v-steven">Dompet Steven</button>
+ <button type="button" id="v-russel">Dompet Russel</button>
+ <button type="button" id="v-trend">Tes tren</button>
+ <button type="button" id="v-dca">Cicilan BTC</button>
 </nav>
+<p class="help-hint sub">Arahkan ke kata yang bergaris putus (seperti SL, TP, LONG, SHORT) untuk arti singkatnya. Angka besar = yang paling penting. Tabel lengkap ada di tombol Detail.</p>
 <header>
- <div><h1 id="htitle">Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
-  <div class="big" id="tot">—</div><div class="sub" id="totsub">loading…</div></div>
+ <div><h1 id="htitle">Desk Majors <span class="badge b-paper">HANYA SIMULASI</span> <span class="badge" id="runb">Sesi 2</span></h1>
+  <div class="big" id="tot">—</div><div class="sub" id="totsub">memuat…</div></div>
  <div class="sub" style="text-align:right"><div id="upd"></div><div id="livest"></div></div>
 </header>
 <section id="banner" class="note" hidden></section>
-<section id="ot"><div class="oth"><h3 id="ottitle">Open Trades <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
+<section id="ot"><div class="oth"><h3 id="ottitle">Posisi terbuka <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
 <section id="shadowsec"><div id="shadow"></div></section>
 <section id="trendsec" hidden></section>
-<section id="learnsec"><h3>Loss review · what the desk learned</h3><div id="learn"></div></section>
-<section id="desksec"><h3 id="desktitle">Desks</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
+<section id="learnsec"><h3>Belajar dari kerugian</h3><div id="learn"></div></section>
+<section id="desksec"><h3 id="desktitle">Ringkasan desk</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two" id="twosec">
- <section><h3 id="cltitle">Recent closed trades</h3><div class="tw" id="closed"></div></section>
- <section id="rightsec"><h3 id="righttitle">Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
+ <section><h3 id="cltitle">Transaksi yang sudah ditutup</h3><div class="tw" id="closed"></div></section>
+ <section id="rightsec"><h3 id="righttitle">Keputusan terbaru</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
 </div>
 <section id="dcasec" hidden></section>
-<footer id="foot">Simulated paper trading. No real money, no keys, no signing.</footer>
+<footer id="foot">Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.</footer>
 </div>
-<div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Open ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analysis"></div>
+<div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Buka ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analisis"></div>
 <script>
 const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";
 const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
@@ -227,12 +272,25 @@ const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+n.toFixed(2)+"%";
 const cls=n=>n>0?"up":n<0?"dn":"mu";
 const px=n=>n==null||isNaN(n)?"—":n>=100?n.toLocaleString(undefined,{maximumFractionDigits:2}):n>=1?n.toFixed(4):Number(n).toPrecision(4);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"just now":m<60?m+"m ago":m<1440?Math.round(m/60)+"h ago":Math.round(m/1440)+"d ago"};
+
+const COIN_BASE="assets/coins/";
+const COIN_FALLBACK=COIN_BASE+"_generic.png";
+const COIN_ALIAS={USOL:"SOL",KSHIB:"SHIB","1000PEPE":"PEPE","1000SHIB":"SHIB",WBTC:"BTC"};
+function coinSym(x){if(x==null||x==="")return"";let s=String(x).toUpperCase().trim();if(s.includes("/"))s=s.split("/")[0];s=s.replace(/[-_]/g,"");if(s==="USDTIDR")return"USDT";if(s.endsWith("USDT")&&s.length>4)s=s.slice(0,-4);else if(s.endsWith("IDR")&&s!=="IDR"&&s.length>3)s=s.slice(0,-3);if(COIN_ALIAS[s])s=COIN_ALIAS[s];return/^[A-Z0-9]{2,12}$/.test(s)?s:""}
+function coinSrc(x){const s=coinSym(x);return s?COIN_BASE+s.toLowerCase()+".png":COIN_FALLBACK}
+function coinIcon(x,sz){const s=coinSym(x)||"";return `<img class="coin-logo${sz?" "+sz:""}" src="${coinSrc(x)}" alt="${esc(s)}" width="20" height="20" loading="lazy" onerror="this.onerror=null;this.src='${COIN_FALLBACK}'">`}
+function coinLabel(x,href){const shown=String(x==null?"":x);const name=shown.includes("/")?shown.split("/")[0]:(coinSym(shown)||shown);const inner=coinIcon(x)+`<span>${esc(name)}</span>`;return href?`<a class="coin" href="${esc(href)}" target="_blank" rel="noopener">${inner}<span class="sub"> ↗</span></a>`:`<span class="coin">${inner}</span>`}
+function coinPair(label){const raw=String(label||"");let a="",b="";if(raw.includes("/")){const p=raw.split("/");a=p[0];b=p[1]}else if(/^USDTIDR$/i.test(raw)){a="USDT";b="IDR"}else if(/USDT$/i.test(raw)&&raw.length>4){a=raw.replace(/USDT$/i,"");b="USDT"}else if(/IDR$/i.test(raw)&&raw.toUpperCase()!=="IDR"&&raw.length>3){a=raw.replace(/IDR$/i,"");b="IDR"}if(a&&b)return `<span class="coin">${coinIcon(a)}${coinIcon(b,"sm")}<span>${esc(a)}/${esc(b)}</span></span>`;return coinLabel(raw)}
+function tip(term,text){return `<abbr class="tip" title="${esc(text)}">${term}</abbr>`}
+const TIPS={pnl:"Untung atau rugi. Hijau = untung, merah = rugi.",upnl:"Untung/rugi di kertas. Masih berubah selama posisi belum ditutup.",rpnl:"Untung/rugi yang sudah dikunci setelah posisi ditutup.",sl:"Stop loss — harga keluar otomatis untuk membatasi rugi.",tp:"Take profit — harga keluar otomatis untuk ambil untung.",long:"Wette harga akan naik. Untung kalau harga naik.",short:"Wette harga akan turun. Untung kalau harga turun.",lev:"Leverage — modal dipinjam. 3x artinya gerak harga 1% kira-kira 3% pada modal Anda. Makin besar, makin cepat untung dan rugi.",fund:"Funding — biaya berkala di kontrak futures, bisa dibayar atau diterima tergantung arah posisi.",liq:"Likuidasi — harga di mana posisi dipaksa tutup karena rugi terlalu besar.",margin:"Modal yang dipakai sebagai jaminan posisi.",wr:"Persentase transaksi yang berakhir untung.",score:"Skor analisis desk. Lebih tinggi = lebih yakin, bukan jaminan.",cycle:"Satu putaran cek dan keputusan desk (biasanya per jam).",paper:"Simulasi, bukan uang sungguhan.",be:"Break-even — stop loss sudah digeser ke harga masuk, supaya kalau salah arah modal tidak berkurang (belum hitung biaya).",trail:"Trailing stop — stop loss ikut bergeser saat posisi untung, untuk mengunci sebagian keuntungan."};
+function sideBadge(side,lev){const sh=String(side||"").toLowerCase()==="short";const lab=sh?tip("SHORT (turun)",TIPS.short):tip("LONG (naik)",TIPS.long);const lx=lev!=null&&lev!==""?` <span class="tip" title="${esc(TIPS.lev)}">${esc(String(lev))}x</span>`:"";return `<span class="sd ${sh?"S":"L"}">${lab}${lx}</span>`}
+function more(id,title,inner){return `<details class="more" id="${esc(id)}"><summary>${title}</summary>${inner}</details>`}
+const ago=ts=>{const m=Math.round((Date.now()/1000-ts)/60);return m<1?"baru saja":m<60?m+" mnt lalu":m<1440?Math.round(m/60)+" jam lalu":Math.round(m/1440)+" hr lalu"};
 const hhmm=t=>{const m=String(t||"").match(/(\d{2}:\d{2})/);return m?m[1]:String(t||"");};
 const slTag=o=>{if(o.trail)return"trail";if(o.s!=null&&o.e!=null&&Math.abs(o.s-o.e)<=Math.max(Math.abs(o.e)*1e-8,1e-10))return"BE";return"";};
-const tpCell=(lab,price,hit,note)=>`<div><span>${lab}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
+const tpCell=(lab,price,hit,note)=>`<div><span>${tip(lab,TIPS.tp)}${hit?` <span class="hit">✓ ${note}</span>`:""}</span>${price!=null?px(price):"—"}</div>`;
 const pnl$=(n,fine)=>n==null||isNaN(n)?"—":(n>0?"+$":n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:fine?4:2});
-const secAgo=ts=>{if(!ts)return"";const s=Math.max(0,Math.round((Date.now()-ts)/1000));return s<1?"just now":s+"s ago"};
+const secAgo=ts=>{if(!ts)return"";const s=Math.max(0,Math.round((Date.now()-ts)/1000));return s<1?"baru saja":s+" dtk lalu"};
 const walletAddr=()=>{const s=walletSpecs();return (s[0]&&s[0].address)||WALLET_FALLBACK};
 function walletSpecs(){const seen=new Set(),out=[];
  const add=w=>{if(!w||!w.address)return;const k=w.address.toLowerCase();if(seen.has(k))return;seen.add(k);out.push({name:w.name||"",address:w.address,url:w.url||("https://app.hyperliquid.xyz/explorer/address/"+w.address)})};
@@ -253,18 +311,18 @@ function walletNow(addr){if(!addr){const s=walletSpecs();addr=s[0]&&s[0].address
 function walletsNow(){return walletSpecs().map(s=>{const w=walletNow(s.address)||{};return Object.assign({},w,{name:w.name||s.name,address:w.address||s.address,url:w.url||s.url,venue:w.venue||"Hyperliquid"})})}
 function walletTitle(w){const name=w&&w.name,venue=(w&&w.venue)||"Hyperliquid";return name?name+" · "+venue:venue}
 function shortAddr(a){return a&&a.length>10?a.slice(0,6)+"…"+a.slice(-4):(a||"")}
-function walletNamesLabel(names){if(!names||!names.length)return"";const poss=names.map(n=>n+"'s");return poss.length===1?poss[0]+" wallet":poss.length===2?poss[0]+" and "+poss[1]+" wallets":poss.slice(0,-1).join(", ")+" and "+poss[poss.length-1]+" wallets"}
+function walletNamesLabel(names){if(!names||!names.length)return"";const poss=names.map(n=>n+"'s");return poss.length===1?"dompet "+names[0]:poss.length===2?"dompet "+names[0]+" dan "+names[1]:"dompet "+names.slice(0,-1).join(", ")+" dan "+names[names.length-1]}
 function walletsHolding(o){const a=(o.a||"").toUpperCase(),side=o.side||"",names=[];
  walletsNow().forEach(w=>{(w.positions||[]).some(p=>{if((p.a||"").toUpperCase()===a&&(p.side||"")===side){if(w.name&&!names.includes(w.name))names.push(w.name);return true}return false})});
  if(!names.length&&Array.isArray(o.wallet_names))o.wallet_names.forEach(n=>{if(n&&!names.includes(n))names.push(n)});
  return names}
-function walletMatchBadge(o){const names=walletsHolding(o);if(!names.length&&!o.wallet_match)return"";const label=walletNamesLabel(names);return `<div class="when"><span class="badge match">${esc(label?"On "+label:(o.wallet_note||"On your live wallet"))}</span></div>`}
+function walletMatchBadge(o){const names=walletsHolding(o);if(!names.length&&!o.wallet_match)return"";const label=walletNamesLabel(names);return `<div class="when"><span class="badge match">${esc(label?"Di "+label:(o.wallet_note||"Di dompet live Anda"))}</span></div>`}
 function posQty(o){if(o.qty!=null&&!isNaN(+o.qty))return +o.qty;if(o.e&&o.n)return o.n/o.e;return null}
 function livePx(o){if(!o)return o;const k=o.sym||o.mint||o.a;const p=k!=null?LIVE[k]:null;if(p!=null)return p;if(o.a&&LIVE[o.a+"USDT"]!=null)return LIVE[o.a+"USDT"];return o.p}
 function crossedSide(side,kind,level,p){if(level==null||p==null||isNaN(p)||isNaN(level))return false;const short=side==="short";return kind==="sl"?(short?p>=level:p<=level):(short?p<=level:p>=level)}
 function crossFlags(o,p){const out={sl:false,tp:false,html:""};if(p==null)return out;const msgs=[];
- if(o.s!=null&&crossedSide(o.side,"sl",o.s,p)){out.sl=true;msgs.push(`<div class="xflag sl">Price crossed SL ${px(o.s)} — display only, the hourly cycle still decides the exit</div>`)}
- [["TP1",o.tp1,o.tp1_hit],["TP2",o.tp2,o.tp2_hit],["TP3",o.tp3,o.tp3_hit]].forEach(([k,v,hit])=>{if(v==null||hit)return;if(crossedSide(o.side,"tp",v,p)){out.tp=true;msgs.push(`<div class="xflag tp">Price crossed ${k} ${px(v)} — display only, the hourly cycle still decides the exit</div>`)}});
+ if(o.s!=null&&crossedSide(o.side,"sl",o.s,p)){out.sl=true;msgs.push(`<div class="xflag sl">Harga sudah melewati ${tip("SL",TIPS.sl)} ${px(o.s)} — ini tampilan saja, siklus per jam yang memutuskan keluar</div>`)}
+ [["TP1",o.tp1,o.tp1_hit],["TP2",o.tp2,o.tp2_hit],["TP3",o.tp3,o.tp3_hit]].forEach(([k,v,hit])=>{if(v==null||hit)return;if(crossedSide(o.side,"tp",v,p)){out.tp=true;msgs.push(`<div class="xflag tp">Harga sudah melewati ${tip(k,TIPS.tp)} ${px(v)} — ini tampilan saja, siklus per jam yang memutuskan keluar</div>`)}});
  out.html=msgs.join("");return out}
 function levelCrossClass(o,r){if(!r||r.px==null||r.st==="hit"||o._p==null)return"";const sl=r.k==="SL";if(crossedSide(o.side,sl?"sl":"tp",r.px,o._p))return sl?" x-sl":" x-tp";return""}
 function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
@@ -272,41 +330,42 @@ function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
   const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
   const xc=levelCrossClass(o,r);
   return `<div class="lr${tot?" tot":""}${xc}"><span>${esc(r.k)}${tag}${xc?` <span class="tag">${xc.includes("sl")?"crossed":"crossed"}</span>`:""}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
- return `<div class="lt"><div class="lh"><span>Level</span><span>Price</span><span>P&amp;L $</span><span>P&amp;L %</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">P&amp;L % of this trade's margin (${(fine?moneyR:money)(L.m)}). Crossed flags are display only.</div>`}
-const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Activity</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
-const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analysis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analysis" width="96" height="67" loading="lazy"><span>Analysis</span></a>`};
-function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analysis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
+ return more("lv-"+esc(o.a),`Detail ${tip("SL",TIPS.sl)} / ${tip("TP",TIPS.tp)}`,`<div class="lt"><div class="lh"><span>Level</span><span>Harga</span><span>${tip("P/L $",TIPS.pnl)}</span><span>${tip("P/L %",TIPS.pnl)}</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">${tip("P/L",TIPS.pnl)} % dari modal posisi ini (${(fine?moneyR:money)(L.m)}). Tanda melewati harga hanya tampilan.</div>`)}
+const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Riwayat</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
+const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analisis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analisis" width="96" height="67" loading="lazy"><span>Analisis</span></a>`};
+function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analisis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
 function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
 const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null||isNaN(p))return o.u||0;const q=posQty(o);if(q!=null&&o.e!=null){const sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-(o.z||0):(o.u||0)}
-function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">curve starts after a few cycles</text></svg>';
+function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">Grafik muncul setelah beberapa siklus</text></svg>';
  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([start]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
  const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=start?"#22c55e":"#ef4444";
  return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(start)}" y2="${Y(start)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
 function setView(v){VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
-function snapUi(){return{y:window.scrollY,open:[...document.querySelectorAll("details[open]")].map(d=>{const card=d.closest("[data-a]");return{a:card&&card.dataset.a,cls:d.className,sum:(d.querySelector("summary")||{}).textContent||""}})}}
-function restoreUi(s){if(!s)return;document.querySelectorAll(".oc[data-a],#wallet [data-a]").forEach(card=>{s.open.forEach(o=>{if(!o.a||card.dataset.a!==o.a)return;card.querySelectorAll("details").forEach(d=>{if(d.className===o.cls||((d.querySelector("summary")||{}).textContent||"")===o.sum)d.open=true})})});if(s.y!=null)window.scrollTo(0,s.y)}
+function snapUi(){return{y:window.scrollY,open:[...document.querySelectorAll("details[open]")].map(d=>{const card=d.closest("[data-a]");return{a:card&&card.dataset.a,cls:d.className,sum:(d.querySelector("summary")||{}).textContent||"",id:d.id||""}})}}
+function restoreUi(s){if(!s)return;document.querySelectorAll(".oc[data-a],#wallet [data-a]").forEach(card=>{s.open.forEach(o=>{if(!o.a||card.dataset.a!==o.a)return;card.querySelectorAll("details").forEach(d=>{if(d.className===o.cls||((d.querySelector("summary")||{}).textContent||"")===o.sum)d.open=true})})});(s.open||[]).forEach(o=>{if(o.id){const d=document.getElementById(o.id);if(d&&d.tagName==="DETAILS")d.open=true}});if(s.y!=null)window.scrollTo(0,s.y)}
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
   const tag=slTag(o),flags=crossFlags(o,p);
   const match=walletMatchBadge(o);
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${o.link?`<a href="${esc(o.link)}" target="_blank" rel="noopener">${esc(o.a)} ↗</a>`:`<b>${esc(o.a)}</b>`} <span class="sub">${esc(o.desk)}</span></div>
-  <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${perp?" "+o.lev+"x":""}</span></div>
+  const tagLab=tag==="trail"?tip("trail",TIPS.trail):tag==="BE"?tip("BE",TIPS.be):tag;
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${coinLabel(o.a,o.link)} <span class="sub">${esc(o.desk)}</span></div>
+  ${sideBadge(o.side,perp?o.lev:null)}</div>
   <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pct(pc)}</span></div>
-  ${o.entered?`<div class="when">Entered: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
-  <div class="g"><div><span>Entry</span>${px(o.e)}</div><div><span>Now</span>${px(p)}${LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':''}</div>
-  <div><span>Liq</span>${px(o.liq)}</div><div><span>To SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
-  ${o.lvls&&o.lvls.rows?"":`<div><span>SL${tag?` <span class="tag">${tag}</span>`:""}</span>${px(o.s)}</div>`}
-  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"closed")}
-  <div><span>Margin</span>${$(sz)}</div>
-  <div><span>Thesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
-  <div><span>Time left</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>Score</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">No open trades right now.</div>';
+  ${o.entered?`<div class="when">Masuk: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
+  <div class="g"><div><span>Masuk</span>${px(o.e)}</div><div><span>Sekarang</span>${px(p)}${LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':''}</div>
+  <div><span>${tip("Likuidasi",TIPS.liq)}</span>${px(o.liq)}</div><div><span>Jarak ke ${tip("SL",TIPS.sl)}</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  ${o.lvls&&o.lvls.rows?"":`<div><span>${tip("SL",TIPS.sl)}${tag?` <span class="tag">${tagLab}</span>`:""}</span>${px(o.s)}</div>`}
+  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"ditutup")}
+  <div><span>${tip("Modal",TIPS.margin)}</span>${$(sz)}</div>
+  <div><span>Tesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
+  <div><span>Sisa waktu</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
+  <div><span>${tip("Skor",TIPS.score)}</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
  return{html,tu,tm}}
 function closedTable(cl,fine){const $=fine?moneyR:money;
- return cl.length?`<table><tr><th>Asset</th><th>Desk</th><th>P&amp;L</th><th>Exit</th><th>Entered / Closed</th></tr>`+cl.map(c=>`<tr><td>${c.link?`<a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.a)}</a>`:esc(c.a)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>In ${esc(c.entered)}</div>`:""}${c.exited?`<div>Out ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`:'<div class="empty">No closed trades yet.</div>'}
+ return cl.length?more("det-closed","Detail transaksi ditutup",`<table><tr><th>Koin</th><th>Desk</th><th>${tip("Untung/Rugi",TIPS.pnl)}</th><th>Alasan keluar</th><th>Masuk / Keluar</th></tr>`+cl.map(c=>`<tr><td>${coinLabel(c.a,c.link)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>Masuk ${esc(c.entered)}</div>`:""}${c.exited?`<div>Keluar ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`):'<div class="empty">Belum ada transaksi yang ditutup.</div>'}
 
 function deskOpens(){const deskOf=x=>x.desk||x.name;return ((D&&D.open)||[]).filter(o=>deskOf(o)===FOCUS)}
 function walletHeld(w){const src=(w&&typeof w==="object"?w:{});const set=new Set();
@@ -327,62 +386,62 @@ function enterability(o){const p=livePx(o)??o.p,reasons=[],short=o.side==="short
  if(p==null||isNaN(p))reasons.push("no live mark");
  return{enterable:!reasons.length,reason:reasons[0]||"",reasons,p,prog}}
 function missingDeskHtml(w){const miss=deskNotIn(w).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
- const note=`<div class="sub" style="margin:0 0 10px">Open Majors paper trades with no matching coin+side on this wallet. This is the desk's signal, not advice — you place any trades yourself.</div>`;
- const head=`<div class="card"><h2>Desk trades not on this wallet <span class="badge">${miss.length}</span></h2>${note}`;
- if(!miss.length)return head+`<div class="empty">All desk trades are on this wallet</div></div>`;
+ const note=`<div class="sub" style="margin:0 0 10px">Posisi paper desk Majors yang belum ada di dompet ini (koin + arah yang sama). Ini sinyal desk, bukan saran — order tetap Anda yang pasang sendiri.</div>`;
+ const head=`<div class="card"><h2>Sinyal desk yang belum ada di dompet ini <span class="badge">${miss.length}</span></h2>${note}`;
+ if(!miss.length)return head+`<div class="empty">Semua posisi desk sudah ada di dompet ini.</div></div>`;
  const rows=miss.map(o=>Object.assign({o},enterability(o)));
  const yes=rows.filter(r=>r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
  const no=rows.filter(r=>!r.enterable).sort((a,b)=>(b.o.ts||0)-(a.o.ts||0));
  const liveDot=o=>LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':"";
- const yesTbl=yes.length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>From entry</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th><th>R:R</th></tr>`+yes.map(r=>{const o=r.o,short=o.side==="short",dist=o.e?(r.p-o.e)/o.e*100:null;
-  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="${cls(dist)}">${pct(dist)}</td><td>${px(o.s)}</td><td>${px(o.tp1)}</td><td>${px(o.tp2)}</td><td>${px(o.tp3)}</td><td>${fmtRR(rrToTp1(o,r.p))}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">None still enterable now.</div>';
- const noTbl=no.length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Lev</th><th>Desk entry</th><th>Live mark</th><th>Why</th></tr>`+no.map(r=>{const o=r.o,short=o.side==="short";
-  return`<tr data-a="${esc(o.a)}"><td><b>${esc(o.a)}</b></td><td><span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}</span></td><td>${o.lev!=null?o.lev+"x":"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="mu when">${esc(r.reason)}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">None too late.</div>';
- return head+`<div class="subh">Still enterable now <span class="badge b-live">${yes.length}</span></div>${yesTbl}<div class="subh">Too late / skip <span class="badge">${no.length}</span></div>${noTbl}</div>`}
+ const yesTbl=yes.length?`<div class="tw"><table><tr><th>Koin</th><th>Arah</th><th>${tip("Lev",TIPS.lev)}</th><th>Harga masuk desk</th><th>Harga live</th><th>Dari masuk</th><th>${tip("SL",TIPS.sl)}</th><th>${tip("TP1",TIPS.tp)}</th><th>${tip("TP2",TIPS.tp)}</th><th>${tip("TP3",TIPS.tp)}</th><th>R:R</th></tr>`+yes.map(r=>{const o=r.o,short=o.side==="short",dist=o.e?(r.p-o.e)/o.e*100:null;
+  return`<tr data-a="${esc(o.a)}"><td>${coinLabel(o.a)}</td><td>${sideBadge(o.side)}</td><td>${o.lev!=null?`<span class="tip" title="${esc(TIPS.lev)}">${o.lev}x</span>`:"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="${cls(dist)}">${pct(dist)}</td><td>${px(o.s)}</td><td>${px(o.tp1)}</td><td>${px(o.tp2)}</td><td>${px(o.tp3)}</td><td>${fmtRR(rrToTp1(o,r.p))}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Tidak ada yang masih bisa dimasuki sekarang.</div>';
+ const noTbl=no.length?`<div class="tw"><table><tr><th>Koin</th><th>Arah</th><th>${tip("Lev",TIPS.lev)}</th><th>Harga masuk desk</th><th>Harga live</th><th>Alasan</th></tr>`+no.map(r=>{const o=r.o,short=o.side==="short";
+  return`<tr data-a="${esc(o.a)}"><td>${coinLabel(o.a)}</td><td>${sideBadge(o.side)}</td><td>${o.lev!=null?`<span class="tip" title="${esc(TIPS.lev)}">${o.lev}x</span>`:"—"}</td><td>${px(o.e)}</td><td>${px(r.p)}${liveDot(o)}</td><td class="mu when">${esc(r.reason)}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Tidak ada yang sudah terlambat.</div>';
+ return head+more("det-miss", "Detail sinyal yang belum diikuti", `<div class="subh">Masih bisa dimasuki sekarang <span class="badge b-live">${yes.length}</span></div>${yesTbl}<div class="subh">Sudah terlambat / dilewati <span class="badge">${no.length}</span></div>${noTbl}`)+`</div>`}
 function deskOpenFor(p){const a=(p.a||"").toUpperCase(),side=p.side||"long";return ((D&&D.open)||[]).find(o=>(o.a||"").toUpperCase()===a&&(o.side||"long")===side)||null}
 function nearPx(a,b){if(a==null||b==null||isNaN(+a)||isNaN(+b))return false;a=+a;b=+b;const s=Math.max(Math.abs(a),Math.abs(b),1e-12);return Math.abs(a-b)<=Math.max(s*0.001,1e-8)}
-function orderList(p){if(p.orders&&p.orders.length)return p.orders;const out=[];if(p.sl!=null)out.push({kind:"sl",px:+p.sl,typ:"Stop"});if(p.tp!=null)out.push({kind:"tp",px:+p.tp,typ:"Take Profit"});return out}
+function orderList(p){if(p.orders&&p.orders.length)return p.orders;const out=[];if(p.sl!=null)out.push({kind:"sl",px:+p.sl,typ:"Stop loss"});if(p.tp!=null)out.push({kind:"tp",px:+p.tp,typ:"Take profit"});return out}
 function takeYours(list,used,level,fallbackOne){const i=list.findIndex((o,idx)=>!used.has(idx)&&level!=null&&nearPx(o.px,level));if(i>=0){used.add(i);return list[i].px}if(fallbackOne&&list.length===1&&!used.has(0)){used.add(0);return list[0].px}return null}
-function lvStatus(o,kind,price,hit,mark){if(price==null)return{lab:"—",cls:"mu"};if(hit)return{lab:"✓ hit",cls:"hit"};if(mark!=null&&crossedSide(o.side,kind,price,mark))return{lab:kind==="sl"?"crossed":"passed",cls:kind==="sl"?"dn":"tag"};return{lab:"–",cls:"mu"}}
+function lvStatus(o,kind,price,hit,mark){if(price==null)return{lab:"—",cls:"mu"};if(hit)return{lab:"✓ kena",cls:"hit"};if(mark!=null&&crossedSide(o.side,kind,price,mark))return{lab:kind==="sl"?"melewati":"terlewati",cls:kind==="sl"?"dn":"tag"};return{lab:"–",cls:"mu"}}
 function walletPosHtml(p){const desk=deskOpenFor(p),short=p.side==="short",ords=orderList(p),sls=ords.filter(o=>o.kind==="sl"),tps=ords.filter(o=>o.kind==="tp"),mark=p.p,flags=[];
- if(!sls.length)flags.push(`<span class="xflag sl">No SL set</span>`);
- if(!tps.length)flags.push(`<span class="xflag sl">No TP set</span>`);
- if(desk&&desk.s!=null&&sls.length&&sls.every(s=>!nearPx(s.px,desk.s)))flags.push(`<span class="xflag diff">SL differs from desk (yours ${sls.map(s=>px(s.px)).join(", ")} · desk ${px(desk.s)})</span>`);
- const badge=p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Not on the paper desk")}</span>`;
- const trail=desk&&desk.trail?`<span class="badge">trailing</span>`:"";
- const be=desk&&slTag(desk)==="BE"?`<span class="badge">BE</span>`:"";
+ if(!sls.length)flags.push(`<span class="xflag sl">Belum ada ${tip("SL",TIPS.sl)}</span>`);
+ if(!tps.length)flags.push(`<span class="xflag sl">Belum ada ${tip("TP",TIPS.tp)}</span>`);
+ if(desk&&desk.s!=null&&sls.length&&sls.every(s=>!nearPx(s.px,desk.s)))flags.push(`<span class="xflag diff">${tip("SL",TIPS.sl)} beda dari desk (milik Anda ${sls.map(s=>px(s.px)).join(", ")} · desk ${px(desk.s)})</span>`);
+ const badge=p.match?`<span class="badge match">${esc(p.match_note)}</span>`:`<span class="badge nomatch">${esc(p.match_note||"Tidak ada di desk paper")}</span>`;
+ const trail=desk&&desk.trail?`<span class="badge">${tip("trailing",TIPS.trail)}</span>`:"";
+ const be=desk&&slTag(desk)==="BE"?`<span class="badge">${tip("BE",TIPS.be)}</span>`:"";
  const row=(k,deskPx,yours,st,tag)=>`<div class="lr"><span>${esc(k)}${tag?` <span class="tag">${esc(tag)}</span>`:""}</span><span>${deskPx!=null?px(deskPx):"—"}</span><span>${yours!=null?px(yours):"—"}</span><span class="${st.cls}">${st.lab}</span></div>`;
  let levels="";
  if(desk){const usedSl=new Set(),usedTp=new Set(),rows=[];
   rows.push(row("SL",desk.s,takeYours(sls,usedSl,desk.s,true),lvStatus(desk,"sl",desk.s,false,mark),slTag(desk)));
   [["TP1","tp1","tp1_hit"],["TP2","tp2","tp2_hit"],["TP3","tp3","tp3_hit"]].forEach(([lab,k,hk])=>{const price=desk[k];rows.push(row(lab,price,takeYours(tps,usedTp,price,false),lvStatus(desk,"tp",price,!!desk[hk],mark),""))});
-  sls.forEach((o,i)=>{if(!usedSl.has(i))rows.push(row("Your SL",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
-  tps.forEach((o,i)=>{if(!usedTp.has(i))rows.push(row("Your TP",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
-  levels=`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Yours</span><span></span></div>${rows.join("")}</div><div class="lnote">Desk levels from the last hourly cycle. Yours are live Hyperliquid TP/SL (read-only). Passed = live mark already through that target; the cycle still decides the exit.</div>`}
- else if(ords.length){levels=`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Yours</span><span></span></div>`+ords.map(o=>`<div class="lr"><span>${o.kind==="sl"?"SL":"TP"}</span><span>—</span><span>${px(o.px)}</span><span class="mu">${esc(o.typ||"")}</span></div>`).join("")+`</div>`}
- return `<div class="wpos ${(p.u||0)>0?"pos":(p.u||0)<0?"neg":""}" data-a="${esc(p.a)}"><div class="t"><div><b>${esc(p.a)}</b> <span class="sd ${short?"S":"L"}">${short?"SHORT":"LONG"}${p.lev!=null?" "+p.lev+"x":""}</span> <span class="badges">${badge}${trail}${be}</span></div><div class="pl ${cls(p.u)}">${moneyR(p.u)}</div></div>
-  <div class="g"><div><span>Size</span>${p.qty??"—"}</div><div><span>Entry</span>${px(p.e)}</div><div><span>Mark</span>${px(p.p)}${p._live?' <span class="up">●</span>':''}</div><div><span>Liq</span>${px(p.liq)}</div></div>
+  sls.forEach((o,i)=>{if(!usedSl.has(i))rows.push(row("SL Anda",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
+  tps.forEach((o,i)=>{if(!usedTp.has(i))rows.push(row("TP Anda",null,o.px,{lab:esc(o.typ||""),cls:"mu"},""))});
+  levels=more("wlv-"+esc(p.a),`Detail ${tip("SL",TIPS.sl)} / ${tip("TP",TIPS.tp)}`,`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Milik Anda</span><span></span></div>${rows.join("")}</div><div class="lnote">Level desk dari siklus per jam terakhir. Level Anda dibaca live dari Hyperliquid (hanya lihat). Passed = harga live sudah melewati target; siklus tetap yang memutuskan keluar.</div>`)}
+ else if(ords.length){levels=more("wlv-"+esc(p.a),`Detail ${tip("SL",TIPS.sl)} / ${tip("TP",TIPS.tp)}`,`<div class="lt wlt"><div class="lh"><span>Level</span><span>Desk</span><span>Milik Anda</span><span></span></div>`+ords.map(o=>`<div class="lr"><span>${o.kind==="sl"?tip("SL",TIPS.sl):tip("TP",TIPS.tp)}</span><span>—</span><span>${px(o.px)}</span><span class="mu">${esc(o.typ||"")}</span></div>`).join("")+`</div>`)}
+ return `<div class="wpos ${(p.u||0)>0?"pos":(p.u||0)<0?"neg":""}" data-a="${esc(p.a)}"><div class="t"><div>${coinLabel(p.a)} ${sideBadge(p.side,p.lev)} <span class="badges">${badge}${trail}${be}</span></div><div class="pl ${cls(p.u)}">${moneyR(p.u)}</div></div>
+  <div class="g"><div><span>Ukuran</span>${p.qty??"—"}</div><div><span>Masuk</span>${px(p.e)}</div><div><span>Harga</span>${px(p.p)}${p._live?' <span class="up">●</span>':''}</div><div><span>${tip("Likuidasi",TIPS.liq)}</span>${px(p.liq)}</div></div>
   ${flags.length?`<div class="wflags">${flags.join("")}</div>`:""}${levels}${desk?activity(desk):""}</div>`}
 
-function walletHtml(w){if(!w)return`<div class="card"><h2>Live wallet</h2><div class="sub">No wallet data in this build.</div></div>`;
+function walletHtml(w){if(!w)return`<div class="card"><h2>Dompet live</h2><div class="sub">Data dompet belum ada di build ini.</div></div>`;
  const title=walletTitle(w),addr=shortAddr(w.address);
- if(!w.ok)return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">READ-ONLY</span></h3></div><div class="card"><h2>${esc(title)} <span class="badge b-wallet">READ-ONLY</span></h2><div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" title="${esc(w.address||"")}">${esc(addr||w.address||"")} ↗</a>`:esc(addr||w.address||"")}</div><div class="sub">${esc(w.error||"Lookup failed")}. Public Hyperliquid read only — no keys, no signing. Showing last snapshot if available.</div></div>`+missingDeskHtml(w);
+ if(!w.ok)return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">HANYA LIHAT</span></h3></div><div class="card"><h2>${esc(title)} <span class="badge b-wallet">HANYA LIHAT</span></h2><div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" title="${esc(w.address||"")}">${esc(addr||w.address||"")} ↗</a>`:esc(addr||w.address||"")}</div><div class="sub">${esc(w.error||"Gagal memuat")}. Bacaan publik Hyperliquid saja — tidak ada kunci, tidak ada order. Menampilkan snapshot terakhir jika ada.</div></div>`+missingDeskHtml(w);
  const pos=(w.positions||[]),fills=w.fills||[];
- const rows=pos.length?`<div class="sub" style="margin-top:10px">Desk-matched coins show the paper SL/TP, trailing and activity. Your TP/SL are read live from Hyperliquid, read-only.</div><div class="wgrid">${pos.map(walletPosHtml).join("")}</div>`:'<div class="empty">No open positions on this wallet.</div>';
- const fillTbl=fills.length?`<div class="tw" style="margin-top:8px"><table><tr><th>Time</th><th>Coin</th><th>Action</th><th>Price</th><th>Size</th><th>Closed PnL</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${esc(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`:'<div class="empty">No recent fills.</div>';
- const liveNote=w.live?"Live Hyperliquid read":(w.asof||"");
- return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">READ-ONLY</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h3><div class="sub">${esc(liveNote)}</div></div>
+ const rows=pos.length?`<div class="sub" style="margin-top:10px">Koin yang cocok dengan desk menampilkan ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} paper, trailing, dan riwayat. ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} Anda dibaca live dari Hyperliquid, hanya lihat.</div><div class="wgrid">${pos.map(walletPosHtml).join("")}</div>`:'<div class="empty">Tidak ada posisi terbuka di dompet ini.</div>';
+ const fillTbl=fills.length?more("det-fills","Detail isi terbaru",`<div class="tw" style="margin-top:8px"><table><tr><th>Waktu</th><th>Koin</th><th>Aksi</th><th>Harga</th><th>Ukuran</th><th>${tip("P/L tertutup",TIPS.rpnl)}</th></tr>`+fills.slice(0,20).map(f=>`<tr><td class="mu when">${esc(f.t||"")}</td><td>${coinLabel(f.a)}</td><td class="mu">${esc(f.dir||f.side||"")}</td><td>${px(f.px)}</td><td>${f.sz??"—"}</td><td class="${cls(f.u)}">${f.closed||f.u?moneyR(f.u):"—"}</td></tr>`).join("")+`</table></div>`):'<div class="empty">Belum ada isi terbaru.</div>';
+ const liveNote=w.live?"Bacaan live Hyperliquid":(w.asof||"");
+ return`<div class="oth"><h3>${esc(title)} <span class="badge b-wallet">HANYA LIHAT</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h3><div class="sub">${esc(liveNote)}</div></div>
  <div class="card">
-  <h2>${esc(title)} <span class="badge b-wallet">NOT THE $37 MIRROR</span></h2>
+  <h2>${esc(title)} <span class="badge b-wallet">BUKAN MIRROR $37</span></h2>
   <div class="eq">${moneyR(w.eq)}</div>
-  <div class="sub" style="margin-bottom:8px">Account value · perps ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}${w.margin!=null?` · margin used ${moneyR(w.margin)}`:""}${w.unreal!=null?` · uPnL <span class="${cls(w.unreal)}">${moneyR(w.unreal)}</span>`:""}</div>
+  <div class="sub" style="margin-bottom:8px">Nilai akun · futures ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}${w.margin!=null?` · ${tip("modal",TIPS.margin)} terpakai ${moneyR(w.margin)}`:""}${w.unreal!=null?` · ${tip("P/L terbuka",TIPS.upnl)} <span class="${cls(w.unreal)}">${moneyR(w.unreal)}</span>`:""}</div>
   <div class="addr">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" title="${esc(w.address||"")}">${esc(addr||w.address||"")} ↗</a>`:esc(addr||w.address||"")}</div>
-  <div class="sub" style="margin-top:6px">Public lookup only. No keys, no signing, no orders from this page.</div>
+  <div class="sub" style="margin-top:6px">Hanya bacaan publik. Tidak ada kunci, tidak ada order dari halaman ini.</div>
   ${rows}
  </div>
  ${missingDeskHtml(w)}
  <div class="card">
-  <h2>Recent fills</h2>
+  <h2>Isi terbaru</h2>
   ${fillTbl}
  </div>`}
 function renderPaper(){
@@ -391,96 +450,96 @@ function renderPaper(){
  const act=(D.desks||[]).filter(d=>!d.paused&&d.name===FOCUS);let tot=0;
  $("desks").innerHTML=act.map(d=>{const eq=d.paused?START:d.eq+(liveU[d.name]||0);if(!d.paused)tot+=eq;const pl=(eq/START-1)*100;
   const full=((D.full||[]).find(f=>f.desk===d.name)||{}).pts||[];
-  return`<div class="card"><h2>${esc(d.name)} ${d.paused?'<span class="badge b-paused">PAUSED</span>':'<span class="badge b-live">RUNNING</span>'}</h2>
+  return`<div class="card"><h2>${esc(d.name)} ${d.paused?'<span class="badge b-paused">DIJEDA</span>':'<span class="badge b-live">BERJALAN</span>'}</h2>
   <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">${d.win==null?"—":d.win+"%"}</div><div class="l">Win rate</div></div>
-  <div class="kpi"><div class="v">${d.open}</div><div class="l">Open</div></div><div class="kpi"><div class="v">${d.closed}</div><div class="l">Closed</div></div>
-  <div class="kpi"><div class="v ${cls(d.real)}">${money(d.real)}</div><div class="l">Realized</div></div>
-  <div class="kpi"><div class="v ${cls(d.unreal+(liveU[d.name]||0))}">${money(d.unreal+(liveU[d.name]||0))}</div><div class="l">Unrealized</div></div>
-  <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">Cycle</div></div></div>
-  ${d.paused?'<div class="sub" style="margin-top:10px">Paused for run 2. No trades.</div>':chart(full)}</div>`}).join("");
+  <div class="kpis"><div class="kpi"><div class="v">${d.win==null?"—":d.win+"%"}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div>
+  <div class="kpi"><div class="v">${d.open}</div><div class="l">Terbuka</div></div><div class="kpi"><div class="v">${d.closed}</div><div class="l">Ditutup</div></div>
+  <div class="kpi"><div class="v ${cls(d.real)}">${money(d.real)}</div><div class="l">${tip("Sudah dikunci",TIPS.rpnl)}</div></div>
+  <div class="kpi"><div class="v ${cls(d.unreal+(liveU[d.name]||0))}">${money(d.unreal+(liveU[d.name]||0))}</div><div class="l">${tip("Belum dikunci",TIPS.upnl)}</div></div>
+  <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">${tip("Siklus",TIPS.cycle)}</div></div></div>
+  ${d.paused?'<div class="sub" style="margin-top:10px">Dijeda di sesi 2. Tidak ada transaksi.</div>':chart(full)}</div>`}).join("");
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
- $("htitle").innerHTML=`Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run ${D.run?.n||2}</span>`;
- $("totsub").textContent=`Majors paper equity (from $10K) · Run ${D.run?.n||2} started ${D.run?.start||""} WIB`;
- $("ottitle").innerHTML=`Open Trades <span class="badge" id="otn">0</span>`;
+ $("htitle").innerHTML=`Desk Majors <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span> <span class="badge" id="runb">Sesi ${D.run?.n||2}</span>`;
+ $("totsub").textContent=`Nilai simulasi Majors (modal $10K) · Sesi ${D.run?.n||2} mulai ${D.run?.start||""} WIB`;
+ $("ottitle").innerHTML=`Posisi terbuka <span class="badge" id="otn">0</span>`;
  const cards=openCards(opens,false);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
- $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(cards.tu)}">${money(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> on ${money(cards.tm)} margin`:"";
- $("cltitle").textContent="Recent closed trades";
+ $("otsum").innerHTML=opens.length?`${tip("Untung/rugi terbuka",TIPS.upnl)} <b class="${cls(cards.tu)}">${money(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> dari ${tip("modal",TIPS.margin)} ${money(cards.tm)}`:"";
+ $("cltitle").textContent="Transaksi yang sudah ditutup";
  const cl=(D.closed||[]).filter(c=>c.desk===FOCUS);$("closed").innerHTML=closedTable(cl,false);
- $("righttitle").textContent="Recent decisions";$("dtabs").style.display="";
- const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"All",approved:"Approved",vetoed:"Vetoed",killed:"Killed"};
+ $("righttitle").textContent="Keputusan terbaru";$("dtabs").style.display="";
+ const dec=(D.dec||[]).filter(x=>x.desk===FOCUS),F={all:"Semua",approved:"Disetujui",vetoed:"Ditolak",killed:"Dibatalkan"};
  $("dtabs").innerHTML=Object.entries(F).map(([k,v])=>`<button class="${dfilter===k?"on":""}" onclick="dfilter='${k}';render()">${v} ${k==="all"?dec.length:dec.filter(x=>x.k===k).length}</button>`).join("");
  const ds=dec.filter(x=>dfilter==="all"||x.k===dfilter).slice(0,30);
  $("shadow").innerHTML=shadowHtml(D.shadow);
- $("learn").innerHTML=learnHtml(D.learn);
- $("dec").innerHTML=ds.length?ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b><b>${esc(x.a)}</b>${x.side?`<span class="badge">${esc(x.side)}</span>`:""}${x.sc!=null?`<span class="badge">score ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · cycle ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join(""):'<div class="it mu">No decisions yet.</div>';
- $("desktitle").textContent="Desks";
- $("foot").innerHTML=`Simulated paper trading. No real money, no keys, no signing. ${esc(D.run?.archive||"Run 1 archived")}. ${esc(D.paused_note||"Memecoin and copy desks are paused.")}`
+ $("learn").innerHTML=more("det-learn","Detail belajar dari kerugian",learnHtml(D.learn));
+ $("dec").innerHTML=ds.length?more("det-dec","Detail keputusan",ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b>${coinLabel(x.a)}${x.side?sideBadge(x.side):""}${x.sc!=null?`<span class="badge">${tip("skor",TIPS.score)} ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · ${tip("siklus",TIPS.cycle)} ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join("")):'<div class="it mu">Belum ada keputusan.</div>';
+ $("desktitle").textContent="Ringkasan desk";
+ $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"Sesi 1 diarsipkan")}. ${esc(D.paused_note||"Desk memecoin dan copy sedang dijeda.")}`
 }
 function learnHtml(L){
  if(!L)return'<div class="card"><div class="sub">Loss review appears after the next data refresh.</div></div>';
  if(L.error)return`<div class="card"><div class="sub">${esc(L.error)}</div></div>`;
  const b=L.bounce,bt=b?(b.block_short?`<span class="bl">New shorts paused</span> — BTC recovered ${b.rec_up}pp toward its 4h EMA50 (now ${b.dist}%)`:b.block_long?`<span class="bl">New longs paused</span> — BTC fell ${b.rec_dn}pp off its 48h high`:`<span class="ok">Clear</span> — BTC ${b.dist}% vs 4h EMA50, recovered ${b.rec_up}pp`):"Not checked yet";
  const cz=(L.causes||[]).map(c=>`<div class="cz"><span>${esc(c.c)}</span><span><span class="mu">${c.n}×</span> <b class="${cls(c.u)}">${money(c.u)}</b></span></div>`).join("");
- const adj=(L.adj||[]).map(a=>`<div class="cz"><span>${esc(a.k)}<div class="sub">${esc(a.why||"")}</div></span><b style="text-align:right">${esc(a.v)}</b></div>`).join("")||'<div class="sub">No score nudges yet (needs 8+ trades per group).</div>';
- const cd=(L.cooldowns||[]).length?(L.cooldowns||[]).map(c=>`<span class="chip">${esc(c.a)} ${esc(c.side)} until ${esc(c.until)}</span>`).join(""):'<span class="sub">None</span>';
- const lev=L.lev_cap?`<div class="sub" style="margin-top:6px">Leverage cap <b style="color:var(--wa)">${L.lev_cap}x</b>: ${esc((L.lev_why||[]).join("; "))}</div>`:'<div class="sub" style="margin-top:6px">No leverage cap from losses right now.</div>';
- const ls=(L.losses||[]).map(x=>`<div class="it"><div class="h"><b>${esc(x.a)}</b><span class="sd ${x.side==="short"?"S":"L"}">${x.side==="short"?"SHORT":"LONG"}</span><span class="badge">${x.lev}x</span><b class="${cls(x.u)}">${money(x.u)}</b>${x.R!=null?`<span class="sub">${x.R}R</span>`:""}<span class="sub">${esc(x.t||"")}${x.h!=null?" · held "+x.h+"h":""}</span></div><div class="r"><b style="color:var(--tx)">${esc(x.c)}</b> · ${esc(x.x)}${x.blk?' · <span class="bl">bounce filter would block</span>':""}</div>${(x.tags||[]).length?`<div>${x.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>`:""}<div class="r">${esc(x.l||"")}</div></div>`).join("")||'<div class="it mu">No losing trades reviewed yet.</div>';
- return`<div class="lrn"><div class="card"><h2>What the desk learned <span class="badge">${L.n} losses reviewed</span></h2>
- <div class="sub">Bounce filter: ${bt}</div>${lev}
- <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Active adjustments</div>${adj}</div>
- <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Cooldowns after a stop-out (12h)</div>${cd}</div>
- <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">All losses by cause (${money(L.u)})</div>${cz}</div>
+ const adj=(L.adj||[]).map(a=>`<div class="cz"><span>${esc(a.k)}<div class="sub">${esc(a.why||"")}</div></span><b style="text-align:right">${esc(a.v)}</b></div>`).join("")||'<div class="sub">Belum ada penyesuaian skor (butuh 8+ transaksi per grup).</div>';
+ const cd=(L.cooldowns||[]).length?(L.cooldowns||[]).map(c=>`<span class="chip">${coinLabel(c.a)} ${esc(c.side)} sampai ${esc(c.until)}</span>`).join(""):'<span class="sub">Tidak ada</span>';
+ const lev=L.lev_cap?`<div class="sub" style="margin-top:6px">Batas ${tip("leverage",TIPS.lev)} <b style="color:var(--wa)">${L.lev_cap}x</b>: ${esc((L.lev_why||[]).join("; "))}</div>`:'<div class="sub" style="margin-top:6px">Tidak ada batas leverage dari kerugian saat ini.</div>';
+ const ls=(L.losses||[]).map(x=>`<div class="it"><div class="h">${coinLabel(x.a)}${sideBadge(x.side,x.lev)}<b class="${cls(x.u)}">${money(x.u)}</b>${x.R!=null?`<span class="sub">${x.R}R</span>`:""}<span class="sub">${esc(x.t||"")}${x.h!=null?" · dipegang "+x.h+" jam":""}</span></div><div class="r"><b style="color:var(--tx)">${esc(x.c)}</b> · ${esc(x.x)}${x.blk?' · <span class="bl">filter pantulan akan memblokir</span>':""}</div>${(x.tags||[]).length?`<div>${x.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>`:""}<div class="r">${esc(x.l||"")}</div></div>`).join("")||'<div class="it mu">Belum ada kerugian yang ditinjau.</div>';
+ return`<div class="lrn"><div class="card"><h2>Yang dipelajari desk <span class="badge">${L.n} kerugian ditinjau</span></h2>
+ <div class="sub">Filter pantulan: ${bt}</div>${lev}
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Penyesuaian aktif</div>${adj}</div>
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Jedah setelah kena stop (12 jam)</div>${cd}</div>
+ <div style="margin-top:10px"><div class="sub" style="margin-bottom:4px">Semua kerugian per penyebab (${money(L.u)})</div>${cz}</div>
  <ul>${(L.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
- <div class="card"><h2>Last ${Math.min(10,(L.losses||[]).length)} losses</h2><div class="feed">${ls}</div></div></div>`}
+ <div class="card"><h2>${Math.min(10,(L.losses||[]).length)} kerugian terakhir</h2><div class="feed">${ls}</div></div></div>`}
 function trendLive(S){let u=0;const rows=(S.open||[]).map(o=>{const d=o.side==="short"?-1:1,m=LIVE[o.c+"USDT"]??o.px,pn=d*(o.qty||0)*(m-o.entry);u+=pn;return{o,m,pn:pn-(o.fee||0),live:LIVE[o.c+"USDT"]!=null}});
  const eq=S.cash!=null?S.cash+u:S.eq;return{rows,eq}}
 function renderTrend(){const S=D.shadow;
- $("htitle").innerHTML=`Trend forward test <span class="badge b-paper">PAPER ONLY</span> <span class="badge">UNPROVEN</span>`;
- if(!S){$("tot").textContent="—";$("totsub").textContent="Shadow data not in this build yet.";$("trendsec").innerHTML="";return}
+ $("htitle").innerHTML=`Tes tren <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span> <span class="badge">BELUM TERBUKTI</span>`;
+ if(!S){$("tot").textContent="—";$("totsub").textContent="Data tes tren belum ada di build ini.";$("trendsec").innerHTML="";return}
  const {rows,eq}=trendLive(S),ret=(eq/S.start-1)*100,lr=(S.live&&S.live0)?((S.live/S.live0-1)*100):null;
  $("tot").innerHTML=`${money(eq)} <span class="${cls(ret)}" style="font-size:15px">${ret>=0?"+":""}${ret.toFixed(2)}%</span>`;
- $("totsub").textContent=`Shadow strategy from $10K, started ${S.started||""} · live desk over the same period ${lr==null?"—":(lr>=0?"+":"")+lr.toFixed(2)+"%"}`;
- const cv=S.curve||[];let svg='<div class="mu" style="font-size:12px;padding:20px 0;text-align:center">Chart fills in as hourly cycles run.</div>';
+ $("totsub").textContent=`Strategi tes tren dari $10K, mulai ${S.started||""} · desk live di periode yang sama ${lr==null?"—":(lr>=0?"+":"")+lr.toFixed(2)+"%"}`;
+ const cv=S.curve||[];let svg='<div class="mu" style="font-size:12px;padding:20px 0;text-align:center">Grafik terisi seiring siklus per jam.</div>';
  if(cv.length>1){const ys=[];cv.forEach(c=>{ys.push(c.eq/S.start*100);if(c.live&&S.live0)ys.push(c.live/S.live0*100)});
   const mn=Math.min(...ys,100),mx=Math.max(...ys,100),r=(mx-mn)||1,X=i=>(i/(cv.length-1)*320).toFixed(1),Y=v=>(118-(v-mn)/r*110).toFixed(1);
   const a=cv.map((c,i)=>`${X(i)},${Y(c.eq/S.start*100)}`).join(" "),lp=cv.map((c,i)=>c.live&&S.live0?`${X(i)},${Y(c.live/S.live0*100)}`:"").filter(Boolean).join(" ");
   svg=`<svg viewBox="0 0 320 122" style="width:100%;height:150px"><line x1="0" x2="320" y1="${Y(100)}" y2="${Y(100)}" stroke="var(--line)"/><polyline fill="none" stroke="var(--up)" stroke-width="2" points="${a}"/>${lp?`<polyline fill="none" stroke="var(--mu)" stroke-width="1.5" stroke-dasharray="4 3" points="${lp}"/>`:""}</svg>
   <div class="trk"><span>${esc(cv[0].t)}</span><span>${esc(cv[cv.length-1].t)}</span></div>`}
  const wr=S.n?Math.round(S.wins/S.n*100)+"%":"—";
- const kp=`<div class="kpis" style="margin-top:8px"><div class="kpi"><div class="v">${money(eq)}</div><div class="l">Equity</div></div><div class="kpi"><div class="v ${cls(ret)}">${ret.toFixed(2)}%</div><div class="l">Return</div></div><div class="kpi"><div class="v dn">${(S.max_dd||0).toFixed(2)}%</div><div class="l">Max drawdown</div></div><div class="kpi"><div class="v">${S.n||0}</div><div class="l">Closed trades</div></div><div class="kpi"><div class="v">${wr}</div><div class="l">Win rate</div></div><div class="kpi"><div class="v">${S.pf??"—"}</div><div class="l">Profit factor</div></div></div>`;
+ const kp=`<div class="kpis" style="margin-top:8px"><div class="kpi"><div class="v">${money(eq)}</div><div class="l">Nilai</div></div><div class="kpi"><div class="v ${cls(ret)}">${ret.toFixed(2)}%</div><div class="l">Imbal hasil</div></div><div class="kpi"><div class="v dn">${(S.max_dd||0).toFixed(2)}%</div><div class="l">Turun terdalam</div></div><div class="kpi"><div class="v">${S.n||0}</div><div class="l">Transaksi ditutup</div></div><div class="kpi"><div class="v">${wr}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div><div class="kpi"><div class="v">${S.pf??"—"}</div><div class="l">Faktor untung</div></div></div>`;
  const oc=rows.length?`<div class="ogrid">`+rows.map(({o,m,pn,live})=>{const sh=o.side==="short",trail=o.init_stop!=null&&Math.abs(o.stop-o.init_stop)>1e-12;
-  return`<div class="oc" style="border-left-color:${sh?"var(--dn)":"var(--up)"}"><div class="h" style="display:flex;justify-content:space-between;align-items:center"><b>${esc(o.c)}</b><span class="sd ${sh?"S":"L"}">${sh?"SHORT":"LONG"}</span></div>
-  <div class="sub">Entry ${px(o.entry)} · mark ${px(m)}${live?' <span class="ok">live</span>':""}</div>
-  <div class="sub">${trail?"Trailing stop (15-day channel)":"Stop (2×ATR)"} ${px(o.stop)}</div>
-  <div class="sub">Size ${money(o.notional)} notional · risk ${money(o.risk)}</div>
-  <div style="margin-top:4px"><b class="${cls(pn)}">${money(pn)}</b> <span class="sub">opened ${esc(o.opened||"")}</span></div></div>`}).join("")+`</div>`:'<div class="card mu" style="font-size:13px">No open trades. The strategy waits for a daily close beyond a 30-day high/low in the coin\'s trend direction — see the watchlist.</div>';
+  return`<div class="oc" style="border-left-color:${sh?"var(--dn)":"var(--up)"}"><div class="h" style="display:flex;justify-content:space-between;align-items:center">${coinLabel(o.c)}${sideBadge(o.side)}</div>
+  <div class="sub">Masuk ${px(o.entry)} · harga ${px(m)}${live?' <span class="ok">live</span>':""}</div>
+  <div class="sub">${trail?tip("Trailing stop",TIPS.trail)+" (kanal 15 hari)":tip("Stop",TIPS.sl)+" (2×ATR)"} ${px(o.stop)}</div>
+  <div class="sub">Ukuran ${money(o.notional)} · risiko ${money(o.risk)}</div>
+  <div style="margin-top:4px"><b class="${cls(pn)}">${money(pn)}</b> <span class="sub">dibuka ${esc(o.opened||"")}</span></div></div>`}).join("")+`</div>`:'<div class="card mu" style="font-size:13px">Tidak ada posisi terbuka. Strategi menunggu penutupan harian melewati tinggi/rendah 30 hari sesuai arah tren — lihat daftar pantau.</div>';
  const wl=(S.watch||[]).map(w=>{const p=LIVE[w.c+"USDT"]??w.px,th=(w.hi/p-1)*100,tl=(w.lo/p-1)*100,pos=Math.max(0,Math.min(100,(p-w.lo)/((w.hi-w.lo)||1)*100));
-  const tag=w.trend==="up"?'<span class="sd L">TREND UP</span>':w.trend==="down"?'<span class="sd S">TREND DOWN</span>':'<span class="badge">NO TREND</span>';
-  const arm=w.armed==="long"?`Long if a daily close > ${px(w.hi)} (${th>=0?"+":""}${th.toFixed(1)}%)`:w.armed==="short"?`Short if a daily close < ${px(w.lo)} (${tl.toFixed(1)}%)`:"No trade until trend lines up";
-  return`<div class="wc"><div class="h"><b>${esc(w.c)}</b>${tag}</div><div class="trk"><span>30d low ${px(w.lo)}</span><span>high ${px(w.hi)}</span></div><div class="bar"><i style="left:calc(${pos.toFixed(1)}% - 1px)"></i></div><div class="trk"><span>${tl.toFixed(1)}%</span><span>${px(p)}</span><span>+${th.toFixed(1)}%</span></div><div style="margin-top:4px">${arm}</div></div>`}).join("")||'<div class="mu">Watchlist appears after the next cycle.</div>';
- const cl=(S.closed||[]).length?`<div class="tw"><table><tr><th>Coin</th><th>Side</th><th>Entry</th><th>Exit</th><th>Reason</th><th>P&amp;L</th><th>R</th><th>Opened / Closed</th></tr>`+S.closed.map(x=>`<tr><td><b>${esc(x.coin)}</b></td><td>${esc(x.side)}</td><td>${px(x.entry)}</td><td>${px(x.exit)}</td><td>${esc(x.why||"stop")}</td><td class="${cls(x.pnl_usd)}">${money(x.pnl_usd)}</td><td>${x.R??"—"}</td><td class="mu">${esc(x.opened||"")} → ${esc(x.closed||"")}</td></tr>`).join("")+`</table></div>`:'<div class="card mu" style="font-size:13px">No closed trades yet.</div>';
- $("trendsec").innerHTML=`<div class="tw2"><div class="card"><h2>Equity vs live desk</h2><div class="sub">Green: trend strategy from $10K · dashed: live majors desk, rebased to the same start</div>${svg}${kp}</div>
- <div class="card"><h2>How it trades</h2><ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.5">
- <li>Looks at daily candles on 12 majors (BTC ETH BNB XRP SOL TRX HYPE ZEC DOGE LINK ADA XLM).</li>
- <li>Goes long when a day closes above its 30-day high while the coin is in an uptrend (above its 200-day average); short on a close below the 30-day low in a downtrend.</li>
- <li>First stop 2× daily ATR; then exits when price crosses the 15-day low (longs) / high (shorts). No fixed take-profit — winners run.</li>
- <li>Risks 2% of equity per trade; max 1× equity per position, 3× in total. Fees, slippage and funding are charged.</li>
- <li>Runs inside the hourly desk cycle. Separate $10K paper account; it does not change the live desk.</li></ul>
- <div style="margin-top:8px;font-size:12px"><b>Backtest (Binance perps)</b><div class="sub">Dev ${esc(S.bt.dev)} · Holdout ${esc(S.bt.hold)} · Full year ${esc(S.bt.full)}<br>${esc(S.bt.live_split)}</div></div>
- <div class="tnote">Paper only and unproven: few trades (~60/yr), backtest year was bearish, holdout drawdown −25%. Judge after ~3 months / 15+ trades.</div></div></div>
- <h3 style="margin-top:14px">Open trades <span class="badge">${rows.length}</span></h3>${oc}
- <h3 style="margin-top:14px">Watchlist · distance to breakout</h3><div class="wl">${wl}</div>
- <h3 style="margin-top:14px">Closed trades</h3>${cl}`;
+  const tag=w.trend==="up"?'<span class="sd L">TREN NAIK</span>':w.trend==="down"?'<span class="sd S">TREN TURUN</span>':'<span class="badge">TANPA TREN</span>';
+  const arm=w.armed==="long"?`${tip("Long",TIPS.long)} jika tutup harian > ${px(w.hi)} (${th>=0?"+":""}${th.toFixed(1)}%)`:w.armed==="short"?`${tip("Short",TIPS.short)} jika tutup harian < ${px(w.lo)} (${tl.toFixed(1)}%)`:"Belum ada sinyal sampai tren selaras";
+  return`<div class="wc"><div class="h">${coinLabel(w.c)}${tag}</div><div class="trk"><span>Rendah 30h ${px(w.lo)}</span><span>tinggi ${px(w.hi)}</span></div><div class="bar"><i style="left:calc(${pos.toFixed(1)}% - 1px)"></i></div><div class="trk"><span>${tl.toFixed(1)}%</span><span>${px(p)}</span><span>+${th.toFixed(1)}%</span></div><div style="margin-top:4px">${arm}</div></div>`}).join("")||'<div class="mu">Daftar pantau muncul setelah siklus berikutnya.</div>';
+ const cl=(S.closed||[]).length?more("det-trend-cl","Detail transaksi ditutup",`<div class="tw"><table><tr><th>Koin</th><th>Arah</th><th>Masuk</th><th>Keluar</th><th>Alasan</th><th>${tip("P/L",TIPS.pnl)}</th><th>R</th><th>Dibuka / Ditutup</th></tr>`+S.closed.map(x=>`<tr><td>${coinLabel(x.coin)}</td><td>${sideBadge(x.side)}</td><td>${px(x.entry)}</td><td>${px(x.exit)}</td><td>${esc(x.why||"stop")}</td><td class="${cls(x.pnl_usd)}">${money(x.pnl_usd)}</td><td>${x.R??"—"}</td><td class="mu">${esc(x.opened||"")} → ${esc(x.closed||"")}</td></tr>`).join("")+`</table></div>`):'<div class="card mu" style="font-size:13px">Belum ada transaksi yang ditutup.</div>';
+ $("trendsec").innerHTML=`<div class="tw2"><div class="card"><h2>Nilai vs desk live</h2><div class="sub">Hijau: strategi tren dari $10K · putus-putus: desk majors live, diseragamkan ke titik awal yang sama</div>${svg}${kp}</div>
+ <div class="card"><h2>Cara berdagang</h2><ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.5">
+ <li>Melihat lilin harian 12 koin utama (BTC ETH BNB XRP SOL TRX HYPE ZEC DOGE LINK ADA XLM).</li>
+ <li>${tip("Long",TIPS.long)} jika hari tutup di atas tinggi 30 hari saat tren naik (di atas rata-rata 200 hari); ${tip("short",TIPS.short)} jika tutup di bawah rendah 30 hari saat tren turun.</li>
+ <li>${tip("Stop",TIPS.sl)} awal 2× ATR harian; lalu keluar saat harga melewati rendah 15 hari (long) / tinggi 15 hari (short). Tidak ada ${tip("TP",TIPS.tp)} tetap — yang untung dibiarkan berjalan.</li>
+ <li>Risiko 2% modal per transaksi; maks 1× modal per posisi, total 3×. Biaya, slip, dan ${tip("funding",TIPS.fund)} dihitung.</li>
+ <li>Jalan di dalam siklus desk per jam. Akun paper $10K terpisah; tidak mengubah desk live.</li></ul>
+ <div style="margin-top:8px;font-size:12px"><b>Uji masa lalu (futures Binance)</b><div class="sub">Dev ${esc(S.bt.dev)} · Holdout ${esc(S.bt.hold)} · Full year ${esc(S.bt.full)}<br>${esc(S.bt.live_split)}</div></div>
+ <div class="tnote">Hanya simulasi dan belum terbukti: transaksi jarang (~60/tahun), tahun uji cenderung turun, penurunan terdalam −25%. Nilai setelah ~3 bulan / 15+ transaksi.</div></div></div>
+ <h3 style="margin-top:14px">Posisi terbuka <span class="badge">${rows.length}</span></h3>${oc}
+ <h3 style="margin-top:14px">Daftar pantau · jarak ke tembusan</h3><div class="wl">${wl}</div>
+ <h3 style="margin-top:14px">Transaksi ditutup</h3>${cl}`;
  $("trendsec").innerHTML+=comboHtml(D.combo,S);
- $("foot").innerHTML="Trend forward test: simulated paper trading, no real money, no keys, no signing, no orders.";
+ $("foot").innerHTML="Tes tren: simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.";
 }
 function comboHtml(C,S){
- const head='<h3 style="margin-top:22px">Combo forward test <span class="badge b-paper">PAPER ONLY</span> <span class="badge">UNPROVEN</span></h3>';
- if(!C)return head+'<div class="card mu" style="font-size:13px">Combo starts with the next hourly cycle.</div>';
+ const head='<h3 style="margin-top:22px">Tes kombinasi <span class="badge b-paper">HANYA SIMULASI</span> <span class="badge">BELUM TERBUKTI</span></h3>';
+ if(!C)return head+'<div class="card mu" style="font-size:13px">Tes kombinasi mulai di siklus per jam berikutnya.</div>';
  const ret=(C.eq/C.start-1)*100,cv=C.curve||[];
  const f0=cv.find(c=>c.f2_shadow)?.f2_shadow,l0=cv.find(c=>c.live)?.live;
- let svg='<div class="mu" style="font-size:12px;padding:20px 0;text-align:center">Chart fills in as hourly cycles run.</div>';
+ let svg='<div class="mu" style="font-size:12px;padding:20px 0;text-align:center">Grafik terisi seiring siklus per jam.</div>';
  if(cv.length>1){const ys=[100];cv.forEach(c=>{ys.push(c.eq/C.start*100);if(c.f2_shadow&&f0)ys.push(c.f2_shadow/f0*100);if(c.live&&l0)ys.push(c.live/l0*100)});
   const mn=Math.min(...ys),mx=Math.max(...ys),r=(mx-mn)||1,X=i=>(i/(cv.length-1)*320).toFixed(1),Y=v=>(118-(v-mn)/r*110).toFixed(1);
   const ln=(f)=>cv.map((c,i)=>{const v=f(c);return v==null?"":`${X(i)},${Y(v)}`}).filter(Boolean).join(" ");
@@ -488,30 +547,30 @@ function comboHtml(C,S){
   svg=`<svg viewBox="0 0 320 122" style="width:100%;height:150px"><line x1="0" x2="320" y1="${Y(100)}" y2="${Y(100)}" stroke="var(--line)"/>${l?`<polyline fill="none" stroke="var(--mu)" stroke-width="1.5" stroke-dasharray="4 3" points="${l}"/>`:""}${b?`<polyline fill="none" stroke="var(--up)" stroke-width="1.5" points="${b}"/>`:""}<polyline fill="none" stroke="var(--ac)" stroke-width="2.2" points="${a}"/></svg>
   <div class="trk"><span>${esc(cv[0].t)}</span><span>${esc(cv[cv.length-1].t)}</span></div>`}
  const wr=C.n?Math.round(C.wins/C.n*100)+"%":"—";
- const kp=`<div class="kpis" style="margin-top:8px"><div class="kpi"><div class="v">${money(C.eq)}</div><div class="l">Equity</div></div><div class="kpi"><div class="v ${cls(ret)}">${ret.toFixed(2)}%</div><div class="l">Return</div></div><div class="kpi"><div class="v dn">${(C.max_dd||0).toFixed(2)}%</div><div class="l">Max drawdown</div></div><div class="kpi"><div class="v">${money(C.f2)} / ${money(C.desk)}</div><div class="l">Trend / desk sleeve</div></div><div class="kpi"><div class="v">${C.n||0} · ${wr}</div><div class="l">Closed · win rate</div></div><div class="kpi"><div class="v">${C.pf??"—"}</div><div class="l">Profit factor</div></div></div>`;
- const op=(C.open||[]).length?`<div class="tw"><table><tr><th>Sleeve</th><th>Coin</th><th>Side</th><th>Entry</th><th>Stop</th><th>Notional</th><th>Mark P&amp;L</th></tr>`+C.open.map(o=>{const m=LIVE[o.c+"USDT"],pn=m&&o.qty?(m-o.entry)*o.qty*(o.side==="short"?-1:1):null;return`<tr><td>${esc(o.sl)}</td><td><b>${esc(o.c)}</b></td><td>${esc(o.side)}</td><td>${px(o.entry)}</td><td>${px(o.stop)}</td><td>${money(o.notional)}</td><td class="${cls(pn||0)}">${pn==null?"—":money(pn)}</td></tr>`}).join("")+`</table></div>`:'<div class="card mu" style="font-size:13px">No open trades.</div>';
- const cl=(C.closed||[]).length?`<div class="tw"><table><tr><th>Sleeve</th><th>Coin</th><th>Side</th><th>Reason</th><th>P&amp;L</th><th>Closed</th></tr>`+C.closed.map(x=>`<tr><td>${esc(x.sl)}</td><td><b>${esc(x.coin)}</b></td><td>${esc(x.side)}</td><td>${esc(x.why||"")}</td><td class="${cls(x.pnl_usd)}">${money(x.pnl_usd)}</td><td class="mu">${esc(x.closed||"")}</td></tr>`).join("")+`</table></div>`:'<div class="card mu" style="font-size:13px">No closed trades yet.</div>';
- return head+`<div class="tw2"><div class="card"><h2>Combo vs trend vs live desk</h2><div class="sub">Blue: combo from $10K · green: trend forward test · dashed: live majors desk (all rebased to 100 at combo start)</div>${svg}${kp}</div>
- <div class="card"><h2>How it trades</h2><ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.5">
- <li>70% of capital: the trend strategy above, at 3% risk per trade (12 majors).</li>
- <li>30%: the desk's scoring rules (min score 75, shorts only in a BTC bear regime) plus a daily-trend check, wider trailing stop, long/short balance cap (max 2 apart) and skipping scores ≥90, on 35 liquid coins.</li>
- <li>Rebalanced to 70/30 once a day. Runs inside the hourly cycle in its own $10K paper account; it does not change the live desk.</li></ul>
- <div style="margin-top:8px;font-size:12px"><b>Backtest (Binance perps)</b><div class="sub">Dev ${esc(C.bt.dev)} · Holdout ${esc(C.bt.hold)}<br>${esc(C.bt.f2)} · ${esc(C.bt.live)}</div></div>
- <div class="tnote">Target was +100%/yr; backtest stitched ≈+75%. Holdout pace ≈43%/yr. 35-coin list has survivorship bias; earlier live widening lost money.</div></div></div>
- <h3 style="margin-top:14px">Combo open trades <span class="badge">${(C.open||[]).length}</span></h3>${op}
- <h3 style="margin-top:14px">Combo closed trades</h3>${cl}`}
+ const kp=`<div class="kpis" style="margin-top:8px"><div class="kpi"><div class="v">${money(C.eq)}</div><div class="l">Nilai</div></div><div class="kpi"><div class="v ${cls(ret)}">${ret.toFixed(2)}%</div><div class="l">Imbal hasil</div></div><div class="kpi"><div class="v dn">${(C.max_dd||0).toFixed(2)}%</div><div class="l">Turun terdalam</div></div><div class="kpi"><div class="v">${money(C.f2)} / ${money(C.desk)}</div><div class="l">Porsi tren / desk</div></div><div class="kpi"><div class="v">${C.n||0} · ${wr}</div><div class="l">Ditutup · ${tip("menang",TIPS.wr)}</div></div><div class="kpi"><div class="v">${C.pf??"—"}</div><div class="l">Faktor untung</div></div></div>`;
+ const op=(C.open||[]).length?`<div class="tw"><table><tr><th>Porsi</th><th>Koin</th><th>Arah</th><th>Masuk</th><th>${tip("Stop",TIPS.sl)}</th><th>Nilai posisi</th><th>${tip("P/L",TIPS.pnl)}</th></tr>`+C.open.map(o=>{const m=LIVE[o.c+"USDT"],pn=m&&o.qty?(m-o.entry)*o.qty*(o.side==="short"?-1:1):null;return`<tr><td>${esc(o.sl)}</td><td>${coinLabel(o.c)}</td><td>${sideBadge(o.side)}</td><td>${px(o.entry)}</td><td>${px(o.stop)}</td><td>${money(o.notional)}</td><td class="${cls(pn||0)}">${pn==null?"—":money(pn)}</td></tr>`}).join("")+`</table></div>`:'<div class="card mu" style="font-size:13px">Tidak ada posisi terbuka.</div>';
+ const cl=(C.closed||[]).length?more("det-combo-cl","Detail transaksi ditutup",`<div class="tw"><table><tr><th>Porsi</th><th>Koin</th><th>Arah</th><th>Alasan</th><th>${tip("P/L",TIPS.pnl)}</th><th>Ditutup</th></tr>`+C.closed.map(x=>`<tr><td>${esc(x.sl)}</td><td>${coinLabel(x.coin)}</td><td>${sideBadge(x.side)}</td><td>${esc(x.why||"")}</td><td class="${cls(x.pnl_usd)}">${money(x.pnl_usd)}</td><td class="mu">${esc(x.closed||"")}</td></tr>`).join("")+`</table></div>`):'<div class="card mu" style="font-size:13px">Belum ada transaksi yang ditutup.</div>';
+ return head+`<div class="tw2"><div class="card"><h2>Kombinasi vs tren vs desk live</h2><div class="sub">Biru: kombinasi dari $10K · hijau: tes tren · putus-putus: desk majors live (semua diseragamkan ke 100 di awal kombinasi)</div>${svg}${kp}</div>
+ <div class="card"><h2>Cara berdagang</h2><ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.5">
+ <li>70% modal: strategi tren di atas, risiko 3% per transaksi (12 koin utama).</li>
+ <li>30%: aturan skor desk (skor min 75, ${tip("short",TIPS.short)} hanya saat rezim BTC turun) plus cek tren harian, ${tip("trailing stop",TIPS.trail)} lebih longgar, batas imbang long/short (maks selisih 2), dan melewati skor ≥90, pada 35 koin likuid.</li>
+ <li>Diseimbangkan ulang ke 70/30 sekali sehari. Jalan di siklus per jam di akun paper $10K sendiri; tidak mengubah desk live.</li></ul>
+ <div style="margin-top:8px;font-size:12px"><b>Uji masa lalu (futures Binance)</b><div class="sub">Dev ${esc(C.bt.dev)} · Holdout ${esc(C.bt.hold)}<br>${esc(C.bt.f2)} · ${esc(C.bt.live)}</div></div>
+ <div class="tnote">Target +100%/tahun; uji gabungan ≈+75%. Laju periode uji ≈43%/tahun. Daftar 35 koin bisa bias; pelebaran live sebelumnya merugi.</div></div></div>
+ <h3 style="margin-top:14px">Posisi terbuka kombinasi <span class="badge">${(C.open||[]).length}</span></h3>${op}
+ <h3 style="margin-top:14px">Transaksi ditutup kombinasi</h3>${cl}`}
 function shadowHtml(S){
  if(!S)return"";const r=((S.eq/S.start-1)*100);
- return`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="sub">Trend forward test (shadow, paper): ${money(S.eq)} <span class="${cls(r)}">${r>=0?"+":""}${r.toFixed(2)}%</span> · ${(S.open||[]).length} open</span><button type="button" class="tabs" style="all:unset;cursor:pointer;color:var(--ac);font-size:13px" onclick="setView('trend')">Open Trend tab →</button></div>`}
+ return`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="sub">Tes tren (simulasi): ${money(S.eq)} <span class="${cls(r)}">${r>=0?"+":""}${r.toFixed(2)}%</span> · ${(S.open||[]).length} terbuka</span><button type="button" class="tabs" style="all:unset;cursor:pointer;color:var(--ac);font-size:13px" onclick="setView('trend')">Buka tab Tes tren →</button></div>`}
 function renderWallet(){
  const name=walletViewName(),w=walletForView(),title=w?walletTitle(w):(name+" · Hyperliquid");
- $("htitle").innerHTML=`${esc(title)} <span class="badge b-wallet">READ-ONLY</span>${w&&w.live?' <span class="badge b-live">LIVE</span>':""}`;
+ $("htitle").innerHTML=`${esc(title)} <span class="badge b-wallet">HANYA LIHAT</span>${w&&w.live?' <span class="badge b-live">LIVE</span>':""}`;
  $("tot").innerHTML=w&&w.ok?moneyR(w.eq):"—";
- $("totsub").textContent=w&&w.ok?`Public Hyperliquid read · perps ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}`:(w&&(w.error||"Wallet data not in this build yet."));
+ $("totsub").textContent=w&&w.ok?`Bacaan publik Hyperliquid · futures ${moneyR(w.perps_eq)} + spot ${moneyR(w.spot_eq)}`:(w&&(w.error||"Data dompet belum ada di build ini."));
  $("banner").hidden=false;
- $("banner").innerHTML=`<b>Read-only.</b> This is ${esc(name)}'s actual Hyperliquid account, public lookup only. No keys, no signing, no orders from this page. The $37 paper mirror is on the Real tab.`;
+ $("banner").innerHTML=`<b>Hanya lihat.</b> Ini akun Hyperliquid asli ${esc(name)}, bacaan publik saja. Tidak ada kunci, tidak ada order dari halaman ini. Mirror paper $37 ada di tab Target $37.`;
  $("wallet").hidden=false;$("wallet").innerHTML=walletHtml(w);
- $("foot").innerHTML=`This tab is a public Hyperliquid read of ${esc(name)}'s wallet. No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
+ $("foot").innerHTML=`Tab ini bacaan publik Hyperliquid untuk dompet ${esc(name)}. Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
 }
 function renderReal(){
  const R=D.real||{},M=R.mirror||{},W=walletNow()||{};
@@ -521,31 +580,31 @@ function renderReal(){
  const unrealLive=opens.reduce((s,o)=>s+(o._u||0),0);
  const eq=(M.eq||start)+(unrealLive-(M.unreal||0));
  const pl=(eq/start-1)*100;
- $("htitle").innerHTML=`$37 → $1000K Goal <span class="badge b-real">SIMULATED MIRROR</span>`;
+ $("htitle").innerHTML=`Target $37 → $1000K <span class="badge b-real">MIRROR SIMULASI</span>`;
  $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
- $("totsub").textContent=`Simulated $37 book copying every Majors paper trade at 0.37% size. Started ${M.started||""}. Not a live wallet.`;
+ $("totsub").textContent=`Buku simulasi $37 yang meniru setiap transaksi paper Majors dengan ukuran 0,37%. Mulai ${M.started||""}. Bukan dompet live.`;
  $("banner").hidden=false;
- $("banner").innerHTML=`<b>Simulated $37 paper mirror.</b> The numbers above and the open trades below copy the $10K desk, same coin, side, leverage and SL/TP, sized × 37/10,000. ${esc(M.init_note||"Started from then-open positions, no closed-trade backfill.")} Live Hyperliquid wallets are on the Steven and Russel tabs, read-only.`;
- $("ottitle").innerHTML=`Mirror open trades <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULATED</span>`;
+ $("banner").innerHTML=`<b>Mirror paper $37 (simulasi).</b> Angka di atas dan posisi terbuka di bawah meniru desk $10K: koin, arah, ${tip("leverage",TIPS.lev)}, serta ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} yang sama, ukurannya × 37/10.000. ${esc(M.init_note||"Dimulai dari posisi yang saat itu terbuka, tanpa mengisi transaksi lama.")} Dompet Hyperliquid live ada di tab Steven dan Russel, hanya lihat.`;
+ $("ottitle").innerHTML=`Posisi terbuka mirror <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULASI</span>`;
  const cards=openCards(opens,true);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
- $("otsum").innerHTML=opens.length?`Total unrealized <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> on ${moneyR(cards.tm)} margin · scaled from the $10K desk`:"";
+ $("otsum").innerHTML=opens.length?`${tip("Untung/rugi terbuka",TIPS.upnl)} <b class="${cls(cards.tu)}">${moneyR(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> dari ${tip("modal",TIPS.margin)} ${moneyR(cards.tm)} · disesuaikan dari desk $10K`:"";
  $("wallet").hidden=true;$("wallet").innerHTML="";
- $("desktitle").innerHTML=`$37 mirror book <span class="badge b-real">SIMULATED</span>`;
- $("desks").innerHTML=`<div class="card"><h2>Real $37 mirror <span class="badge b-paper">PAPER ONLY</span></h2>
+ $("desktitle").innerHTML=`Buku mirror $37 <span class="badge b-real">SIMULASI</span>`;
+ $("desks").innerHTML=`<div class="card"><h2>Mirror $37 <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span></h2>
   <div class="eq">${moneyR(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">${M.win==null?"—":M.win+"%"}</div><div class="l">Win rate</div></div>
-  <div class="kpi"><div class="v">${M.open??opens.length}</div><div class="l">Open</div></div>
-  <div class="kpi"><div class="v">${M.closed??0}</div><div class="l">Closed</div></div>
-  <div class="kpi"><div class="v ${cls(M.real)}">${moneyR(M.real)}</div><div class="l">Realized</div></div>
-  <div class="kpi"><div class="v ${cls(unrealLive)}">${moneyR(unrealLive)}</div><div class="l">Unrealized</div></div>
-  <div class="kpi"><div class="v">${M.mdd==null?"—":pct(M.mdd)}</div><div class="l">Max DD</div></div></div>
+  <div class="kpis"><div class="kpi"><div class="v">${M.win==null?"—":M.win+"%"}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div>
+  <div class="kpi"><div class="v">${M.open??opens.length}</div><div class="l">Terbuka</div></div>
+  <div class="kpi"><div class="v">${M.closed??0}</div><div class="l">Ditutup</div></div>
+  <div class="kpi"><div class="v ${cls(M.real)}">${moneyR(M.real)}</div><div class="l">${tip("Sudah dikunci",TIPS.rpnl)}</div></div>
+  <div class="kpi"><div class="v ${cls(unrealLive)}">${moneyR(unrealLive)}</div><div class="l">${tip("Belum dikunci",TIPS.upnl)}</div></div>
+  <div class="kpi"><div class="v">${M.mdd==null?"—":pct(M.mdd)}</div><div class="l">Turun terdalam</div></div></div>
   ${chart(M.pts||[],start)}
-  <div class="sub" style="margin-top:8px">Cash ${moneyR(M.cash)} · margin ${moneyR(M.margin)} · scale ${esc(M.scale_label||"× 37/10,000")}. Win rate starts empty until a mirrored trade fully closes.</div></div>`;
- $("cltitle").textContent="Mirror closed trades (from start only)";
+  <div class="sub" style="margin-top:8px">Kas ${moneyR(M.cash)} · ${tip("modal",TIPS.margin)} ${moneyR(M.margin)} · skala ${esc(M.scale_label||"× 37/10.000")}. ${tip("Menang",TIPS.wr)} masih kosong sampai ada transaksi mirror yang benar-benar ditutup.</div></div>`;
+ $("cltitle").textContent="Transaksi mirror yang sudah ditutup (sejak mulai saja)";
  $("closed").innerHTML=closedTable(M.closes||[],true);
- $("righttitle").textContent="How this book works";$("dtabs").style.display="none";$("dtabs").innerHTML="";
- $("dec").innerHTML=`<div class="it"><div class="r">The $37 book opens and closes in sync with the $10K Majors desk each cycle. New paper entries are copied automatically; closes and partial TPs after ${esc(M.started||"start")} are recorded here at 0.37% size. Older $10K results are not backfilled, so this win rate is this book's own record. Live wallets are on the Steven and Russel tabs — positions you open yourself are tagged here when they match a desk trade.</div></div>`;
- $("foot").innerHTML=`The $37 book is simulated paper, not live orders. Live wallets are on the Steven and Russel tabs (public Hyperliquid reads). No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
+ $("righttitle").textContent="Cara kerja buku ini";$("dtabs").style.display="none";$("dtabs").innerHTML="";
+ $("dec").innerHTML=`<div class="it"><div class="r">Buku $37 buka dan tutup bersamaan dengan desk Majors $10K setiap ${tip("siklus",TIPS.cycle)}. Entri paper baru disalin otomatis; penutupan dan ${tip("TP",TIPS.tp)} sebagian setelah ${esc(M.started||"mulai")} dicatat di sini dengan ukuran 0,37%. Hasil lama $10K tidak diisi mundur, jadi ${tip("menang",TIPS.wr)} ini catatan buku ini sendiri. Dompet live ada di tab Steven dan Russel — posisi yang Anda buka sendiri ditandai di sini kalau cocok dengan transaksi desk.</div></div>`;
+ $("foot").innerHTML=`Buku $37 adalah simulasi, bukan order live. Dompet live ada di tab Steven dan Russel (bacaan publik Hyperliquid). Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
 }
 function dcaUnlocked(){try{return sessionStorage.getItem("dcaSoftUnlock")==="1"}catch(e){return false}}
 function unlockDca(ev){if(ev)ev.preventDefault();const v=(($("dcapw")||{}).value||"");if(v==="1234"){try{sessionStorage.setItem("dcaSoftUnlock","1")}catch(e){}render()}else{const e=$("dcapwerr");if(e)e.textContent="Salah. Ingat, ini cuma kunci lunak, bukan keamanan."}}
@@ -617,6 +676,52 @@ function copyDcaBuy(){const el=$("dcabuymsg");if(!el)return;const t=el.textConte
  const done=()=>{const b=$("dcacopybuy");if(b){b.textContent="Tersalin";setTimeout(()=>{if($("dcacopybuy"))$("dcacopybuy").textContent="Salin"},1200)}};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done).catch(()=>fb());else fb();
  function fb(){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){}document.body.removeChild(a)}}
+
+function dcaWeekBars(B, orders){
+  if(B&&B.week_bars&&B.week_bars.length)return B.week_bars;
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth(), last=new Date(y,m+1,0).getDate();
+  const cur=now.getDate()<=7?1:now.getDate()<=14?2:now.getDate()<=21?3:4;
+  const labels={1:"1–7",2:"8–14",3:"15–21",4:"22–"+last};
+  const spent=[0,0,0,0,0], buys=[0,0,0,0,0], seen=[{},{},{},{},{}];
+  (orders||[]).forEach(o=>{
+    const t=String(o.time_wib||o.time||"").replace(" WIB","");
+    const dt=new Date(t.replace(" ","T"));
+    if(isNaN(dt)||dt.getFullYear()!==y||dt.getMonth()!==m)return;
+    const w=dt.getDate()<=7?1:dt.getDate()<=14?2:dt.getDate()<=21?3:4;
+    const pair=String(o.pair||"").replace(/[\/_]/g,"").toUpperCase();
+    const idr=o.idr!=null?Number(o.idr):(o.amount_idr!=null?Number(o.amount_idr):null);
+    if(!(idr>0))return;
+    const key=Math.round(idr);
+    if(seen[w][key])return;
+    // prefer counting; two legs share idr so first wins
+    seen[w][key]=1;spent[w]+=idr;buys[w]+=1;
+  });
+  return [1,2,3,4].map(w=>({week:w,label:labels[w],spent:Math.round(spent[w]||0),buys:buys[w]||0,current:w===cur}));
+}
+function dcaBudgetHero(B, orders){
+  const monthly=Number(B.monthly||1000000), spent=Math.max(0,Number(B.spent||0));
+  const remain=B.remaining!=null?Math.max(0,Number(B.remaining)):Math.max(0,monthly-spent);
+  const pct=monthly>0?spent/monthly:0, pctLab=Math.round(pct*100);
+  const r=58,cx=80,cy=80,sw=18,C=2*Math.PI*r, spentLen=Math.max(0,Math.min(C,C*pct));
+  const svg=`<svg class="dca-donut" viewBox="0 0 160 160" role="img" aria-label="${pctLab} persen anggaran terpakai">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1f2633" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#22c55e" stroke-width="${sw}" stroke-linecap="${spentLen>0&&spentLen<C?"round":"butt"}" stroke-dasharray="${spentLen.toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#e6e9ef" font-size="26" font-weight="800">${pctLab}%</text>
+    <text x="${cx}" y="${cy+16}" text-anchor="middle" fill="#8a93a6" font-size="12">terpakai</text>
+  </svg>`;
+  const weeks=dcaWeekBars(B,orders);
+  const strip=weeks.map(w=>{
+    const on=w.current, bought=(w.spent||0)>0||(w.buys||0)>0;
+    const st=bought?("beli · "+idr(w.spent)):(on?"berjalan":"belum beli");
+    return `<div class="dca-week${on?" now":""}${bought?" buy":""}"><div class="wn">M${w.week}${on?" · ini":""}</div><div class="ws">${esc(w.label||"")}</div><div class="ws">${st}</div></div>`;
+  }).join("");
+  const sent=`Bulan ini sudah dipakai ${idr(spent)} dari anggaran ${idr(monthly)}, sisa ${idr(remain)}.`;
+  return `<div class="dca-hero"><div class="dca-donut-wrap">${svg}
+    <div class="dca-leg"><span><i style="background:#22c55e"></i>Terpakai ${idr(spent)}</span><span><i style="background:#1f2633"></i>Sisa ${idr(remain)}</span></div>
+    <p class="sent">${sent}</p>
+    <div class="dca-weeks" aria-label="Isi per minggu">${strip}</div>
+  </div></div>`;
+}
 function renderDca(){const A=D.dca||{};
  $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
  $("banner").hidden=false;
@@ -637,9 +742,9 @@ function renderDca(){const A=D.dca||{};
  const vcls=buy?"go":"skip";
  const Bal=A.balances||{};
  const fmtBal=(a)=>{const x=Number(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
-  if(a.asset==="IDR")return `${idr(x)}`;
+  if(a.asset==="IDR")return `${coinIcon("IDR","sm")} ${idr(x)}`;
   const q=a.asset==="BTC"?x.toLocaleString("id-ID",{minimumFractionDigits:6,maximumFractionDigits:8}):x.toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:8});
-  return `${q} ${esc(a.asset)}`;};
+  return `${coinIcon(a.asset,"sm")} ${q} ${esc(a.asset)}`;};
  const aset=(Bal.assets||[]).filter(a=>a&&a.asset).map(fmtBal).join(" · ")||"—";
  const warn=Bal.warning||"Saldo di kartu ini juga tercatat di data publik. Siapa pun yang membuka sumber halaman ini bisa melihatnya.";
  const idrFree=(A.portfolio&&A.portfolio.idr_free!=null)?Math.floor(Number(A.portfolio.idr_free)):(Bal.idr_free!=null?Math.floor(Number(Bal.idr_free)):Math.floor(Number(((Bal.assets||[]).find(x=>x&&x.asset==="IDR")||{}).free||0)));
@@ -686,17 +791,17 @@ function renderDca(){const A=D.dca||{};
  const P=A.portfolio||{};
  const fmtA=(asset,n)=>{if(n==null||isNaN(n))return "—";if(asset==="IDR")return Number(n).toLocaleString("id-ID",{maximumFractionDigits:0});if(asset==="BTC")return Number(n).toFixed(8);return Number(n).toLocaleString("id-ID",{maximumFractionDigits:8})};
  const fmtPx=(row)=>{const a=row.asset;if(a==="BTC"&&row.price_usdt!=null)return Number(row.price_usdt).toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2})+" USDT";if(row.price==null||isNaN(row.price))return "—";if(a==="IDR")return idr(1);return idr(row.price)};
- const rows=(P.assets||[]).map(r=>`<tr><td>${esc(r.asset)}</td><td>${esc(fmtA(r.asset,r.amount))}</td><td>${esc(fmtPx(r))}</td><td>${r.idr!=null?idr(r.idr):"—"}</td><td>${r.pct!=null?Number(r.pct).toFixed(2).replace(".",",")+"%":"—"}</td></tr>`).join("");
+ const rows=(P.assets||[]).map(r=>`<tr><td>${coinLabel(r.asset)}</td><td>${esc(fmtA(r.asset,r.amount))}</td><td>${esc(fmtPx(r))}</td><td>${r.idr!=null?idr(r.idr):"—"}</td><td>${r.pct!=null?Number(r.pct).toFixed(2).replace(".",",")+"%":"—"}</td></tr>`).join("");
  const tot=P.total_idr!=null?P.total_idr:Bal.idr_est;
  const known=(P.btc||{}).known,lama=(P.btc||{}).lama;
  let basis="";
  if(known&&known.qty){
   const pnl=known.pnl_idr,pc=known.pnl_pct,pnlCls=pnl==null?"":(pnl>0?"up":pnl<0?"dn":"");
-  const pnlS=pnl==null?"P/L tidak dihitung":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
-  basis+=`<p>BTC dari cicilan tercatat: <b>${fmtA("BTC",known.qty)}</b>${known.avg_price_usdt!=null?" · rata-rata "+Number(known.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT":""}${known.invested_idr!=null?" · modal "+idr(known.invested_idr):""}${known.value_idr!=null?" · nilai sekarang "+idr(known.value_idr):""} · <span class="${pnlCls}">${pnlS}</span>.</p>`;
+  const pnlS=pnl==null?tip("P/L",TIPS.pnl)+" tidak dihitung":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
+  basis+=`<p>${coinLabel("BTC")} dari cicilan tercatat: <b>${fmtA("BTC",known.qty)}</b>${known.avg_price_usdt!=null?" · rata-rata "+Number(known.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT":""}${known.invested_idr!=null?" · modal "+idr(known.invested_idr):""}${known.value_idr!=null?" · nilai sekarang "+idr(known.value_idr):""} · <span class="${pnlCls}">${pnlS}</span>.</p>`;
  }
  if(lama&&lama.qty){
-  basis+=`<p class="lama">${esc(lama.label||"BTC lama (modal tidak diketahui)")}: <b>${fmtA("BTC",lama.qty)}</b>${lama.value_idr!=null?" · nilai sekarang "+idr(lama.value_idr):""}. P/L tidak dihitung — modal tidak diketahui, tidak dikarang.</p>`;
+  basis+=`<p class="lama">${coinLabel("BTC")} ${esc((lama.label||"BTC lama (modal tidak diketahui)").replace(/^BTC /,))}: <b>${fmtA("BTC",lama.qty)}</b>${lama.value_idr!=null?" · nilai sekarang "+idr(lama.value_idr):""}. P/L tidak dihitung — modal tidak diketahui, tidak dikarang.</p>`;
  }else if(!known){
   basis+=`<p class="lama">Belum ada isi BTC yang tercatat untuk menghitung modal.</p>`;
  }
@@ -715,7 +820,7 @@ function renderDca(){const A=D.dca||{};
   const qtyS=qty==null?"—":(String(o.pair||"").toUpperCase().includes("BTC")?Number(qty).toFixed(8):Number(qty).toLocaleString("id-ID",{maximumFractionDigits:8}));
   const fee=o.fee==null?"—":`${Number(o.fee).toLocaleString("id-ID",{maximumFractionDigits:8})}${o.fee_asset?" "+esc(o.fee_asset):""}`;
   const idrAmt=o.idr!=null?o.idr:o.amount_idr;
-  return `<tr><td class="mu when">${esc(t)}</td><td>${esc(o.pair||"")}</td><td>${esc(o.side||"BUY")}${o.type?" · "+esc(o.type):""}</td><td>${esc(qtyS)}</td><td>${px(o.price)}</td><td class="mu">${fee}</td><td>${idrAmt!=null?idr(idrAmt):"—"}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
+  return `<tr><td class="mu when">${esc(t)}</td><td>${coinPair(o.pair||"")}</td><td>${esc(o.side||"BELI")}${o.type?" · "+esc(o.type):""}</td><td>${esc(qtyS)}</td><td>${px(o.price)}</td><td class="mu">${fee}</td><td>${idrAmt!=null?idr(idrAmt):"—"}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
  const detail=`<details class="dca-detail"><summary>Detail</summary>
   <div class="card" style="margin-top:8px"><p style="margin:0 0 8px;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
    <p class="sub" style="margin:10px 0 0">Harga ${px(A.price)} USDT · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. ${esc(A.src||"")}${A.stale?" · data cache":""}.</p></div>
@@ -724,7 +829,7 @@ function renderDca(){const A=D.dca||{};
   <div class="card"><h2>Aturan zona &amp; anggaran</h2>${rules}</div>
   <section style="margin-top:16px"><h3>Riwayat beli DCA</h3>${hist}</section>
  </details>`;
- $("dcasec").innerHTML=bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
+ const hero=dcaBudgetHero(B,A.orders||[]);$("dcasec").innerHTML=hero+bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
  $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
@@ -739,18 +844,18 @@ function render(){if(!D)return;
  if(trend)renderTrend();
  else if(walt)renderWallet();
  else if(dca)renderDca();
- else if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
+ else if(real){if(!D.real){$("totsub").textContent="Data Target $37 belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Target $37 muncul setelah data diperbarui."}else renderReal()}
  else renderPaper();
- $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
+ $("upd").textContent="Data desk per jam "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
  paintLive();
  restoreUi(snap);
 }
 function paintLive(){const el=$("livest");if(!el)return;
  const t=marksAt||walletAt;
- if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} marks`:"" ));if(wantsWallet()&&walletAt)bits.push(isWalletView()?"wallet":"wallets");
-  el.innerHTML=`<span class="dot"></span><span class="ok">${esc(bits.join(" · "))} · updated ${secAgo(t)}</span>`}
- else if(t&&liveFail){el.innerHTML=`<span class="dot off"></span><span class="off">Live delayed · last ${secAgo(t)} · showing last marks or build prices</span>`}
- else{el.innerHTML=`<span class="dot off"></span><span class="off">Showing build prices · live marks unavailable</span>`}
+ if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} harga`:"" ));if(wantsWallet()&&walletAt)bits.push(isWalletView()?"dompet":"dompet");
+  el.innerHTML=`<span class="dot"></span><span class="ok">${esc(bits.join(" · "))} · diperbarui ${secAgo(t)}</span>`}
+ else if(t&&liveFail){el.innerHTML=`<span class="dot off"></span><span class="off">Live tertunda · terakhir ${secAgo(t)} · memakai harga terakhir atau harga build</span>`}
+ else{el.innerHTML=`<span class="dot off"></span><span class="off">Memakai harga build · harga live belum tersedia</span>`}
 }
 async function fetchJson(url,opt){const c=new AbortController(),t=setTimeout(()=>c.abort(),(opt&&opt.timeout)||8000);
  try{const r=await fetch(url,Object.assign({signal:c.signal,cache:"no-store"},opt||{}));if(!r.ok)throw new Error("http "+r.status);return await r.json()}finally{clearTimeout(t)}}
@@ -785,7 +890,7 @@ function ordersByCoin(orders){const out={};(orders||[]).forEach(o=>{const coin=o
   if(!kind||pxv==null||isNaN(pxv))return;const rec=out[coin]||(out[coin]={sl:null,tp:null,orders:[]});
   if(kind==="sl")rec.sl=pxv;else rec.tp=pxv;rec.orders.push({kind,typ,px:pxv})});return out}
 function tagMatches(positions){const desk={};((D&&D.open)||[]).forEach(o=>{const a=(o.a||"").toUpperCase();if(a)desk[a]=o.side||"long"});
- (positions||[]).forEach(p=>{const a=(p.a||"").toUpperCase();if(a in desk){if(desk[a]===p.side){p.match=true;p.match_note="Matches desk "+p.side}else{p.match=false;p.match_note="Desk is "+desk[a]+", wallet is "+p.side}}else{p.match=false;p.match_note="Not on the paper desk"}});return positions}
+ (positions||[]).forEach(p=>{const a=(p.a||"").toUpperCase();if(a in desk){if(desk[a]===p.side){p.match=true;p.match_note="Cocok dengan desk ("+p.side+")"}else{p.match=false;p.match_note="Desk: "+desk[a]+", dompet: "+p.side}}else{p.match=false;p.match_note="Tidak ada di desk paper"}});return positions}
 async function fetchOneWallet(spec){const user=spec.address,prev=walletNow(user)||spec||{};
   const [ch,spot,orders]=await Promise.all([hl("clearinghouseState",{user}),hl("spotClearinghouseState",{user}),hl("frontendOpenOrders",{user}).catch(()=>[])]);
   const mids=HLMIDS||{},ms=ch.marginSummary||{},perps_eq=+(ms.accountValue||0),margin_used=+(ms.totalMarginUsed||0),notional=+(ms.totalNtlPos||0),withdrawable=+(ch.withdrawable||0);
@@ -815,7 +920,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
   walletAt=Date.now();if(wantsWallet())render();else paintLive()}
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
-async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Could not load data.json"}}
+async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
 $("v-steven").addEventListener("click",()=>{setView("steven");fetchWallet()});
