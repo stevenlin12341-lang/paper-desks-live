@@ -151,6 +151,10 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-notes .nc{background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:10px}
 .dca-notes .nc b{display:block;font-size:12px;margin:0 0 4px}
 .dca-notes .nc p{margin:0;font-size:12px;color:var(--mu)}
+.dca-buyline{margin:14px 0 0;font-size:14px;line-height:1.5}
+.dca-detail{margin-top:16px;border-top:1px solid var(--line);padding-top:8px}
+.dca-detail>summary{cursor:pointer;color:var(--mu);font-weight:600;padding:8px 0;user-select:none}
+.dca-kpis.compact{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
@@ -570,77 +574,52 @@ function renderDca(){const A=D.dca||{};
   $("tot").textContent="Terkunci lunak";
   $("totsub").textContent="Bukan keamanan · situs ini publik";
   $("banner").innerHTML=`<b>Kunci lunak, bukan keamanan.</b> Situs ini publik (GitHub Pages). Siapa pun bisa baca kode halaman ini, jadi kunci ini tidak melindungi apa pun. Cuma biar tab ini nggak kebuka tanpa sengaja. Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
-  $("dcasec").innerHTML=`<div class="card"><form onsubmit="unlockDca(event)" class="dca-form"><label>Kunci lunak <input id="dcapw" type="password" autocomplete="off"></label><button type="submit">Buka tab</button></form><div id="dcapwerr"></div><p class="sub" style="margin:10px 0 0">Tidak ada rahasia di balik kunci ini. Analisis DCA dan riwayat tiket tetap data publik.</p></div>`;
+  $("dcasec").innerHTML=`<div class="card"><form onsubmit="unlockDca(event)" class="dca-form"><label>Kunci lunak <input id="dcapw" type="password" autocomplete="off"></label><button type="submit">Buka tab</button></form><div id="dcapwerr"></div><p class="sub" style="margin:10px 0 0">Tidak ada rahasia di balik kunci ini. Analisis DCA tetap data publik.</p></div>`;
   $("foot").innerHTML=`Kunci lunak di halaman publik bukan keamanan. Tidak ada kunci exchange dan tidak ada order dari halaman ini.`;
   const inp=$("dcapw");if(inp)inp.focus();return}
- const ok=A.ok!==false&&A.price!=null,z=A.zone||"—",zcls=z==="MURAH"||z==="AGAK MURAH"?"up":z==="MAHAL"?"dn":"wa";
- const B=A.budget||{},ver=B.verdict||"";
- $("tot").textContent=ok?px(A.price)+" USDT":"—";
- $("totsub").textContent=ok?(`${esc(ver||z)} · ${esc(z)} skor ${A.score??"—"} · ${B.suggest?idr(B.suggest)+" · ":""}${esc(A.asof||"")}`):esc(A.error||"Analisis belum tersedia");
- $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini. Tombol di bawah cuma bikin tiket teks 2 langkah (USDT/IDR lalu BTC/USDT) — tidak ada order ke exchange. Salin tiketnya, lalu kirim ke Grok Bot di chat buat dieksekusi. ${esc((A.pairs&&A.pairs.note)||"Indodax punya BTC/USDT, BTC/IDR, dan USDT/IDR.")}`;
+ const ok=A.ok!==false&&A.price!=null,B=A.budget||{};
+ let ver=B.verdict||"";if(ver==="SKIP MINGGU INI")ver="SKIP";if(ver==="BELI MINGGU INI")ver="BELI SEKARANG";
+ const buy=ver==="BELI SEKARANG",z=A.zone||"—";
+ $("tot").textContent=buy?idr(B.suggest||0):"SKIP";
+ $("totsub").textContent=ok?`${esc(ver||"—")} · ${esc(z)} · ${esc(A.asof||"")}`:esc(A.error||"Analisis belum tersedia");
+ $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
  const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
- const na=v=>v==null||v===""?"N/A":v;
- const kpis=ok?`<div class="dca-kpis">
-  ${kpi("Harga BTC/USDT",px(A.price)+" USDT")}
-  ${kpi("Mayer Multiple",A.mayer!=null?Number(A.mayer).toFixed(2):"N/A",A.mayer!=null&&A.mayer<=0.8?"up":A.mayer>=2.4?"dn":"")}
-  ${kpi("Vs MA200 harian",pct(A.vs_ma200),cls(A.vs_ma200))}
-  ${kpi("MA 200 minggu",A.ma200w!=null?px(A.ma200w):"N/A")}
-  ${kpi("Vs MA 200 minggu",A.vs_ma200w==null?"N/A":pct(A.vs_ma200w),cls(A.vs_ma200w))}
-  ${kpi("RSI harian",A.rsi_d!=null?A.rsi_d:"—",A.rsi_d!=null&&A.rsi_d<30?"up":A.rsi_d>70?"dn":"")}
-  ${kpi("RSI mingguan",A.rsi_w!=null?A.rsi_w:"—",A.rsi_w!=null&&A.rsi_w<35?"up":A.rsi_w>70?"dn":"")}
-  ${kpi("Fear & Greed",A.fng!=null?`${A.fng}${A.fng_label?" · "+esc(A.fng_label):""}`:"N/A",A.fng!=null&&A.fng<=24?"up":A.fng>=75?"dn":"")}
-  ${kpi("Funding perp",A.funding_pct==null?"N/A":(A.funding_pct>0?"+":"")+Number(A.funding_pct).toFixed(4)+"%",cls(A.funding_pct))}
-  ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2)+(A.mvrv_date?" · "+esc(A.mvrv_date):""):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
-  ${kpi("Silang MA50/200",esc(A.ma_cross_label||"—"))}
-  ${kpi("Drawdown dari puncak data",pct(A.dd_ath),cls(A.dd_ath))}
-  ${kpi("Zona / skor",esc(z)+" · "+(A.score??"—")+" · "+(A.mult!=null?A.mult+"×":"—"),zcls)}
- </div>`:'<div class="empty">Analisis belum tersedia. Tiket tetap bisa dibuat manual.</div>';
- const vcls=ver==="BELI SEKARANG"?"go":ver==="BELI MINGGU INI"?"week":"skip";
+ const vcls=buy?"go":"skip";
  const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(ver||"—")}</div>
+  <div class="v" style="font-size:28px;font-weight:700;margin:2px 0 8px">${buy?idr(B.suggest||0):"—"}</div>
   <p class="vr">${esc(B.reason||"Rencana anggaran belum tersedia.")}</p>
-  <div class="dca-kpis">
-   ${kpi("Minggu (WIB)",esc(B.week_label||"—"))}
-   ${kpi("Saran minggu ini",B.suggest!=null?idr(B.suggest):"—")}
-   ${kpi("Sudah terpakai / sisa",`${idr(B.spent||0)} / ${idr(B.remaining!=null?B.remaining:B.monthly)}`)}
-   ${kpi("Anggaran bulan ini",idr(B.monthly||1000000))}
+  <div class="dca-kpis compact">
+   ${kpi("Terpakai bulan ini",idr(B.spent||0))}
+   ${kpi("Sisa",idr(B.remaining!=null?B.remaining:B.monthly))}
+   ${kpi("Anggaran",idr(B.monthly||1000000))}
+   ${kpi("Minggu (WIB)",esc((B.week_label||"—").replace(/^Minggu /,"M")))}
   </div>
-  <p class="sub" style="margin:10px 0 0">Skor indikator ${A.score??"—"} · zona ${esc(z)}. Aturan anggaran ada di kartu bawah.</p>
+  <p class="dca-buyline">Mau beli? Kirim "beli ${B.suggest>0?B.suggest:"<jumlah>"}" ke Grok Bot</p>
  </div>`;
+ const keys=`<div class="card"><div class="dca-kpis compact">
+  ${kpi("Mayer Multiple",A.mayer!=null?Number(A.mayer).toFixed(2):"N/A",A.mayer!=null&&A.mayer<=0.8?"up":A.mayer>=2.4?"dn":"")}
+  ${kpi("Vs MA 200 minggu",A.vs_ma200w==null?"N/A":pct(A.vs_ma200w),cls(A.vs_ma200w))}
+  ${kpi("Fear &amp; Greed",A.fng!=null?`${A.fng}${A.fng_label?" · "+esc(A.fng_label):""}`:"N/A",A.fng!=null&&A.fng<=24?"up":A.fng>=75?"dn":"")}
+  ${kpi("RSI harian",A.rsi_d!=null?A.rsi_d:"N/A",A.rsi_d!=null&&A.rsi_d<30?"up":A.rsi_d>70?"dn":"")}
+  ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
+ </div></div>`;
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
  const ords=A.orders||[];
  const hist=ords.length?`<div class="tw"><table><tr><th>Waktu</th><th>Pair</th><th>Side</th><th>Jumlah</th><th>Harga</th><th>BTC</th><th>Status</th></tr>`+ords.map(o=>{
   const amt=o.amount_usdt!=null?fmtAmt(o.amount_usdt,"USDT"):(o.amount_idr!=null?fmtAmt(o.amount_idr,"IDR"):"—");
-  return `<tr><td class="mu when">${esc(o.time||"")}</td><td>${esc(o.pair||"BTC/USDT")}</td><td>${esc(o.side||"BUY")}</td><td>${esc(amt)}</td><td>${px(o.price)}</td><td>${o.btc!=null?Number(o.btc).toFixed(8):"—"}</td><td class="mu">${esc(o.status||"")}${o.note?" · "+esc(o.note):""}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat. Nanti isi dari tiket yang sudah dieksekusi.</div>';
- $("dcasec").innerHTML=`
-  ${bud}
-  <div class="card">${kpis}
-   <p style="margin:12px 0 0;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
-   <p class="sub" style="margin:10px 0 0">${esc(A.ath_note||"")} Low 50 hari ${px(A.low50)} · high 50 hari ${px(A.high50)} · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak data ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. Sumber: ${esc(A.src||"Binance spot BTCUSDT")}${A.stale?" · data cache":""}.</p>
-  </div>
+  return `<tr><td class="mu when">${esc(o.time||"")}</td><td>${esc(o.pair||"BTC/USDT")}</td><td>${esc(o.side||"BUY")}</td><td>${esc(amt)}</td><td>${px(o.price)}</td><td>${o.btc!=null?Number(o.btc).toFixed(8):"—"}</td><td class="mu">${esc(o.status||"")}${o.note?" · "+esc(o.note):""}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
+ const detail=`<details class="dca-detail"><summary>Detail</summary>
+  <div class="card" style="margin-top:8px"><p style="margin:0 0 8px;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
+   <p class="sub" style="margin:10px 0 0">Harga ${px(A.price)} USDT · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. ${esc(A.src||"")}${A.stale?" · data cache":""}.</p></div>
   <div class="card"><h2>Grafik harian ~1 tahun</h2>${dcaChart(A.chart)}</div>
   <div class="card"><h2>Penjelasan indikator</h2>${notes}</div>
-  <div class="card"><h2>Aturan zona &amp; anggaran</h2><p class="sub" style="margin:0 0 6px">Aturan ini tetap, biar rating dan keputusan minggu ini transparan. Skor makin tinggi = makin menarik buat nyicil.</p>${rules}</div>
-  <div class="card"><h2>Buat tiket Buy</h2>
-   <p class="sub" style="margin:0 0 10px">Halaman ini tidak mengirim order ke Indodax atau exchange lain. Isi jumlah IDR, buat tiket 2 langkah (beli USDT di usdtidr, lalu beli BTC di btcusdt), salin, lalu kirim ke Grok Bot di chat buat dieksekusi. Boleh sisain sebagian sebagai USDT biar ada exposure ke dollar. Kalau dananya sudah USDT, pilih USDT (1 langkah).</p>
-   <div class="dca-form">
-    <label>Jumlah <input id="dcaamt" type="number" min="0" step="any" placeholder="contoh 1000000"></label>
-    <label>Mata uang <select id="dcacur"><option value="IDR" selected>IDR</option><option value="USDT">USDT</option></select></label>
-    <label>Simpan % sebagai USDT <input id="dcakeep" type="number" min="0" max="100" step="1" value="0" title="Persen USDT yang tidak dipakai beli BTC"></label>
-    <button type="button" onclick="makeDcaTicket()">Buat tiket Buy</button>
-   </div>
-   <div id="dcatixbox" hidden>
-    <pre class="ticket" id="dcaticket"></pre>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
-     <button type="button" class="tixbtn" id="dcacopy" onclick="copyDcaTicket()">Salin tiket</button>
-     <span class="sub">Kirim tiket ini ke Grok Bot di chat buat dieksekusi.</span>
-    </div>
-   </div>
-  </div>
-  <section style="margin-top:22px"><h3>Riwayat beli DCA</h3>${hist}</section>`;
- const amtEl=$("dcaamt");if(amtEl&&B.suggest>0){amtEl.value=B.suggest;const cur=$("dcacur");if(cur)cur.value="IDR"}
- $("foot").innerHTML=`Spot DCA adalah analisis dan tiket teks saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
+  <div class="card"><h2>Aturan zona &amp; anggaran</h2>${rules}</div>
+  <section style="margin-top:16px"><h3>Riwayat beli DCA</h3>${hist}</section>
+ </details>`;
+ $("dcasec").innerHTML=bud+keys+detail;
+ $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
