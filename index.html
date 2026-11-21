@@ -189,6 +189,9 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-buyrow .meta{font-size:12px;color:var(--mu)}
 .dca-buyrow .rp{font-size:13px;font-weight:700;text-align:right}
 .dca-buyrow .note{font-size:12px;color:var(--mu);text-align:right}
+.dca-buyrow .side{font-weight:700;margin-right:6px}
+.dca-buyrow.sell .side{color:var(--dn)}
+.dca-buyrow.buy .side{color:var(--up)}
 .dca-port{margin:0 0 12px}
 .dca-port h2{margin:0 0 8px;font-size:15px}
 .dca-port .tw{overflow:auto}
@@ -893,7 +896,7 @@ function dcaHoldRows(rows){
   const pnl=asset==="BTC"?dcaPnl(a.pnl_idr,a.pnl_pct):"";
   return `<div class="dca-row">${coinIcon(asset)}<div class="nm"><b>${esc(asset)}</b><span class="q">${dcaAmt(asset,a.amount)}</span></div><div class="rv"><b>${a.idr!=null?idr(a.idr):"Rp —"}</b>${pnl}<span class="p"><i class="dca-dot" style="background:${col}"></i>${pS}</span></div></div>`}).join("")}</div>`}
 function dcaBasisHtml(P){P=P||dcaLivePortfolio();
- const known=(P.btc||{}).known,lama=(P.btc||{}).lama,bits=[];
+ const btc=P.btc||{},known=btc.known,lama=btc.lama,bits=[];
  const q=n=>dcaAmt("BTC",n)+" BTC";
  if(known&&known.qty){const pnlS=dcaPnl(known.pnl_idr,known.pnl_pct)||"P/L —";
   bits.push(`<div class="dca-brow">${coinIcon("BTC","sm")}<span>Cicilan <b>${q(known.qty)}</b></span><span>${known.invested_idr!=null?"modal "+idr(known.invested_idr)+" · ":""}${pnlS}</span></div>`)}
@@ -901,6 +904,10 @@ function dcaBasisHtml(P){P=P||dcaLivePortfolio();
   const avg=[];if(lama.avg_price_usdt!=null)avg.push("~"+Number(lama.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
   if(lama.avg_price_idr!=null)avg.push(idr(lama.avg_price_idr));
   bits.push(`<div class="dca-brow lama">${coinIcon("BTC","sm")}<span class="lbl">BTC lama <b>${q(lama.qty)}</b>${avg.length?" · "+avg.join(" · "):""}</span><span>${lama.invested_idr!=null?"modal "+idr(lama.invested_idr)+" · ":""}${pnlS}</span></div>`)}
+ if(!bits.length&&btc.invested_idr!=null){const avg=[];
+  if(btc.avg_price_usdt!=null)avg.push(Number(btc.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
+  if(btc.avg_price_idr!=null)avg.push(idr(btc.avg_price_idr));
+  bits.push(`<div class="dca-brow">${coinIcon("BTC","sm")}<span>Modal <b>${idr(btc.invested_idr)}</b></span><span>${avg.length?"rata-rata "+avg.join(" · "):""}</span></div>`)}
  return bits.length?`<div class="dca-basis">${bits.join("")}</div>`:""}
 function dcaWhen(s){if(!s)return "";const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/);
  if(!m)return String(s);const mo=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -915,27 +922,32 @@ function dcaBuysFromOrders(orders,lama){
  return rows}
 function dcaAvgUsdt(rows,given){if(given!=null&&!isNaN(given))return Number(given);
  let q=0,s=0;(rows||[]).forEach(r=>{if(r.qty&&r.price_usdt!=null){q+=Number(r.qty);s+=Number(r.qty)*Number(r.price_usdt)}});return q?s/q:null}
+function dcaFmtAmt(n,asset){if(n==null||isNaN(n))return "—";const x=Number(n);
+ if(asset==="IDR")return idr(x);
+ return x.toLocaleString("id-ID",{maximumFractionDigits:8})+" "+esc(asset||"")}
+function dcaFmtPx(r){const a=(r.amount_asset||(String(r.pair||"").toUpperCase().endsWith("IDR")?"IDR":"USDT"));
+ const px=r.price!=null?r.price:(a==="IDR"?r.price_idr:r.price_usdt);
+ if(px==null||isNaN(px))return "";
+ if(a==="IDR")return idr(px);
+ return Number(px).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT"}
 function dcaBuysHtml(P,orders){P=dcaLivePortfolio();
  const H=P.buys||{},btc=P.btc||{},lama=btc.lama||{};
  let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
  if(!rows.length)rows=dcaBuysFromOrders(orders,lama);
- const avg=dcaAvgUsdt(rows,H.avg_price_usdt!=null?H.avg_price_usdt:btc.avg_price_usdt);
- const cic=H.avg_cicilan_usdt!=null?Number(H.avg_cicilan_usdt):null;
+ rows=rows.filter(r=>r&&r.kind!=="lama");
+ const avg=H.avg_price_usdt!=null?Number(H.avg_price_usdt):(btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):dcaAvgUsdt(rows));
+ const avgIdr=H.avg_price_idr!=null?H.avg_price_idr:btc.avg_price_idr;
  let avgS="";
- if(avg!=null)avgS+=`<div class="st">Rata-rata ${Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})} USDT${H.avg_price_idr!=null?" · "+idr(H.avg_price_idr):""}</div>`;
- if(cic!=null)avgS+=`<div class="st">Cicilan saja ${cic.toLocaleString("id-ID",{maximumFractionDigits:2})} USDT</div>`;
+ if(btc.invested_idr!=null)avgS+=`<div class="st">Modal ${idr(btc.invested_idr)}</div>`;
+ if(avg!=null||avgIdr!=null)avgS+=`<div class="st">Rata-rata ${avg!=null?Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":""}${avg!=null&&avgIdr!=null?" · ":""}${avgIdr!=null?idr(avgIdr):""}</div>`;
  const body=rows.length?rows.map(r=>{
-  if(r.kind==="lama"){const px=[];
-   if(r.price_usdt!=null)px.push("~"+Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
-   if(r.price_idr!=null)px.push(idr(r.price_idr));
-   if(r.usdt_idr!=null)px.push("kurs "+Number(r.usdt_idr).toLocaleString("id-ID"));
-   const right=dcaPnl(r.pnl_idr,r.pnl_pct)||esc(r.note||"harga tidak diketahui");
-   const meta=px.join(" · ")|| (r.note&&!r.price_usdt?esc(r.note):"");
-   const note=r.idr!=null?"modal "+idr(r.idr):(r.value_idr!=null?"nilai "+idr(r.value_idr):"");
-   return `<div class="dca-buyrow"><div class="when">${esc(r.label||"BTC lama")}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${right}</div><div class="meta">${meta}</div><div class="note">${note}</div></div>`}
-  const pxS=r.price_usdt!=null?Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":"—";
-  const kurs=r.usdt_idr!=null?" · kurs "+Number(r.usdt_idr).toLocaleString("id-ID"):"";
-  return `<div class="dca-buyrow"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${r.idr!=null?idr(r.idr):"Rp —"}</div><div class="meta">${pxS}${kurs}</div><div class="note"></div></div>`}).join(""):`<div class="empty">Belum ada pembelian yang dicatat.</div>`;
+  const sell=String(r.side||"BUY").toUpperCase()==="SELL";
+  const side=sell?"JUAL":"BELI";
+  const amtAsset=r.amount_asset||(String(r.pair||"").toUpperCase().endsWith("IDR")?"IDR":"USDT");
+  const amt=r.amount!=null?r.amount:(!sell&&r.quote!=null&&r.fee!=null&&(r.fee_asset||amtAsset)===amtAsset?Number(r.quote)+Number(r.fee):r.quote);
+  const pxS=dcaFmtPx(r);
+  const amtS=amt!=null?dcaFmtAmt(amt,amtAsset):"";
+  return `<div class="dca-buyrow ${sell?"sell":"buy"}"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql"><span class="side">${side}</span>${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${amtS}</div><div class="meta">${pxS}${r.pair?" · "+esc(r.pair.replace("BTC","BTC/")):""}</div><div class="note">${r.fills>1?r.fills+" isi":""}</div></div>`}).join(""):`<div class="empty">Belum ada transaksi yang dicatat.</div>`;
  return `<div class="card dca-buys" id="dcabuys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
 function dcaSaldoCard(){const P=dcaLivePortfolio(),h=dcaHoldAssets();
  if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
