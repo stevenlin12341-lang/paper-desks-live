@@ -127,6 +127,16 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .wc .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.wc .bar{position:relative;height:6px;background:var(--line);border-radius:3px;margin:6px 0}
 .wc .bar i{position:absolute;top:-3px;width:3px;height:12px;background:var(--tx);border-radius:2px}
 .trk{display:flex;justify-content:space-between;color:var(--mu)}.tnote{font-size:12px;color:var(--wa);margin-top:6px}
+.b-dca{color:#67e8f9;border-color:#155e75}
+.dca-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.dca-form{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.dca-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mu)}
+.dca-form input,.dca-form select{background:#0b0e14;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+.dca-form button,.tixbtn{background:#152238;color:var(--ac);border:1px solid var(--ac);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.ticket{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#0b0e14;border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:8px;line-height:1.45}
+#dcapwerr{color:var(--dn);font-size:12px;margin-top:6px}
+.dca-why{margin:8px 0 0;padding-left:18px;color:var(--mu);font-size:12px}
+.dca-why li{margin:3px 0}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
@@ -135,6 +145,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
  <button type="button" id="v-steven">Steven</button>
  <button type="button" id="v-russel">Russel</button>
  <button type="button" id="v-trend">Trend (forward test)</button>
+ <button type="button" id="v-dca">Spot DCA</button>
 </nav>
 <header>
  <div><h1 id="htitle">Paper Majors <span class="badge b-paper">PAPER ONLY</span> <span class="badge" id="runb">Run 2</span></h1>
@@ -152,6 +163,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
  <section><h3 id="cltitle">Recent closed trades</h3><div class="tw" id="closed"></div></section>
  <section id="rightsec"><h3 id="righttitle">Recent decisions</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
 </div>
+<section id="dcasec" hidden></section>
 <footer id="foot">Simulated paper trading. No real money, no keys, no signing.</footer>
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Open ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analysis"></div>
@@ -162,7 +174,7 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="trend"||v==="steven"||v==="russel"?v:"paper"}catch(e){return"paper"}})();
+let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="trend"||v==="steven"||v==="russel"||v==="dca"?v:"paper"}catch(e){return"paper"}})();
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
 const walletViewName=()=>VIEW==="steven"?"Steven":VIEW==="russel"?"Russel":"";
 const wantsWallet=()=>VIEW==="real"||isWalletView();
@@ -493,17 +505,96 @@ function renderReal(){
  $("dec").innerHTML=`<div class="it"><div class="r">The $37 book opens and closes in sync with the $10K Majors desk each cycle. New paper entries are copied automatically; closes and partial TPs after ${esc(M.started||"start")} are recorded here at 0.37% size. Older $10K results are not backfilled, so this win rate is this book's own record. Live wallets are on the Steven and Russel tabs — positions you open yourself are tagged here when they match a desk trade.</div></div>`;
  $("foot").innerHTML=`The $37 book is simulated paper, not live orders. Live wallets are on the Steven and Russel tabs (public Hyperliquid reads). No keys, no signing, no orders from this page. ${esc(D.run?.archive||"")}`
 }
+function dcaUnlocked(){try{return sessionStorage.getItem("dcaSoftUnlock")==="1"}catch(e){return false}}
+function unlockDca(ev){if(ev)ev.preventDefault();const v=(($("dcapw")||{}).value||"");if(v==="1234"){try{sessionStorage.setItem("dcaSoftUnlock","1")}catch(e){}render()}else{const e=$("dcapwerr");if(e)e.textContent="Salah. Ingat, ini cuma kunci lunak, bukan keamanan."}}
+function nowWibLabel(){try{return new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date())+" WIB"}catch(e){const d=new Date(Date.now()+7*3600*1000);return d.toISOString().slice(0,16).replace("T"," ")+" WIB"}}
+function fmtAmt(n,cur){if(n==null||isNaN(n))return "—";const x=Number(n);return (cur==="IDR"?Math.round(x).toLocaleString("id-ID"):x.toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2}))+" "+cur}
+function copyDcaTicket(){const el=$("dcaticket");if(!el)return;const t=el.textContent||"";const done=()=>{const b=$("dcacopy");if(b){b.textContent="Tersalin";setTimeout(()=>{if($("dcacopy"))$("dcacopy").textContent="Salin tiket"},1200)}};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done).catch(()=>fallback());else fallback();
+ function fallback(){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){}document.body.removeChild(a)}}
+function makeDcaTicket(){const A=D.dca||{},amt=parseFloat(($("dcaamt")||{}).value),cur=(($("dcacur")||{}).value)||"IDR",out=$("dcaticket"),box=$("dcatixbox");
+ if(!out)return;if(!(amt>0)){if(box)box.hidden=false;out.textContent="Isi jumlah yang valid dulu.";return}
+ let keep=parseFloat(($("dcakeep")||{}).value);if(isNaN(keep)||keep<0)keep=0;if(keep>100)keep=100;
+ const FEE=0.002,px0=A.price,rate=A.usdt_idr,feePct=(FEE*100).toFixed(1),twoFeePct=(FEE*200).toFixed(1);
+ const n2=x=>x==null||isNaN(x)?"—":Number(x).toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2});
+ const n8=x=>x==null||isNaN(x)?"—":Number(x).toFixed(8);
+ const lines=["TIKET DCA SPOT"+(cur==="IDR"?" (2 LANGKAH)":""),"Waktu: "+nowWibLabel(),"Venue: Indodax","Zona: "+(A.zone||"—")+" · saran "+(A.mult!=null?A.mult+"×":"—")];
+ if(cur==="IDR"){
+  const gross=rate?amt/rate:null, after1=gross!=null?gross*(1-FEE):null, keepU=after1!=null?after1*(keep/100):null, useU=after1!=null?after1*(1-keep/100):null, btc=(useU&&px0)?(useU/px0)*(1-FEE):null;
+  lines.push("Jumlah awal: "+fmtAmt(amt,"IDR"),"Kurs perkiraan USDT/IDR: "+(rate!=null?n2(rate):"— (belum ada di data, isi saat eksekusi)"),"Harga perkiraan BTC/USDT: "+(px0!=null?n2(px0):"—"),"Simpan sebagai USDT: "+keep+"%","","Langkah 1 — BUY USDT","Pair: USDT/IDR (usdtidr)","Side: BUY","Jumlah: "+fmtAmt(amt,"IDR"),"Perkiraan USDT kotor: "+(gross!=null?n2(gross)+" USDT":"—"),"Perkiraan USDT setelah fee ~"+feePct+"%: "+(after1!=null?n2(after1)+" USDT":"—"),"","Langkah 2 — BUY BTC","Pair: BTC/USDT (btcusdt)","Side: BUY","USDT dipakai beli BTC: "+(useU!=null?n2(useU)+" USDT":"—")+(keep?` (${n2(100-keep)}% setelah langkah 1)`:""),"USDT disimpan (exposure dollar): "+(keepU!=null?n2(keepU)+" USDT":"—"),"Perkiraan harga: "+(px0!=null?n2(px0)+" USDT":"—"),"Perkiraan BTC setelah fee ~"+feePct+"%: "+(btc!=null?n8(btc)+" BTC":"—"),"","Catatan:","- Ada 2 kali fee trading Indodax (kira-kira "+feePct+"% taker per langkah, total ~"+twoFeePct+"%). Angka di atas perkiraan dari harga publik, bisa beda di orderbook.","- Mungkin ada sisa USDT kecil karena pembulatan atau minimum lot.","- Belum dieksekusi. Kirim tiket ini ke Grok Bot di chat buat dieksekusi.");
+ }else{
+  const keepU=amt*(keep/100), useU=amt*(1-keep/100), btc=(useU&&px0)?(useU/px0)*(1-FEE):null, idr=rate?amt*rate:null;
+  lines.push("Jumlah awal: "+fmtAmt(amt,"USDT")+(idr!=null?" (perkiraan "+fmtAmt(idr,"IDR")+")":""),"Harga perkiraan BTC/USDT: "+(px0!=null?n2(px0):"—"),"Simpan sebagai USDT: "+keep+"%","","Langkah 1 — BUY BTC","Pair: BTC/USDT (btcusdt)","Side: BUY","USDT dipakai beli BTC: "+n2(useU)+" USDT","USDT disimpan (exposure dollar): "+n2(keepU)+" USDT","Perkiraan BTC setelah fee ~"+feePct+"%: "+(btc!=null?n8(btc)+" BTC":"—"),"","Catatan:","- Sudah dalam USDT, jadi cuma 1 langkah (fee ~"+feePct+"% taker). Kalau dananya masih IDR, pilih IDR biar tiketnya 2 langkah (USDT/IDR lalu BTC/USDT).","- Mungkin ada sisa USDT kecil karena pembulatan.","- Belum dieksekusi. Kirim tiket ini ke Grok Bot di chat buat dieksekusi.");
+ }
+ if(box)box.hidden=false;out.textContent=lines.join("\n")}
+function renderDca(){const A=D.dca||{};
+ $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
+ $("banner").hidden=false;
+ if(!dcaUnlocked()){
+  $("tot").textContent="Terkunci lunak";
+  $("totsub").textContent="Bukan keamanan · situs ini publik";
+  $("banner").innerHTML=`<b>Kunci lunak, bukan keamanan.</b> Situs ini publik (GitHub Pages). Siapa pun bisa baca kode halaman ini, jadi kunci ini tidak melindungi apa pun. Cuma biar tab ini nggak kebuka tanpa sengaja. Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
+  $("dcasec").innerHTML=`<div class="card"><form onsubmit="unlockDca(event)" class="dca-form"><label>Kunci lunak <input id="dcapw" type="password" autocomplete="off"></label><button type="submit">Buka tab</button></form><div id="dcapwerr"></div><p class="sub" style="margin:10px 0 0">Tidak ada rahasia di balik kunci ini. Analisis DCA dan riwayat tiket tetap data publik.</p></div>`;
+  $("foot").innerHTML=`Kunci lunak di halaman publik bukan keamanan. Tidak ada kunci exchange dan tidak ada order dari halaman ini.`;
+  const inp=$("dcapw");if(inp)inp.focus();return}
+ const ok=A.ok!==false&&A.price!=null,z=A.zone||"—",zcls=z==="MURAH"||z==="AGAK MURAH"?"up":z==="MAHAL"?"dn":"wa";
+ $("tot").textContent=ok?px(A.price)+" USDT":"—";
+ $("totsub").textContent=ok?(`${esc(z)} · saran cicilan ${A.mult!=null?A.mult+"×":"—"} · ${esc(A.asof||"")}`):esc(A.error||"Analisis belum tersedia");
+ $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini. Tombol di bawah cuma bikin tiket teks 2 langkah (USDT/IDR lalu BTC/USDT) — tidak ada order ke exchange. Salin tiketnya, lalu kirim ke Grok Bot di chat buat dieksekusi. ${esc((A.pairs&&A.pairs.note)||"Indodax punya BTC/USDT, BTC/IDR, dan USDT/IDR.")}`;
+ const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
+ const kpis=ok?`<div class="dca-kpis">
+  ${kpi("Harga BTC/USDT",px(A.price)+" USDT")}
+  ${kpi("Vs low 50 hari",pct(A.from_low50),cls(A.from_low50))}
+  ${kpi("Vs high 50 hari",pct(A.from_high50),cls(A.from_high50))}
+  ${kpi("Vs MA200",pct(A.vs_ma200),cls(A.vs_ma200))}
+  ${kpi("RSI harian",A.rsi_d!=null?A.rsi_d:"—",A.rsi_d!=null&&A.rsi_d<30?"up":A.rsi_d>70?"dn":"")}
+  ${kpi("RSI mingguan",A.rsi_w!=null?A.rsi_w:"—",A.rsi_w!=null&&A.rsi_w<35?"up":A.rsi_w>70?"dn":"")}
+  ${kpi("Drawdown dari puncak data",pct(A.dd_ath),cls(A.dd_ath))}
+  ${kpi("Zona / saran",esc(z)+" · "+(A.mult!=null?A.mult+"×":"—"),zcls)}
+ </div>`:'<div class="empty">Analisis belum tersedia. Tiket tetap bisa dibuat manual.</div>';
+ const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+ const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
+ const ords=A.orders||[];
+ const hist=ords.length?`<div class="tw"><table><tr><th>Waktu</th><th>Pair</th><th>Side</th><th>Jumlah</th><th>Harga</th><th>BTC</th><th>Status</th></tr>`+ords.map(o=>{
+  const amt=o.amount_usdt!=null?fmtAmt(o.amount_usdt,"USDT"):(o.amount_idr!=null?fmtAmt(o.amount_idr,"IDR"):"—");
+  return `<tr><td class="mu when">${esc(o.time||"")}</td><td>${esc(o.pair||"BTC/USDT")}</td><td>${esc(o.side||"BUY")}</td><td>${esc(amt)}</td><td>${px(o.price)}</td><td>${o.btc!=null?Number(o.btc).toFixed(8):"—"}</td><td class="mu">${esc(o.status||"")}${o.note?" · "+esc(o.note):""}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat. Nanti isi dari tiket yang sudah dieksekusi.</div>';
+ $("dcasec").innerHTML=`
+  <div class="card">${kpis}
+   <p style="margin:12px 0 0;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
+   <p class="sub" style="margin:10px 0 0">${esc(A.ath_note||"")} Low 50 hari ${px(A.low50)} · high 50 hari ${px(A.high50)} · MA200 ${px(A.ma200)} · puncak data ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. Sumber: ${esc(A.src||"Binance spot BTCUSDT")}${A.stale?" · data cache":""}.</p>
+  </div>
+  <div class="card"><h2>Aturan zona</h2><p class="sub" style="margin:0 0 6px">Aturan ini tetap, biar ratingnya transparan. Skor makin tinggi = makin menarik buat nyicil.</p>${rules}</div>
+  <div class="card"><h2>Buat tiket Buy</h2>
+   <p class="sub" style="margin:0 0 10px">Halaman ini tidak mengirim order ke Indodax atau exchange lain. Isi jumlah IDR, buat tiket 2 langkah (beli USDT di usdtidr, lalu beli BTC di btcusdt), salin, lalu kirim ke Grok Bot di chat buat dieksekusi. Boleh sisain sebagian sebagai USDT biar ada exposure ke dollar. Kalau dananya sudah USDT, pilih USDT (1 langkah).</p>
+   <div class="dca-form">
+    <label>Jumlah <input id="dcaamt" type="number" min="0" step="any" placeholder="contoh 1000000"></label>
+    <label>Mata uang <select id="dcacur"><option value="IDR" selected>IDR</option><option value="USDT">USDT</option></select></label>
+    <label>Simpan % sebagai USDT <input id="dcakeep" type="number" min="0" max="100" step="1" value="0" title="Persen USDT yang tidak dipakai beli BTC"></label>
+    <button type="button" onclick="makeDcaTicket()">Buat tiket Buy</button>
+   </div>
+   <div id="dcatixbox" hidden>
+    <pre class="ticket" id="dcaticket"></pre>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+     <button type="button" class="tixbtn" id="dcacopy" onclick="copyDcaTicket()">Salin tiket</button>
+     <span class="sub">Kirim tiket ini ke Grok Bot di chat buat dieksekusi.</span>
+    </div>
+   </div>
+  </div>
+  <section style="margin-top:22px"><h3>Riwayat beli DCA</h3>${hist}</section>`;
+ $("foot").innerHTML=`Spot DCA adalah analisis dan tiket teks saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
  const trend=VIEW==="trend";
+ const dca=VIEW==="dca";
  const walt=isWalletView();
  $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-trend").classList.toggle("on",trend);
- $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");
- $("banner").hidden=!(real||walt);$("wallet").hidden=!walt;$("learnsec").hidden=real||trend||walt;$("shadowsec").hidden=real||trend||walt;
- $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt);
+ $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);
+ $("banner").hidden=!(real||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("learnsec").hidden=real||trend||walt||dca;$("shadowsec").hidden=real||trend||walt||dca;
+ $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca);
  if(trend)renderTrend();
  else if(walt)renderWallet();
+ else if(dca)renderDca();
  else if(real){if(!D.real){$("totsub").textContent="Real $37 data is not in this build yet.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="The $37 view will appear after the next data refresh."}else renderReal()}
  else renderPaper();
  $("upd").textContent="Hourly desk data "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
@@ -586,6 +677,7 @@ $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
 $("v-steven").addEventListener("click",()=>{setView("steven");fetchWallet()});
 $("v-russel").addEventListener("click",()=>{setView("russel");fetchWallet()});
 $("v-trend").addEventListener("click",()=>setView("trend"));
+$("v-dca").addEventListener("click",()=>setView("dca"));
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
