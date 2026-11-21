@@ -155,11 +155,34 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-detail{margin-top:16px;border-top:1px solid var(--line);padding-top:8px}
 .dca-detail>summary{cursor:pointer;color:var(--mu);font-weight:600;padding:8px 0;user-select:none}
 .dca-kpis.compact{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
-.dca-saldo{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.dca-saldo{margin:0 0 12px}
+.dca-saldo h2,.dca-buys h2{margin:0 0 4px;font-size:15px}
 .dca-saldo .sh{font-size:11px;color:var(--mu);letter-spacing:.04em;font-weight:600}
-.dca-saldo .sv{font-size:20px;font-weight:700;margin:2px 0 4px}
-.dca-saldo .sa{font-size:12px;color:var(--mu);line-height:1.45}
-.dca-saldo .sw{font-size:11px;color:var(--wa);margin:8px 0 0;line-height:1.4}
+.dca-saldo .sv{font-size:26px;font-weight:800;margin:0 0 2px}
+.dca-saldo .st,.dca-buys .st{font-size:11px;color:var(--mu);margin:0 0 10px}
+.dca-hold{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:4px 0 8px}
+.dca-hold-donut{width:min(148px,40vw);height:auto;flex:0 0 auto}
+.dca-rows{flex:1 1 220px;min-width:200px}
+.dca-row{display:grid;grid-template-columns:24px 1fr auto;gap:8px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.dca-row:last-child{border-bottom:0}
+.dca-row .nm{display:flex;flex-direction:column;gap:1px;min-width:0}
+.dca-row .nm b{font-size:13px;font-weight:700;line-height:1.2}
+.dca-row .nm .q{font-size:12px;color:var(--mu)}
+.dca-row .rv{text-align:right}
+.dca-row .rv b{display:block;font-size:13px;font-weight:700}
+.dca-row .rv .p{font-size:11px;color:var(--mu)}
+.dca-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.dca-basis{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.dca-brow{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:12px;margin:4px 0;align-items:center}
+.dca-brow.lama{color:var(--mu)}
+.dca-buys{margin:0 0 12px}
+.dca-buyrow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.dca-buyrow:last-child{border-bottom:0}
+.dca-buyrow .when{grid-column:1/-1;font-size:11px;color:var(--mu)}
+.dca-buyrow .ql{font-size:13px;font-weight:700}
+.dca-buyrow .meta{font-size:12px;color:var(--mu)}
+.dca-buyrow .rp{font-size:13px;font-weight:700;text-align:right}
+.dca-buyrow .note{font-size:12px;color:var(--mu);text-align:right}
 .dca-port{margin:0 0 12px}
 .dca-port h2{margin:0 0 8px;font-size:15px}
 .dca-port .tw{overflow:auto}
@@ -209,6 +232,8 @@ h1{text-transform:none;letter-spacing:0}
   .views{gap:6px}
   .views button{padding:10px 12px;font-size:13px}
   .two{grid-template-columns:1fr}
+  .dca-hold{flex-direction:column;align-items:center}
+  .dca-rows{width:100%}
 }
 
 .dca-hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 14px;text-align:center}
@@ -788,6 +813,70 @@ function dcaBudgetHero(B, orders){
     <div class="dca-weeks" aria-label="Isi per minggu">${strip}</div>
   </div></div>`;
 }
+
+const HOLD_COL={BTC:"#F7931A",USDT:"#26A17B",IDR:"#64748B"};
+function dcaAmt(asset,n){if(n==null||isNaN(n))return "—";const x=Number(n);
+ if(asset==="IDR")return idr(x);
+ if(asset==="BTC")return x.toLocaleString("id-ID",{minimumFractionDigits:8,maximumFractionDigits:8});
+ return x.toLocaleString("id-ID",{maximumFractionDigits:8})}
+function dcaHoldAssets(){const A=D.dca||{},P=A.portfolio||{},Bal=A.balances||{};
+ let rows=(P.assets&&P.assets.length?P.assets:(Bal.assets||[])).filter(a=>a&&a.asset).map(a=>{
+  const amount=a.amount!=null?a.amount:(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
+  return {asset:a.asset,amount,idr:a.idr,pct:a.pct};});
+ const tot=Number((P.total_idr!=null?P.total_idr:Bal.idr_est)||0);
+ if(tot>0)rows=rows.map(r=>{const v=r.idr!=null?Number(r.idr):null;return Object.assign({},r,{pct:r.pct!=null?r.pct:(v!=null?v/tot*100:null)})});
+ return {rows,tot,asof:P.asof||Bal.asof,err:Bal.ok===false?Bal.error:null}}
+function dcaHoldDonut(rows,tot){
+ const r=54,cx=80,cy=80,sw=22,C=2*Math.PI*r;
+ let acc=0;const segs=[`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1f2633" stroke-width="${sw}"/>`];
+ (rows||[]).forEach((a,i)=>{const v=Number(a.idr||0);if(!(v>0)||!(tot>0))return;
+  const frac=v/tot,len=C*frac,rot=-90+acc*360;acc+=frac;
+  const col=HOLD_COL[(a.asset||"").toUpperCase()]||["#60a5fa","#a78bfa","#f472b6"][i%3];
+  segs.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(3)} ${(C-len).toFixed(3)}" transform="rotate(${rot.toFixed(3)} ${cx} ${cy})"/>`)});
+ return `<svg class="dca-donut dca-hold-donut" viewBox="0 0 160 160" role="img" aria-label="Komposisi saldo">${segs.join("")}</svg>`}
+function dcaHoldRows(rows){
+ return `<div class="dca-rows">${(rows||[]).map(a=>{
+  const asset=a.asset||"",col=HOLD_COL[asset]||"#8a93a6";
+  const p=a.pct,pS=p==null||isNaN(p)?"—":Number(p).toFixed(1).replace(".",",")+"%";
+  return `<div class="dca-row">${coinIcon(asset)}<div class="nm"><b>${esc(asset)}</b><span class="q">${dcaAmt(asset,a.amount)}</span></div><div class="rv"><b>${a.idr!=null?idr(a.idr):"Rp —"}</b><span class="p"><i class="dca-dot" style="background:${col}"></i>${pS}</span></div></div>`}).join("")}</div>`}
+function dcaBasisHtml(P){
+ const known=(P.btc||{}).known,lama=(P.btc||{}).lama,bits=[];
+ const q=n=>dcaAmt("BTC",n)+" BTC";
+ if(known&&known.qty){const pnl=known.pnl_idr,pc=known.pnl_pct,pnlCls=pnl==null?"":(pnl>0?"up":pnl<0?"dn":"");
+  const pnlS=pnl==null?"P/L —":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
+  bits.push(`<div class="dca-brow">${coinIcon("BTC","sm")}<span>Cicilan <b>${q(known.qty)}</b></span><span>${known.invested_idr!=null?"modal "+idr(known.invested_idr)+" · ":""}<span class="${pnlCls}">${pnlS}</span></span></div>`)}
+ if(lama&&lama.qty)bits.push(`<div class="dca-brow lama">${coinIcon("BTC","sm")}<span>BTC lama <b>${q(lama.qty)}</b></span><span>${lama.value_idr!=null?idr(lama.value_idr)+" · ":""}P/L —</span></div>`);
+ return bits.length?`<div class="dca-basis">${bits.join("")}</div>`:""}
+function dcaWhen(s){if(!s)return "";const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/);
+ if(!m)return String(s);const mo=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+ return `${Number(m[3])} ${mo[+m[2]-1]} ${m[1]}, ${m[4]} WIB`}
+function dcaBuysFromOrders(orders,lama){
+ const list=orders||[],norm=p=>String(p||"").toUpperCase().replace("/","");
+ const btc=list.filter(o=>norm(o.pair)==="BTCUSDT"&&String(o.side||"BUY").toUpperCase().startsWith("B"));
+ const rows=btc.map(o=>{const t=o.time_wib||o.time;
+  const rate=(list.find(x=>norm(x.pair)==="USDTIDR"&&(x.time_wib||x.time)===t)||{}).price;
+  return {kind:"dca",time_wib:t,qty:o.qty,price_usdt:o.price,usdt_idr:rate,idr:o.idr!=null?o.idr:o.amount_idr}});
+ if(lama&&lama.qty)rows.unshift({kind:"lama",label:"BTC lama",note:"harga tidak diketahui",qty:lama.qty,value_idr:lama.value_idr});
+ return rows}
+function dcaAvgUsdt(rows,given){if(given!=null&&!isNaN(given))return Number(given);
+ let q=0,s=0;(rows||[]).forEach(r=>{if(r.kind!=="lama"&&r.qty&&r.price_usdt){q+=Number(r.qty);s+=Number(r.qty)*Number(r.price_usdt)}});return q?s/q:null}
+function dcaBuysHtml(P,orders){
+ const H=P.buys||{};
+ let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
+ if(!rows.length)rows=dcaBuysFromOrders(orders,(P.btc||{}).lama);
+ const hasLama=rows.some(r=>r.kind==="lama");
+ const avg=dcaAvgUsdt(rows,H.avg_price_usdt);
+ const avgS=avg==null?"":`<div class="st">Rata-rata ${Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})} USDT${hasLama||H.avg_excludes_lama?" · tanpa BTC lama":""}</div>`;
+ const body=rows.length?rows.map(r=>{
+  if(r.kind==="lama")return `<div class="dca-buyrow"><div class="when">${esc(r.label||"BTC lama")}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${esc(r.note||"harga tidak diketahui")}</div><div class="meta"></div><div class="note">${r.value_idr!=null?"nilai "+idr(r.value_idr):""}</div></div>`;
+  const pxS=r.price_usdt!=null?Number(r.price_usdt).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":"—";
+  const kurs=r.usdt_idr!=null?" · kurs "+Number(r.usdt_idr).toLocaleString("id-ID"):"";
+  return `<div class="dca-buyrow"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${r.idr!=null?idr(r.idr):"Rp —"}</div><div class="meta">${pxS}${kurs}</div><div class="note"></div></div>`}).join(""):`<div class="empty">Belum ada pembelian yang dicatat.</div>`;
+ return `<div class="card dca-buys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
+function dcaSaldoCard(){const A=D.dca||{},P=A.portfolio||{},h=dcaHoldAssets();
+ if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
+ return `<div class="card dca-saldo"><h2>Saldo Indodax</h2><div class="sv">${h.tot?idr(h.tot):"Rp —"}</div>${h.asof?`<div class="st">${esc(h.asof)}</div>`:""}${h.err?`<div class="st">${esc(h.err)}</div>`:""}<div class="dca-hold">${dcaHoldDonut(h.rows,h.tot)}${dcaHoldRows(h.rows)}</div>${dcaBasisHtml(P)}</div>`}
+
 function renderDca(){const A=D.dca||{};
  $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
  $("banner").hidden=false;
@@ -807,17 +896,7 @@ function renderDca(){const A=D.dca||{};
  const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
  const vcls=buy?"go":"skip";
  const Bal=A.balances||{};
- const fmtBal=(a)=>{const x=Number(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
-  if(a.asset==="IDR")return `${coinIcon("IDR","sm")} ${idr(x)}`;
-  const q=a.asset==="BTC"?x.toLocaleString("id-ID",{minimumFractionDigits:6,maximumFractionDigits:8}):x.toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:8});
-  return `${coinIcon(a.asset,"sm")} ${q} ${esc(a.asset)}`;};
- const aset=(Bal.assets||[]).filter(a=>a&&a.asset).map(fmtBal).join(" · ")||"—";
- const warn=Bal.warning||"Saldo di kartu ini juga tercatat di data publik. Siapa pun yang membuka sumber halaman ini bisa melihatnya.";
  const idrFree=(A.portfolio&&A.portfolio.idr_free!=null)?Math.floor(Number(A.portfolio.idr_free)):(Bal.idr_free!=null?Math.floor(Number(Bal.idr_free)):Math.floor(Number(((Bal.assets||[]).find(x=>x&&x.asset==="IDR")||{}).free||0)));
- const saldoBox=`<div class="dca-saldo"><div class="sh">Saldo Indodax</div>
-  <div class="sv">${Bal.idr_est!=null?idr(Bal.idr_est):"Rp —"}</div>
-  <div class="sa">${aset}${Bal.asof?` · ${esc(Bal.asof)}`:""}${Bal.ok===false&&Bal.error?" · "+esc(Bal.error):""}</div>
-  <p class="sw">${esc(warn)}</p></div>`;
  const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(ver||"—")}</div>
   <div class="v" style="font-size:28px;font-weight:700;margin:2px 0 8px">${buy?idr(B.suggest||0):"—"}</div>
   <p class="vr">${esc(B.reason||"Rencana anggaran belum tersedia.")}</p>
@@ -829,7 +908,7 @@ function renderDca(){const A=D.dca||{};
   </div>
   <div class="dca-buypad">
    <div class="sh">Beli BTC</div>
-   <p class="dca-buyfree">Persen dihitung dari saldo IDR bebas (${idr(idrFree)}), bukan dari BTC atau USDT. Tombol ini hanya merangkai pesan; halaman ini tidak memasang order.</p>
+   <p class="dca-buyfree">Dari IDR bebas ${idr(idrFree)}. Tombol ini hanya merangkai pesan ke chat.</p>
    <div class="dca-buybtns">
     <button type="button" onclick="dcaBuyPct(25)">25%</button>
     <button type="button" onclick="dcaBuyPct(50)">50%</button>
@@ -845,7 +924,6 @@ function renderDca(){const A=D.dca||{};
     <p class="dca-buywarn" id="dcabuywarn" hidden></p>
    </div>
   </div>
-  ${saldoBox}
  </div>`;
  const keys=`<div class="card"><div class="dca-kpis compact">
   ${kpi("Mayer Multiple",A.mayer!=null?Number(A.mayer).toFixed(2):"N/A",A.mayer!=null&&A.mayer<=0.8?"up":A.mayer>=2.4?"dn":"")}
@@ -855,27 +933,7 @@ function renderDca(){const A=D.dca||{};
   ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
  </div></div>`;
  const P=A.portfolio||{};
- const fmtA=(asset,n)=>{if(n==null||isNaN(n))return "—";if(asset==="IDR")return Number(n).toLocaleString("id-ID",{maximumFractionDigits:0});if(asset==="BTC")return Number(n).toFixed(8);return Number(n).toLocaleString("id-ID",{maximumFractionDigits:8})};
- const fmtPx=(row)=>{const a=row.asset;if(a==="BTC"&&row.price_usdt!=null)return Number(row.price_usdt).toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2})+" USDT";if(row.price==null||isNaN(row.price))return "—";if(a==="IDR")return idr(1);return idr(row.price)};
- const rows=(P.assets||[]).map(r=>`<tr><td>${coinLabel(r.asset)}</td><td>${esc(fmtA(r.asset,r.amount))}</td><td>${esc(fmtPx(r))}</td><td>${r.idr!=null?idr(r.idr):"—"}</td><td>${r.pct!=null?Number(r.pct).toFixed(2).replace(".",",")+"%":"—"}</td></tr>`).join("");
- const tot=P.total_idr!=null?P.total_idr:Bal.idr_est;
- const known=(P.btc||{}).known,lama=(P.btc||{}).lama;
- let basis="";
- if(known&&known.qty){
-  const pnl=known.pnl_idr,pc=known.pnl_pct,pnlCls=pnl==null?"":(pnl>0?"up":pnl<0?"dn":"");
-  const pnlS=pnl==null?tip("P/L",TIPS.pnl)+" tidak dihitung":`${idr(pnl)}${pc!=null?" ("+(pc>0?"+":"")+Number(pc).toFixed(2).replace(".",",")+"%)":""}`;
-  basis+=`<p>${coinLabel("BTC")} dari cicilan tercatat: <b>${fmtA("BTC",known.qty)}</b>${known.avg_price_usdt!=null?" · rata-rata "+Number(known.avg_price_usdt).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT":""}${known.invested_idr!=null?" · modal "+idr(known.invested_idr):""}${known.value_idr!=null?" · nilai sekarang "+idr(known.value_idr):""} · <span class="${pnlCls}">${pnlS}</span>.</p>`;
- }
- if(lama&&lama.qty){
-  basis+=`<p class="lama">${coinLabel("BTC")} ${esc((lama.label||"BTC lama (modal tidak diketahui)").replace(/^BTC /,))}: <b>${fmtA("BTC",lama.qty)}</b>${lama.value_idr!=null?" · nilai sekarang "+idr(lama.value_idr):""}. P/L tidak dihitung — modal tidak diketahui, tidak dikarang.</p>`;
- }else if(!known){
-  basis+=`<p class="lama">Belum ada isi BTC yang tercatat untuk menghitung modal.</p>`;
- }
- const port=(P.assets||[]).length?`<div class="card dca-port"><h2>Portofolio</h2>
-  <div class="tw"><table><tr><th>Aset</th><th>Jumlah</th><th>Harga</th><th>Nilai IDR</th><th>%</th></tr>${rows}<tr><th colspan="3">Total</th><th>${tot!=null?idr(tot):"—"}</th><th>100%</th></tr></table></div>
-  <div class="dca-basis"><b>Modal BTC</b>${basis}</div>
-  ${P.asof?`<p class="sub" style="margin:8px 0 0">Harga dan nilai per ${esc(P.asof)}.</p>`:""}
- </div>`:`<div class="card dca-port"><h2>Portofolio</h2><div class="empty">Saldo belum tersedia.</div></div>`;
+ const port=dcaSaldoCard()+dcaBuysHtml(P,A.orders||[]);
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
@@ -893,7 +951,7 @@ function renderDca(){const A=D.dca||{};
   <div class="card"><h2>Grafik harian ~1 tahun</h2>${dcaChart(A.chart)}</div>
   <div class="card"><h2>Penjelasan indikator</h2>${notes}</div>
   <div class="card"><h2>Aturan zona &amp; anggaran</h2>${rules}</div>
-  <section style="margin-top:16px"><h3>Riwayat beli DCA</h3>${hist}</section>
+  <section style="margin-top:16px"><h3>Catatan order</h3>${hist}</section>
  </details>`;
  const hero=dcaBudgetHero(B,A.orders||[]);$("dcasec").innerHTML=hero+bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
  $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
