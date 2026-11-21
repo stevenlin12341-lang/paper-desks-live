@@ -155,6 +155,12 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-detail{margin-top:16px;border-top:1px solid var(--line);padding-top:8px}
 .dca-detail>summary{cursor:pointer;color:var(--mu);font-weight:600;padding:8px 0;user-select:none}
 .dca-kpis.compact{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.dca-saldo{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.dca-saldo .sh{font-size:11px;color:var(--mu);letter-spacing:.04em;font-weight:600}
+.dca-saldo .sv{font-size:20px;font-weight:700;margin:2px 0 4px}
+.dca-saldo .sa{font-size:12px;color:var(--mu);line-height:1.45}
+.dca-saldo .sw{font-size:11px;color:var(--wa);margin:8px 0 0;line-height:1.4}
+
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Portfolio">
@@ -585,6 +591,17 @@ function renderDca(){const A=D.dca||{};
  $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
  const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
  const vcls=buy?"go":"skip";
+ const Bal=A.balances||{};
+ const fmtBal=(a)=>{const x=Number(a.total!=null?a.total:(Number(a.free||0)+Number(a.locked||0)));
+  if(a.asset==="IDR")return `${idr(x)}`;
+  const q=a.asset==="BTC"?x.toLocaleString("id-ID",{minimumFractionDigits:6,maximumFractionDigits:8}):x.toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:8});
+  return `${q} ${esc(a.asset)}`;};
+ const aset=(Bal.assets||[]).filter(a=>a&&a.asset).map(fmtBal).join(" · ")||"—";
+ const warn=Bal.warning||"Saldo di kartu ini juga tercatat di data publik. Siapa pun yang membuka sumber halaman ini bisa melihatnya.";
+ const saldoBox=`<div class="dca-saldo"><div class="sh">Saldo Indodax</div>
+  <div class="sv">${Bal.idr_est!=null?idr(Bal.idr_est):"Rp —"}</div>
+  <div class="sa">${aset}${Bal.asof?` · ${esc(Bal.asof)}`:""}${Bal.ok===false&&Bal.error?" · "+esc(Bal.error):""}</div>
+  <p class="sw">${esc(warn)}</p></div>`;
  const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(ver||"—")}</div>
   <div class="v" style="font-size:28px;font-weight:700;margin:2px 0 8px">${buy?idr(B.suggest||0):"—"}</div>
   <p class="vr">${esc(B.reason||"Rencana anggaran belum tersedia.")}</p>
@@ -595,6 +612,7 @@ function renderDca(){const A=D.dca||{};
    ${kpi("Minggu (WIB)",esc((B.week_label||"—").replace(/^Minggu /,"M")))}
   </div>
   <p class="dca-buyline">Mau beli? Kirim "beli ${B.suggest>0?B.suggest:"<jumlah>"}" ke Grok Bot</p>
+  ${saldoBox}
  </div>`;
  const keys=`<div class="card"><div class="dca-kpis compact">
   ${kpi("Mayer Multiple",A.mayer!=null?Number(A.mayer).toFixed(2):"N/A",A.mayer!=null&&A.mayer<=0.8?"up":A.mayer>=2.4?"dn":"")}
@@ -607,9 +625,13 @@ function renderDca(){const A=D.dca||{};
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
  const ords=A.orders||[];
- const hist=ords.length?`<div class="tw"><table><tr><th>Waktu</th><th>Pair</th><th>Side</th><th>Jumlah</th><th>Harga</th><th>BTC</th><th>Status</th></tr>`+ords.map(o=>{
-  const amt=o.amount_usdt!=null?fmtAmt(o.amount_usdt,"USDT"):(o.amount_idr!=null?fmtAmt(o.amount_idr,"IDR"):"—");
-  return `<tr><td class="mu when">${esc(o.time||"")}</td><td>${esc(o.pair||"BTC/USDT")}</td><td>${esc(o.side||"BUY")}</td><td>${esc(amt)}</td><td>${px(o.price)}</td><td>${o.btc!=null?Number(o.btc).toFixed(8):"—"}</td><td class="mu">${esc(o.status||"")}${o.note?" · "+esc(o.note):""}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
+ const hist=ords.length?`<div class="tw"><table><tr><th>Waktu</th><th>Pair</th><th>Side</th><th>Qty</th><th>Harga</th><th>Fee</th><th>IDR</th></tr>`+ords.map(o=>{
+  const t=o.time_wib||o.time||"";
+  const qty=o.qty!=null?o.qty:(o.btc!=null?o.btc:o.amount_usdt);
+  const qtyS=qty==null?"—":(String(o.pair||"").toUpperCase().includes("BTC")?Number(qty).toFixed(8):Number(qty).toLocaleString("id-ID",{maximumFractionDigits:8}));
+  const fee=o.fee==null?"—":`${Number(o.fee).toLocaleString("id-ID",{maximumFractionDigits:8})}${o.fee_asset?" "+esc(o.fee_asset):""}`;
+  const idrAmt=o.idr!=null?o.idr:o.amount_idr;
+  return `<tr><td class="mu when">${esc(t)}</td><td>${esc(o.pair||"")}</td><td>${esc(o.side||"BUY")}${o.type?" · "+esc(o.type):""}</td><td>${esc(qtyS)}</td><td>${px(o.price)}</td><td class="mu">${fee}</td><td>${idrAmt!=null?idr(idrAmt):"—"}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
  const detail=`<details class="dca-detail"><summary>Detail</summary>
   <div class="card" style="margin-top:8px"><p style="margin:0 0 8px;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
    <p class="sub" style="margin:10px 0 0">Harga ${px(A.price)} USDT · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. ${esc(A.src||"")}${A.stale?" · data cache":""}.</p></div>
