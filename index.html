@@ -156,10 +156,10 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-detail>summary{cursor:pointer;color:var(--mu);font-weight:600;padding:8px 0;user-select:none}
 .dca-kpis.compact{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
 .dca-saldo{margin:0 0 12px}
-.dca-saldo h2,.dca-buys h2{margin:0 0 4px;font-size:15px}
+.dca-saldo h2,.dca-buys h2,.dca-scen h2{margin:0 0 4px;font-size:15px}
 .dca-saldo .sh{font-size:11px;color:var(--mu);letter-spacing:.04em;font-weight:600}
 .dca-saldo .sv{font-size:26px;font-weight:800;margin:0 0 2px}
-.dca-saldo .st,.dca-buys .st{font-size:11px;color:var(--mu);margin:0 0 10px}
+.dca-saldo .st,.dca-buys .st,.dca-scen .st{font-size:11px;color:var(--mu);margin:0 0 10px}
 .dca-live{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;color:var(--tx)}
 .dca-live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #22c55e33;flex:0 0 auto}
 .dca-live.off{color:var(--mu)}
@@ -182,6 +182,23 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-brow{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:12px;margin:4px 0;align-items:center}
 .dca-brow.lama .lbl{color:var(--mu)}
 .dca-buys{margin:0 0 12px}
+.dca-scen{margin:0 0 12px}
+.dca-scen h2{margin:0 0 4px;font-size:15px}
+.dca-scen .st{font-size:11px;color:var(--mu);margin:0 0 8px}
+.dca-srow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.dca-srow:last-child{border-bottom:0}
+.dca-srow .hd{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.dca-spill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.02em;border:1px solid var(--line)}
+.dca-spill.bear{color:#fca5a5;background:#2a1212;border-color:#7f1d1d}
+.dca-spill.base{color:#fcd34d;background:#1c1508;border-color:#854d0e}
+.dca-spill.bull{color:#86efac;background:#0f2e1c;border-color:#14532d}
+.dca-spill.be{color:#93c5fd;background:#152238;border-color:var(--ac)}
+.dca-srow .px{font-size:14px;font-weight:800}
+.dca-srow .from{font-size:11px;color:var(--mu)}
+.dca-srow .rv{text-align:right}
+.dca-srow .rv b{display:block;font-size:13px;font-weight:700}
+.dca-srow .note{grid-column:1/-1;font-size:12px;color:var(--mu);margin-top:2px}
+
 .dca-buyrow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
 .dca-buyrow:last-child{border-bottom:0}
 .dca-buyrow .when{grid-column:1/-1;font-size:11px;color:var(--mu)}
@@ -1054,6 +1071,48 @@ function dcaBuysHtml(P,orders){P=dcaLivePortfolio();
 function dcaSaldoCard(){const P=dcaLivePortfolio(),h=dcaHoldAssets();
  if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
  return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="sv">${h.tot?idr(h.tot):"Rp —"}</div>${dcaAsOfHtml()}${h.err?`<div class="st">${esc(h.err)}</div>`:""}<div class="dca-hold">${dcaHoldDonut(h.rows,h.tot)}${dcaHoldRows(h.rows)}</div>${dcaBasisHtml(P)}</div>`}
+
+function dcaScenNow(){const L=dcaLivePx();if(L&&L.btc_usdt>0)return Number(L.btc_usdt);
+ const A=D.dca||{},P=A.portfolio||{},R=P.rates||((A.balances||{}).rates)||{};
+ const n=Number(R.btc_usdt||A.price||0);return n>0?n:null}
+function dcaScenRate(){const L=dcaLivePx();if(L&&L.usdt_idr>0)return Number(L.usdt_idr);return dcaDataRate()}
+function dcaScenFrom(px,now){if(!(px>0)||!(now>0))return "";
+ const p=(px/now-1)*100,sign=p>0?"+":p<0?"−":"";
+ return sign+Math.abs(p).toFixed(1).replace(".",",")+"% dari sekarang"}
+function dcaScenLevels(){const A=D.dca||{},P=A.portfolio||{},btc=P.btc||{};
+ const qty=btc.total!=null?Number(btc.total):null;
+ const invested=btc.invested_idr!=null?Number(btc.invested_idr):null;
+ const rate=dcaScenRate(),now=dcaScenNow();
+ const avg=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
+ let be=avg;
+ if(!(be>0)&&invested>0&&qty>0&&rate>0)be=invested/(qty*rate);
+ const raw=A.scenarios;
+ if(Array.isArray(raw)&&raw.length){
+  return raw.map(s=>{
+   const o=Object.assign({qty,invested,rate,now},s);
+   if(o.be&&!(Number(o.px)>0)&&be>0)o.px=be;
+   return o})}
+ const low=Number(A.low50||0),ema=Number(A.ema50_4h||0);
+ let bear=low>0?Math.round(low/1000)*1000:55000;
+ if(now>0&&bear>=now*0.98)bear=50000;
+ const base=ema>0?Math.round(ema):63600;
+ return [
+  {id:"bear",label:"Bearish",px:bear,note:"Turun. Harga beli lebih murah, lanjut DCA.",qty,invested,rate,now},
+  {id:"base",label:"Datar",px:base,note:"Reclaim EMA50 4 jam. Masih di bawah modal.",qty,invested,rate,now},
+  {id:"bull",label:"Bullish",px:be,be:true,note:"Balik modal. Kalau lebih tinggi, mulai untung.",qty,invested,rate,now}
+ ]}
+function dcaScenCard(){const rows=dcaScenLevels();
+ const body=(rows||[]).map(s=>{
+  const id=s.id||"",cls=id==="bear"?"bear":id==="bull"?"bull":"base";
+  const px=Number(s.px),qty=Number(s.qty),rate=Number(s.rate),inv=Number(s.invested);
+  let val=null,pnl=null,pct=null;
+  if(s.be&&inv>0){val=Math.round(inv);pnl=0;pct=0}
+  else if(px>0&&qty>0&&rate>0){val=Math.round(qty*px*rate);if(inv>0){pnl=val-inv;pct=pnl/inv*100}}
+  const tag=s.be?`<span class="dca-spill be">Balik modal</span>`:"";
+  const from=dcaScenFrom(px,s.now);
+  return `<div class="dca-srow"><div class="hd"><span class="dca-spill ${cls}">${esc(s.label||id)}</span>${tag}<span class="px">${px>0?dcaIntSep(px)+" USDT":"—"}</span>${from?`<span class="from">${from}</span>`:""}</div><div class="rv">${val!=null?`<b>${idr(val)}</b>`:"<b>Rp —</b>"}${dcaPnl(pnl,pct)}</div><div class="note">${esc(s.note||"")}</div></div>`
+ }).join("");
+ return `<div class="card dca-scen" id="dcascen"><h2>3 Skenario BTC</h2><div class="st">Skenario / ilustrasi, bukan prediksi.</div>${body||'<div class="empty">Skenario belum tersedia.</div>'}</div>`}
 function dcaTickerLast(j){const t=(j&&j.ticker)||j||{},n=Number(t.last||t.sell||t.buy||t.price||0);return n>0?n:null}
 async function fetchDcaIndodax(){const [b,u]=await Promise.all([
   fetchJson("https://indodax.com/api/ticker/btcidr"),
@@ -1071,7 +1130,7 @@ async function fetchDcaCoinGecko(){const j=await fetchJson("https://api.coingeck
  return {btc_idr,usdt_idr,btc_usdt:btc_usdt||(usdt_idr?btc_idr/usdt_idr:null),src:"CoinGecko"}}
 function paintDcaLive(){if(VIEW!=="dca"||!dcaUnlocked())return;
  const put=(id,html)=>{const el=$(id);if(!el)return;const tmp=document.createElement("div");tmp.innerHTML=html;const n=tmp.firstElementChild;if(n)el.replaceWith(n)};
- put("dcasaldo",dcaSaldoCard());put("dcabuys",dcaBuysHtml());}
+ put("dcasaldo",dcaSaldoCard());put("dcascen",dcaScenCard());put("dcabuys",dcaBuysHtml());}
 async function fetchDcaLive(){if(dcaLiveBusy||!D)return;dcaLiveBusy=true;
  try{let got=null;
   if(!dcaSkipIndodax||Date.now()-dcaSkipIndodax>300000){
@@ -1144,7 +1203,7 @@ function renderDca(){const A=D.dca||{};
   ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
  </div></div>`;
  const P=A.portfolio||{};
- const port=dcaSaldoCard()+dcaBuysHtml(P,A.orders||[]);
+ const port=dcaSaldoCard()+dcaScenCard()+dcaBuysHtml(P,A.orders||[]);
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
