@@ -317,9 +317,41 @@ h1{text-transform:none;letter-spacing:0}
 .mover{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:0 0 4px;font-size:13px}
 @media(max-width:520px){.metode td,.metode th{padding:6px 5px;font-size:12px}.mbar{min-width:48px}}
 [hidden]{display:none!important}
+
+.home-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:12px}
+.home-card h2{margin:0 0 6px;font-size:13px;font-weight:600}
+.home-card .eq{font-size:22px;margin:0 0 8px}
+.home-card .kpis{grid-template-columns:repeat(2,1fr)}
+.home-go{display:inline-block;margin-top:10px;background:transparent;color:var(--ac);border:1px solid var(--ac);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.home-go.off{color:var(--mu);border-color:var(--line);cursor:default}
+.btc-box{margin:0 0 12px}
+.btc-box .sv{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.btc-box .arah{font-size:16px;font-weight:700;margin:4px 0 8px}
+.btc-box .lv{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.btc-chip{display:inline-block;padding:5px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
+.btc-chip .l{color:var(--mu);font-size:11px;display:block}
+.btc-chip b{font-weight:700}
+.btc-sgrid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.btc-s{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#0b0e14}
+.btc-s .lab{font-size:11px;font-weight:800}
+.btc-s.up .lab{color:#86efac}
+.btc-s.side .lab{color:#fcd34d}
+.btc-s.down .lab{color:#fca5a5}
+.btc-s .tg,.btc-s .nt{font-size:12px;color:var(--mu);margin-top:2px}
+.btc-s .ta{font-size:12px;color:var(--tx);margin-top:2px}
+.dca-avg{margin:0 0 12px}
+.dca-avg .sv{font-size:22px;font-weight:800;margin:2px 0}
+.dca-avg .st{margin:0 0 6px}
+.dca-arah{margin:0 0 12px}
+.dca-arah .arah{font-size:15px;font-weight:700;margin:0 0 8px}
+.dca-arah .srow{padding:8px 0;border-bottom:1px solid var(--line)}
+.dca-arah .srow:last-child{border-bottom:0}
+.dca-arah .srow .hd{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.dca-arah .srow .tx{font-size:12px;color:var(--mu);margin-top:2px}
 </style></head><body><div class="wrap">
 <nav class="views" id="views" aria-label="Tampilan">
- <button type="button" id="v-paper" class="on">Paper $10K</button>
+ <button type="button" id="v-home" class="on">Beranda</button>
+ <button type="button" id="v-paper">Paper $10K</button>
  <button type="button" id="v-real">Target $37</button>
  <button type="button" id="v-signals">$37 Semua Sinyal</button>
  <button type="button" id="v-steven">Dompet Steven</button>
@@ -344,6 +376,7 @@ h1{text-transform:none;letter-spacing:0}
  <section><h3 id="cltitle">Transaksi yang sudah ditutup</h3><div class="tw" id="closed"></div></section>
  <section id="rightsec"><h3 id="righttitle">Keputusan terbaru</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
 </div>
+<section id="homesec" hidden></section>
 <section id="dcasec" hidden></section>
 <footer id="foot">Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.</footer>
 </div>
@@ -355,10 +388,12 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const v=localStorage.getItem("deskView");return v==="real"||v==="signals"||v==="trend"||v==="steven"||v==="russel"||v==="dca"?v:"paper"}catch(e){return"paper"}})();
+let VIEW=(()=>{try{const ok=["home","paper","real","signals","trend","steven","russel","dca"];
+  if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
+  const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
 const walletViewName=()=>VIEW==="steven"?"Steven":VIEW==="russel"?"Russel":"";
-const wantsWallet=()=>VIEW==="real"||isWalletView();
+const wantsWallet=()=>VIEW==="real"||VIEW==="home"||isWalletView();
 function walletForView(){const name=walletViewName();return walletsNow().find(w=>(w.name||"").toLowerCase()===name.toLowerCase())||WALLETS_FALLBACK.find(w=>w.name===name)||{name,ok:false,error:"No wallet data in this build."}}
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const moneyR=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
@@ -1142,7 +1177,105 @@ async function fetchDcaLive(){if(dcaLiveBusy||!D)return;dcaLiveBusy=true;
    if(age>60000){if(DCA_LIVE)DCA_LIVE.ok=false;paintDcaLive()}}}
  finally{dcaLiveBusy=false}}
 
+
+function btcOutlook(){return(D&&D.btc)||{}}
+function usdtId(n,d){if(n==null||isNaN(n))return"—";const x=Number(n);return x.toLocaleString("id-ID",{minimumFractionDigits:d||0,maximumFractionDigits:d==null?0:d})}
+function btcLivePx(){const p=LIVE.BTCUSDT;if(p>0)return Number(p);const B=btcOutlook();return B.mark>0?Number(B.mark):(B.price>0?Number(B.price):null)}
+function btcUpdateLabel(B){B=B||btcOutlook();
+ if(B.stale&&B.updated)return"Data jam "+esc(B.updated)+(B.stale_since?" · coba lagi "+esc(B.stale_since):"");
+ if(B.updated)return"Update: "+esc(B.updated);
+ return""}
+function btcLevelChips(B){const L=(B&&B.levels)||{};
+ const rows=[];
+ const add=(lab,v,d)=>{if(v==null||isNaN(Number(v)))return;rows.push(`<span class="btc-chip"><span class="l">${esc(lab)}</span><b>${usdtId(v,d)} USDT</b></span>`)};
+ add("Reclaim",L.reclaim,0);
+ add("EMA20 4 jam",L.ema20_4h,0);
+ add("EMA50 4 jam · ganti tren",L.ema50_4h,0);
+ if(L.swing_low!=null&&L.invalid!=null&&Math.abs(Number(L.swing_low)-Number(L.invalid))>200)add("Support dekat",L.swing_low,0);
+ add("Invalidasi",L.invalid!=null?L.invalid:L.swing_low,0);
+ return rows.length?`<div class="lv">${rows.join("")}</div>`:""}
+function btcScenGrid(B,short){const rows=(B&&B.scenarios)||[];
+ if(!rows.length)return'<div class="empty">Skenario belum tersedia.</div>';
+ return `<div class="btc-sgrid">${rows.map(s=>{
+  const id=s.id||"";const kind=id==="up"?"up":id==="down"?"down":"side";
+  return `<div class="btc-s ${kind}"><div class="lab">${esc(s.label||id)}</div><div class="tg">${esc(s.trigger||"")}</div><div class="ta">${esc(s.target||"")}</div>${short?"":`<div class="nt">${esc(s.note||"")}</div>`}</div>`}).join("")}</div>`}
+function btcKondisiCard(){const B=btcOutlook(),pxv=btcLivePx();
+ const stale=!!B.stale,ok=B.ok!==false&&(pxv>0||B.arah);
+ const dist=B.dist_ema50_pct,reg=B.regime_label||"";
+ const regS=reg?`Tren 4 jam: ${esc(reg)}${dist!=null&&!isNaN(Number(dist))?" · "+(Number(dist)>0?"+":"")+Number(dist).toFixed(1).replace(".",",")+"% vs EMA50":""}`:"";
+ return `<div class="card btc-box" id="btckondisi"><h2>Kondisi BTC (update tiap jam)</h2>
+  <div class="sv">${pxv>0?usdtId(pxv,2)+" USDT":"—"}</div>
+  <div class="arah">${esc(B.arah||(ok?"":"Data BTC belum ada"))}</div>
+  ${regS?`<div class="st">${regS}</div>`:""}
+  <div class="st">${btcUpdateLabel(B)}${stale?" · memakai data terakhir":""} · ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}</div>
+  ${btcLevelChips(B)}${btcScenGrid(B,false)}</div>`}
+function homeGo(v,lab,off){return off?`<button type="button" class="home-go off" disabled>${esc(lab||"Dijeda")}</button>`:`<button type="button" class="home-go" onclick="setView('${esc(v)}')">${esc(lab||"Buka tab")} →</button>`}
+function homeKpis(items){return `<div class="kpis">${items.map(([v,l,c])=>`<div class="kpi"><div class="v${c?" "+c:""}">${v}</div><div class="l">${l}</div></div>`).join("")}</div>`}
+function homeMajorsCard(){const d=(D.desks||[]).find(x=>x.name==="Majors")||{};
+ const opens=(D.open||[]).filter(o=>(o.desk||o.name)==="Majors");
+ let liveAdj=0;opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;const u=upnl(o,o._p);liveAdj+=u-(o.u||0)});
+ const eq=(d.eq||START)+liveAdj,pl=(eq/START-1)*100,nOpen=d.open??opens.length;
+ return `<div class="card home-card"><h2>Paper $10K · Majors <span class="badge b-paper">SIMULASI</span></h2>
+  <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:13px">${pct(pl)}</span></div>
+  ${homeKpis([[d.win==null?"—":d.win+"%","Menang"],[nOpen,"Terbuka"],[d.closed??0,"Ditutup"],[`<span class="${cls(d.real)}">${money(d.real)}</span>`,"Dikunci"]])}
+  ${homeGo("paper","Buka tab")}</div>`}
+function homeGoalCard(kind){const all=kind==="signals",M=all?(D.real_all||{}):((D.real||{}).mirror||D.real||{}),start=M.start||37;
+ const opens=all?(M.opens||[]):(((M.opens)||[]));
+ let unrealLive=0;opens.forEach(o=>{const p=livePx(o);if(p==null||o.e==null){unrealLive+=o.u||0;return}const q=o.qty!=null?+o.qty:(o.n&&o.e?o.n/o.e:null);unrealLive+=q!=null?((o.side==="short"?-1:1)*q*(p-o.e)-(o.f||0)):(o.u||0)});
+ const eq=(M.eq||start)+(unrealLive-(M.unreal||0)),pl=(eq/start-1)*100;
+ const title=all?"$37 Semua Sinyal":"Target $37";
+ const view=all?"signals":"real";
+ return `<div class="card home-card"><h2>${title} <span class="badge b-real">MIRROR</span></h2>
+  <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:13px">${pct(pl)}</span></div>
+  ${homeKpis([[M.win==null?"—":M.win+"%","Menang"],[M.open??opens.length,"Terbuka"],[M.closed??0,"Ditutup"],[`<span class="${cls(M.real)}">${money(M.real)}</span>`,"Dikunci"]])}
+  ${homeGo(view,"Buka tab")}</div>`}
+function homeWalletCard(name){const w=walletsNow().find(x=>(x.name||"").toLowerCase()===name.toLowerCase())||{name,ok:false};
+ const eq=w.eq,n=(w.positions||[]).length,un=w.unreal,view=name.toLowerCase()==="russel"?"russel":"steven";
+ return `<div class="card home-card"><h2>Dompet ${esc(name)} <span class="badge b-wallet">HANYA LIHAT</span>${w.live?' <span class="badge b-live">LIVE</span>':""}</h2>
+  <div class="eq">${eq!=null?money(eq):"—"}</div>
+  ${homeKpis([[n,"Posisi"],[`<span class="${cls(un||0)}">${un==null?"—":money(un)}</span>`,"P/L terbuka"]])}
+  ${homeGo(view,"Buka tab")}</div>`}
+function homeTrendCard(){const S=D.shadow||{},start=S.start||START,eq=S.eq,pl=eq!=null?(eq/start-1)*100:null;
+ const nOpen=(S.open||[]).length,nCl=(S.closed||[]).length,wr=(S.n&&S.wins!=null)?Math.round(S.wins/S.n*100):null;
+ return `<div class="card home-card"><h2>Tes tren <span class="badge b-paper">SIMULASI</span></h2>
+  <div class="eq">${eq!=null?money(eq):"—"} ${pl!=null?`<span class="${cls(pl)}" style="font-size:13px">${pct(pl)}</span>`:""}</div>
+  ${homeKpis([[wr==null?"—":wr+"%","Menang"],[nOpen,"Terbuka"],[nCl,"Ditutup"],[S.max_dd!=null?pct(S.max_dd):"—","Max DD"]])}
+  ${homeGo("trend","Buka tab")}</div>`}
+function homePausedCard(d){d=d||{};
+ return `<div class="card home-card"><h2>${esc(d.name||"Desk")} <span class="badge b-paused">DIJEDA</span></h2>
+  <div class="eq">${money(d.eq||START)}</div>
+  ${homeKpis([["0","Terbuka"],["0","Ditutup"]])}
+  ${homeGo("","Dijeda · tidak ada tab",true)}</div>`}
+function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
+ $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
+ $("tot").hidden=false;$("totsub").hidden=false;
+ $("tot").innerHTML=pxv>0?`${usdtId(pxv,2)} USDT`: "—";
+ $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
+ $("banner").hidden=true;$("banner").innerHTML="";
+ const paused=(D.paused_desks||[]).map(homePausedCard).join("");
+ $("homesec").innerHTML=btcKondisiCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${paused}</div>`;
+ $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
+function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
+ const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
+ const avgI=btc.avg_price_idr!=null?Number(btc.avg_price_idr):null;
+ const now=dcaScenNow();
+ let dist=null;if(avgU>0&&now>0)dist=(now/avgU-1)*100;
+ const distS=dist==null?"":`<div class="${cls(dist)}" style="font-weight:700">${(dist>0?"+":dist<0?"−":"")+Math.abs(dist).toFixed(1).replace(".",",")}% dari harga sekarang</div>`;
+ if(!(avgU>0)&&!(avgI>0))return"";
+ return `<div class="card dca-avg" id="dcaavg"><h2>Avg entry kamu</h2>
+  <div class="sv">${avgU>0?dcaUsdtShort(avgU)+" USDT":"—"}</div>
+  <div class="st">${avgI>0?"≈ "+idr(avgI)+"/BTC":""}</div>
+  ${distS}</div>`}
+function dcaArahCard(){const B=btcOutlook();
+ const body=((B.scenarios)||[]).map(s=>{
+  const id=s.id||"",kind=id==="up"?"bull":id==="down"?"bear":"base";
+  return `<div class="srow"><div class="hd"><span class="dca-spill ${kind}">${esc(s.label||id)}</span></div><div class="tx">${esc(s.trigger||"")} · ${esc(s.target||"")}</div></div>`}).join("");
+ return `<div class="card dca-arah" id="dcaarah"><h2>Kemungkinan arah BTC</h2>
+  <div class="arah">${esc(B.arah||"—")}</div>
+  <div class="st">${btcUpdateLabel(B)} · ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}</div>
+  ${body||'<div class="empty">Skenario belum tersedia.</div>'}</div>`}
 function renderDca(){const A=D.dca||{};
+
  $("htitle").textContent="Spot DCA BTC";
  $("banner").hidden=true;$("banner").innerHTML="";
  const hideTot=true;
@@ -1203,7 +1336,7 @@ function renderDca(){const A=D.dca||{};
   ${kpi("MVRV",A.mvrv!=null?Number(A.mvrv).toFixed(2):"N/A",A.mvrv!=null&&A.mvrv<1.2?"up":A.mvrv>=2.4?"dn":"")}
  </div></div>`;
  const P=A.portfolio||{};
- const port=dcaSaldoCard()+dcaScenCard()+dcaBuysHtml(P,A.orders||[]);
+ const port=dcaSaldoCard()+dcaAvgEntryCard()+dcaArahCard()+dcaScenCard()+dcaBuysHtml(P,A.orders||[]);
  const why=(A.why||[]).length?`<ul class="dca-why">${A.why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
  const rules=(A.rules||[]).length?`<ol class="dca-why">${A.rules.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";
  const notes=(A.notes||[]).length?`<div class="dca-notes">${A.notes.map(n=>`<div class="nc"><b>${esc(n.k)}${n.na?" · N/A":""}</b><p>${esc(n.note||"")}</p></div>`).join("")}</div>`:"";
@@ -1228,16 +1361,19 @@ function renderDca(){const A=D.dca||{};
  $("foot").innerHTML=`Analisis saja · tidak ada order dari halaman ini${A.asof?" · Data "+esc(A.asof):((D.updated)?" · Data "+esc(D.updated):"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
+ const home=VIEW==="home";
  const real=VIEW==="real";
  const signals=VIEW==="signals";
  const trend=VIEW==="trend";
  const dca=VIEW==="dca";
  const walt=isWalletView();
+ $("v-home")&&$("v-home").classList.toggle("on",home);
  $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-signals")&&$("v-signals").classList.toggle("on",signals);$("v-trend").classList.toggle("on",trend);
  $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);
- $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("learnsec").hidden=real||signals||trend||walt||dca;$("shadowsec").hidden=real||signals||trend||walt||dca;
- $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca);
- if(trend)renderTrend();
+ $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("homesec")&&($("homesec").hidden=!home);$("learnsec").hidden=real||signals||trend||walt||dca||home;$("shadowsec").hidden=real||signals||trend||walt||dca||home;
+ $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca||home);
+ if(home)renderHome();
+ else if(trend)renderTrend();
  else if(walt)renderWallet();
  else if(dca)renderDca();
  else if(signals){if(!D.real_all){$("totsub").textContent="Data $37 Semua Sinyal belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Semua Sinyal muncul setelah data diperbarui."}else renderSignals()}
@@ -1274,7 +1410,7 @@ function neededSymbols(){const os=[...((D&&D.open)||[]),...((((D&&D.real)||{}).m
  os.forEach(o=>{if(o.sym)syms.add(o.sym);if(o.a)coins.add(o.a);if(o.mint&&!o.sym)mints.add(o.mint)});
  wpos.forEach(p=>{if(p.a){coins.add(p.a);syms.add(p.a+"USDT")}});
  const S=(D&&D.shadow)||{};(S.open||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});(S.watch||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});(((D&&D.combo)||{}).open||[]).forEach(o=>{syms.add(o.c+"USDT");coins.add(o.c)});
- return{syms,coins,mints,os}}
+ syms.add("BTCUSDT");coins.add("BTC");return{syms,coins,mints,os}}
 async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
  try{const {syms,coins,mints}=neededSymbols();const got={};let src="",n=0;
   if(mints.size){const arr=[...mints];for(let i=0;i<arr.length;i+=30){try{const a=await fetchJson("https://api.dexscreener.com/tokens/v1/solana/"+arr.slice(i,i+30).join(","));const best={};(a||[]).forEach(p=>{const m=p.baseToken?.address,l=p.liquidity?.usd||0;if(m&&p.priceUsd&&(!best[m]||l>best[m].l))best[m]={l,p:+p.priceUsd}});for(const m in best){got[m]=best[m].p;n++}}catch(e){}}}
@@ -1328,6 +1464,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
+$("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
 $("v-signals").addEventListener("click",()=>setView("signals"));
