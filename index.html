@@ -660,7 +660,7 @@ function metodeSection(M){
   if(!S||!S.groups||!S.groups.length){
     return `<div class="metode"><h3>Metode</h3><p class="mnote">Belum ada transaksi ditutup di buku ini, jadi belum ada ringkasan menang/kalah per metode.</p></div>`;
   }
-  const ov=o?`<div class="mover"><b>${o.n||0} transaksi utuh</b><span class="${cls(o.pnl)}">${moneyR(o.pnl)}</span><span>${o.win==null?"—":o.win+"% menang"}</span><span>rata-rata R ${o.avg_r==null?"—":o.avg_r}</span></div>${metodeBar(o.wins,o.losses,"mbar-lg")}`:"";
+  const ov=o?`<div class="mover"><b>${o.n||0} transaksi utuh</b><span>${o.wins??0} menang · ${o.losses??0} kalah</span><span>${o.win==null?"—":o.win+"% menang"}</span><span class="${cls(o.pnl)}">${moneyR(o.pnl)}</span><span>rata-rata R ${o.avg_r==null?"—":o.avg_r}</span></div>${metodeBar(o.wins,o.losses,"mbar-lg")}`:"";
   const groups=(S.groups||[]).map(g=>{
     const rows=(g.rows||[]).map(r=>`<tr>
       <td>${esc(r.label||r.k||"")}</td>
