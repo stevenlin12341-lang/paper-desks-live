@@ -1246,6 +1246,14 @@ function homePausedCard(d){d=d||{};
   <div class="eq">${money(d.eq||START)}</div>
   ${homeKpis([["0","Terbuka"],["0","Ditutup"]])}
   ${homeGo("","Dijeda · tidak ada tab",true)}</div>`}
+function homeMemeCard(){const M=D.meme;if(!M||!M.ok)return"";const L=M.last||{},o=M.open||[];
+ const pl=M.pl_pct,reg=(L.regime||"").toLowerCase();const bear=reg.indexOf("blocked")>=0;
+ return `<div class="card home-card"><h2>Paper $10K · Memecoin <span class="badge b-paper">SIMULASI</span></h2>
+  <div class="eq">${money(M.eq)} ${pl!=null?`<span class="${cls(pl)}" style="font-size:13px">${pct(pl)}</span>`:""}</div>
+  ${homeKpis([[M.win==null?"—":M.win+"%","Menang"],[o.length,"Terbuka"],[M.closed??0,"Ditutup"],[`<span class="${cls(M.real)}">${money(M.real)}</span>`,"Dikunci"]])}
+  <div class="st" style="margin-top:8px;font-size:12px">${L.cycle?`Scan terakhir: ${L.scanned??"—"} pair · lolos filter ${L.passed??0} · disetujui ${L.approved??0}`:"Mulai jalan ±06:30 WIB"}</div>
+  <div class="st" style="font-size:12px">${bear?"Pasar lagi turun: cuma token super kuat yang boleh dibeli":"Aturan gabungan futures v4"}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${(M.rules||[]).map(r=>`<span class="badge b-paper" style="font-size:10px">${esc(r)}</span>`).join("")}</div></div>`}
 function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;
@@ -1253,7 +1261,7 @@ function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
  $("banner").hidden=true;$("banner").innerHTML="";
  const paused=(D.paused_desks||[]).map(homePausedCard).join("");
- $("homesec").innerHTML=btcKondisiCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${paused}</div>`;
+ $("homesec").innerHTML=btcKondisiCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
  $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
