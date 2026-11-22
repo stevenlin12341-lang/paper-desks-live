@@ -185,7 +185,7 @@ tr.x-sl td{background:#3a121244}tr.x-tp td{background:#0f2e1c44}
 .dca-buyrow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
 .dca-buyrow:last-child{border-bottom:0}
 .dca-buyrow .when{grid-column:1/-1;font-size:11px;color:var(--mu)}
-.dca-buyrow .ql{font-size:13px;font-weight:700}
+.dca-buyrow .ql{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}.dca-buyrow .ql .coin-logo{width:16px;height:16px;flex:0 0 auto}
 .dca-buyrow .meta{font-size:12px;color:var(--mu)}
 .dca-buyrow .rp{font-size:13px;font-weight:700;text-align:right}
 .dca-buyrow .note{font-size:12px;color:var(--mu);text-align:right}
@@ -930,24 +930,34 @@ function dcaFmtPx(r){const a=(r.amount_asset||(String(r.pair||"").toUpperCase().
  if(px==null||isNaN(px))return "";
  if(a==="IDR")return idr(px);
  return Number(px).toLocaleString("id-ID",{maximumFractionDigits:6})+" USDT"}
+function dcaRiwayatFrom(s){s=String(s||"").replace(" WIB","").trim();return s>="2026-11-05 00:00:00"}
 function dcaBuysHtml(P,orders){P=dcaLivePortfolio();
  const H=P.buys||{},btc=P.btc||{},lama=btc.lama||{};
  let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
  if(!rows.length)rows=dcaBuysFromOrders(orders,lama);
- rows=rows.filter(r=>r&&r.kind!=="lama");
- const avg=H.avg_price_usdt!=null?Number(H.avg_price_usdt):(btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):dcaAvgUsdt(rows));
+ rows=rows.filter(r=>r&&r.kind!=="lama"&&dcaRiwayatFrom(r.time_wib||r.time||""));
+ const avg=H.avg_price_usdt!=null?Number(H.avg_price_usdt):(btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null);
  const avgIdr=H.avg_price_idr!=null?H.avg_price_idr:btc.avg_price_idr;
- let avgS="";
+ let avgS=`<div class="st">Dari 5 Nov 2026</div>`;
  if(btc.invested_idr!=null)avgS+=`<div class="st">Modal ${idr(btc.invested_idr)}</div>`;
  if(avg!=null||avgIdr!=null)avgS+=`<div class="st">Rata-rata ${avg!=null?Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":""}${avg!=null&&avgIdr!=null?" · ":""}${avgIdr!=null?idr(avgIdr):""}</div>`;
  const body=rows.length?rows.map(r=>{
   const sell=String(r.side||"BUY").toUpperCase()==="SELL";
   const side=sell?"JUAL":"BELI";
+  const usdt=r.kind==="usdt"||String(r.pair||"").toUpperCase().replace("/","")==="USDTIDR";
+  const asset=usdt?"USDT":"BTC";
+  const logo=coinIcon(asset,"sm");
   const amtAsset=r.amount_asset||(String(r.pair||"").toUpperCase().endsWith("IDR")?"IDR":"USDT");
-  const amt=r.amount!=null?r.amount:(!sell&&r.quote!=null&&r.fee!=null&&(r.fee_asset||amtAsset)===amtAsset?Number(r.quote)+Number(r.fee):r.quote);
+  const amt=r.amount!=null?r.amount:(!sell&&r.quote!=null&&r.fee!=null&&String(r.fee_asset||amtAsset).toUpperCase()===String(amtAsset).toUpperCase()?Number(r.quote)+Number(r.fee):r.quote);
+  if(usdt){
+    const kurs=r.price!=null?r.price:r.price_idr;
+    const amtS=amt!=null?idr(amt):"";
+    const kursS=kurs!=null?"kurs "+idr(kurs):"";
+    return `<div class="dca-buyrow ${sell?"sell":"buy"}"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${logo}<span class="side">${side}</span>${dcaAmt("USDT",r.qty)} USDT</div><div class="rp">${amtS}</div><div class="meta">${kursS}${r.pair?" · USDT/IDR":""}</div><div class="note">${r.fills>1?r.fills+" isi":""}</div></div>`;
+  }
   const pxS=dcaFmtPx(r);
   const amtS=amt!=null?dcaFmtAmt(amt,amtAsset):"";
-  return `<div class="dca-buyrow ${sell?"sell":"buy"}"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql"><span class="side">${side}</span>${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${amtS}</div><div class="meta">${pxS}${r.pair?" · "+esc(r.pair.replace("BTC","BTC/")):""}</div><div class="note">${r.fills>1?r.fills+" isi":""}</div></div>`}).join(""):`<div class="empty">Belum ada transaksi yang dicatat.</div>`;
+  return `<div class="dca-buyrow ${sell?"sell":"buy"}"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="ql">${logo}<span class="side">${side}</span>${dcaAmt("BTC",r.qty)} BTC</div><div class="rp">${amtS}</div><div class="meta">${pxS}${r.pair?" · "+esc(r.pair.replace("BTC","BTC/")):""}</div><div class="note">${r.fills>1?r.fills+" isi":""}</div></div>`}).join(""):`<div class="empty">Belum ada transaksi yang dicatat.</div>`;
  return `<div class="card dca-buys" id="dcabuys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
 function dcaSaldoCard(){const P=dcaLivePortfolio(),h=dcaHoldAssets();
  if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
