@@ -352,6 +352,7 @@ h1{text-transform:none;letter-spacing:0}
 <nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-home" class="on">Beranda</button>
  <button type="button" id="v-paper">Paper $10K</button>
+ <button type="button" id="v-meme">Memecoin</button>
  <button type="button" id="v-real">Target $37</button>
  <button type="button" id="v-signals">$37 Semua Sinyal</button>
  <button type="button" id="v-steven">Dompet Steven</button>
@@ -378,6 +379,7 @@ h1{text-transform:none;letter-spacing:0}
 </div>
 <section id="homesec" hidden></section>
 <section id="dcasec" hidden></section>
+<section id="memesec" hidden></section>
 <footer id="foot">Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.</footer>
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Buka ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analisis"></div>
@@ -388,7 +390,7 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const ok=["home","paper","real","signals","trend","steven","russel","dca"];
+let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca"];
   if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
   const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
@@ -1253,7 +1255,29 @@ function homeMemeCard(){const M=D.meme;if(!M||!M.ok)return"";const L=M.last||{},
   ${homeKpis([[M.win==null?"—":M.win+"%","Menang"],[o.length,"Terbuka"],[M.closed??0,"Ditutup"],[`<span class="${cls(M.real)}">${money(M.real)}</span>`,"Dikunci"]])}
   <div class="st" style="margin-top:8px;font-size:12px">${L.cycle?`Scan terakhir: ${L.scanned??"—"} pair · lolos filter ${L.passed??0} · disetujui ${L.approved??0}`:"Mulai jalan ±06:30 WIB"}</div>
   <div class="st" style="font-size:12px">${bear?"Pasar lagi turun: cuma token super kuat yang boleh dibeli":"Aturan gabungan futures v4"}</div>
-  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${(M.rules||[]).map(r=>`<span class="badge b-paper" style="font-size:10px">${esc(r)}</span>`).join("")}</div></div>`}
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${(M.rules||[]).map(r=>`<span class="badge b-paper" style="font-size:10px">${esc(r)}</span>`).join("")}</div>
+  ${homeGo("meme","Buka tab")}</div>`}
+function renderMeme(){const M=D.meme||{};
+ $("htitle").innerHTML=`Desk Memecoin <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
+ $("tot").hidden=false;$("totsub").hidden=false;$("banner").hidden=true;
+ if(!M.ok){$("tot").textContent="—";$("totsub").textContent="Data memecoin belum ada di build ini.";$("memesec").innerHTML="";return}
+ const pl=M.pl_pct;$("tot").innerHTML=`${money(M.eq)} ${pl!=null?`<span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`:""}`;
+ $("totsub").textContent=M.status==="live"?`Jalan tiap jam · ${M.bear?"pasar lagi turun, beli cuma token super kuat":"aturan gabungan futures v4"}`:"Mulai jalan ±06:30 WIB";
+ const S=M.scan||{},o=M.open||[],F=M.fomo||{};
+ const kp=homeKpis([[M.win==null?"—":M.win+"%","Menang"],[o.length,"Terbuka"],[M.closed??0,"Ditutup"],[`<span class="${cls(M.real)}">${money(M.real)}</span>`,"Dikunci"]]);
+ const chips=`<div style="display:flex;flex-wrap:wrap;gap:6px">${(M.rules||[]).map(r=>`<span class="badge b-paper">${esc(r)}</span>`).join("")}</div>`;
+ const status=`<div class="card"><h2>Status</h2>${kp}<div class="sub" style="margin-top:8px">${M.status==="live"?"Aktif":"⏳ Mulai jalan ±06:30 WIB"} · ${M.bear?"🔴 BTC & SOL lagi turun (4 jam)":"🟢 Pasar boleh long"}</div><div style="margin-top:10px">${chips}</div></div>`;
+ const openC=`<div class="card"><h2>Posisi terbuka <span class="badge">${o.length}</span></h2>${o.length?`<div class="tw"><table><tr><th>Token</th><th>P/L</th><th>Nilai</th><th>TP1</th></tr>${o.map(p=>`<tr><td>${esc(p.sym)}${p.lane==="fresh"?' <span class="badge">baru</span>':""}</td><td class="${cls(p.pl)}">${pct(p.pl)}</td><td>${money(p.val)}</td><td>${p.tp1?"✔":"—"}</td></tr>`).join("")}</table></div>`:`<div class="sub">Belum ada posisi.</div>`}</div>`;
+ const top=(S.top||[]).map(t=>`<tr><td>${esc(t.sym)}${t.lane==="fresh"?' <span class="badge">baru</span>':""}</td><td>${t.score!=null?Number(t.score).toFixed(0):"—"}</td><td class="${t.ok?"up":"mu"}">${esc(t.ok?"✔ "+(t.why||"Lolos"):t.why||"—")}</td></tr>`).join("");
+ const scanC=`<div class="card"><h2>Scan terakhir <span class="sub" style="font-weight:400">${esc(S.src||"")}${S.ts?" · "+esc(S.ts):""}</span></h2>${S.src?homeKpis([[S.scanned??"—","Dicek"],[S.passed??"—","Lolos filter"],[S.killed??"—","Dibuang"],[S.would??0,"Mau dibeli"]])+(top?`<h3 style="margin:12px 0 4px;font-size:13px">Kandidat teratas (butuh skor 75)</h3><div class="tw"><table><tr><th>Token</th><th>Skor</th><th>Hasil</th></tr>${top}</table></div>`:""):`<div class="sub">Belum ada scan.</div>`}</div>`;
+ const kills=(S.kills||[]).map(k=>`<tr><td>${esc(k.sym)}</td><td title="${esc(k.detail||"")}">${esc(k.why)}</td></tr>`).join("");
+ const killC=`<div class="card"><h2>Dibuang terakhir</h2>${kills?`<div class="tw"><table><tr><th>Token</th><th>Alasan</th></tr>${kills}</table></div>`:`<div class="sub">—</div>`}</div>`;
+ const cl=(M.closed_list||[]).map(t=>`<tr><td>${esc(t.sym)}</td><td class="${cls(t.pnl)}">${money(t.pnl)} (${pct(t.pp)})</td><td>${esc(t.why)}</td><td class="sub">${esc(t.ts)}</td></tr>`).join("");
+ const clC=`<div class="card"><h2>Riwayat ditutup</h2>${cl?`<div class="tw"><table><tr><th>Token</th><th>P/L</th><th>Keluar</th><th>Waktu</th></tr>${cl}</table></div>`:`<div class="sub">Belum ada.</div>`}</div>`;
+ const left=F.left_month,used=F.used_today;
+ const fomoC=`<div class="card"><h2>Kuota data FOMO</h2>${homeKpis([[left!=null?Number(left).toLocaleString("id-ID"):"—","Sisa bulan ini"],[used!=null?`${Number(used).toLocaleString("id-ID")} / ${Number(F.cap||7500).toLocaleString("id-ID")}`:"—","Terpakai hari ini"]])}</div>`;
+ $("memesec").innerHTML=`<div class="tw2">${status}${scanC}</div><div class="tw2" style="margin-top:12px">${openC}${killC}</div><div class="tw2" style="margin-top:12px">${clC}${fomoC}</div>`;
+ $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Data token dari DexScreener, RugCheck dan FOMO API."}
 function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;
@@ -1374,13 +1398,16 @@ function render(){if(!D)return;
  const signals=VIEW==="signals";
  const trend=VIEW==="trend";
  const dca=VIEW==="dca";
+ const meme=VIEW==="meme";
  const walt=isWalletView();
  $("v-home")&&$("v-home").classList.toggle("on",home);
  $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-signals")&&$("v-signals").classList.toggle("on",signals);$("v-trend").classList.toggle("on",trend);
- $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);
- $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("homesec")&&($("homesec").hidden=!home);$("learnsec").hidden=real||signals||trend||walt||dca||home;$("shadowsec").hidden=real||signals||trend||walt||dca||home;
- $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca||home);
+ $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);$("v-meme")&&$("v-meme").classList.toggle("on",meme);
+ $("memesec").hidden=!meme;
+ $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("homesec")&&($("homesec").hidden=!home);$("learnsec").hidden=real||signals||trend||walt||dca||home||meme;$("shadowsec").hidden=real||signals||trend||walt||dca||home||meme;
+ $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca||home||meme);
  if(home)renderHome();
+ else if(meme)renderMeme();
  else if(trend)renderTrend();
  else if(walt)renderWallet();
  else if(dca)renderDca();
@@ -1474,6 +1501,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
 async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
+$("v-meme").addEventListener("click",()=>setView("meme"));
 $("v-real").addEventListener("click",()=>{setView("real");fetchWallet()});
 $("v-signals").addEventListener("click",()=>setView("signals"));
 $("v-steven").addEventListener("click",()=>{setView("steven");fetchWallet()});
