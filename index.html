@@ -352,7 +352,7 @@ h1{text-transform:none;letter-spacing:0}
 <nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-home" class="on">Beranda</button>
  <button type="button" id="v-paper">Paper $10K</button>
- <button type="button" id="v-meme">Memecoin</button>
+ <button type="button" id="v-meme">🐸 Memecoin <span class="badge b-live" style="font-size:9px;padding:1px 5px">BARU</span></button>
  <button type="button" id="v-real">Target $37</button>
  <button type="button" id="v-signals">$37 Semua Sinyal</button>
  <button type="button" id="v-steven">Dompet Steven</button>
@@ -391,6 +391,7 @@ const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
 let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca"];
+  const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
   if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
   const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
@@ -1260,7 +1261,7 @@ function homeMemeCard(){const M=D.meme;if(!M||!M.ok)return"";const L=M.last||{},
 function renderMeme(){const M=D.meme||{};
  $("htitle").innerHTML=`Desk Memecoin <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;$("banner").hidden=true;
- if(!M.ok){$("tot").textContent="—";$("totsub").textContent="Data memecoin belum ada di build ini.";$("memesec").innerHTML="";return}
+ if(!M.ok){$("tot").textContent="$10,000.00";$("totsub").textContent="Mulai jalan ±06:30 WIB";$("memesec").innerHTML=`<div class="card"><h2>Status</h2><div class="sub">⏳ Mulai jalan ±06:30 WIB. Data muncul setelah scan pertama.</div></div>`;return}
  const pl=M.pl_pct;$("tot").innerHTML=`${money(M.eq)} ${pl!=null?`<span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`:""}`;
  $("totsub").textContent=M.status==="live"?`Jalan tiap jam · ${M.bear?"pasar lagi turun, beli cuma token super kuat":"aturan gabungan futures v4"}`:"Mulai jalan ±06:30 WIB";
  const S=M.scan||{},o=M.open||[],F=M.fomo||{};
