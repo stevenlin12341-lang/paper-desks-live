@@ -256,18 +256,32 @@ h1{text-transform:none;letter-spacing:0}
   .dca-rows{width:100%}
 }
 
-.dca-hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 14px;text-align:center}
-.dca-donut-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
-.dca-donut{width:min(240px,72vw);height:auto;display:block}
-.dca-hero .sent{font-size:15px;line-height:1.45;margin:6px 0 0;max-width:34rem;color:var(--tx)}
-.dca-hero .dca-leg{justify-content:center;margin-top:2px}
-.dca-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:520px;margin:10px auto 0}
-.dca-week{border:1px solid var(--line);border-radius:10px;padding:8px 6px;background:#0b0e14;font-size:12px;line-height:1.35}
+.dca-hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 14px}
+.dca-hero-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 12px}
+.dca-remain{font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.dca-saran{display:inline-block;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:800;letter-spacing:.02em;border:1px solid var(--line)}
+.dca-saran.beli,.dca-saran.lunas{color:#86efac;background:#0f2e1c;border-color:#14532d}
+.dca-saran.tahan{color:#fcd34d;background:#1c1508;border-color:#854d0e}
+.dca-donut-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.dca-donut{width:min(200px,64vw);height:auto;display:block}
+.dca-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:360px}
+.dca-stats div{background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
+.dca-stats .l{display:block;font-size:11px;color:var(--mu);margin:0 0 2px}
+.dca-stats b{font-size:15px}
+.dca-asli{font-size:12px;color:var(--mu);margin:0}
+.dca-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:420px;margin:4px auto 0}
+.dca-week{border:1px solid var(--line);border-radius:999px;padding:7px 6px;background:#0b0e14;font-size:11px;line-height:1.3;text-align:center}
 .dca-week.now{border-color:var(--ac);box-shadow:0 0 0 1px #60a5fa55}
-.dca-week.buy{background:#0f2e1c;border-color:#14532d}
-.dca-week .wn{font-weight:700;font-size:13px}
-.dca-week .ws{color:var(--mu);font-size:11px}
-@media(max-width:420px){.dca-weeks{gap:6px}.dca-week{padding:7px 4px}}
+.dca-week.buy,.dca-week.done{background:#0f2e1c;border-color:#14532d}
+.dca-week .wn{font-weight:700;font-size:12px}
+.dca-week .wa{color:var(--mu);font-size:10px;margin-top:1px}
+.dca-week.buy .wa,.dca-week.done .wa{color:#86efac}
+@media(max-width:420px){.dca-remain{font-size:18px}.dca-weeks{gap:4px}.dca-week{padding:6px 3px;border-radius:12px}}
+.dca-hcard{padding:10px 0;border-bottom:1px solid var(--line)}
+.dca-hcard:last-child{border-bottom:0}
+.dca-hcard .when{font-size:11px;color:var(--mu);margin:0 0 3px}
+.dca-hcard .main{font-size:14px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.dca-hcard .meta{font-size:12px;color:var(--mu);margin:3px 0 0;line-height:1.4}
 
 .metode{margin-top:14px;text-align:left}
 .metode h3{margin:0 0 6px;font-size:16px}
@@ -809,30 +823,41 @@ function dcaWeekBars(B, orders){
   });
   return [1,2,3,4].map(w=>({week:w,label:labels[w],spent:Math.round(spent[w]||0),buys:buys[w]||0,current:w===cur}));
 }
+function dcaMonthShort(n){n=Number(n)||0;if(n>=1000000&&n%1000000===0)return "Rp "+(n/1000000).toLocaleString("id-ID")+" jt";return idr(n)}
 function dcaBudgetHero(B, orders){
-  const monthly=Number(B.monthly||1000000), spent=Math.max(0,Number(B.spent||0));
-  const remain=B.remaining!=null?Math.max(0,Number(B.remaining)):Math.max(0,monthly-spent);
-  const pct=monthly>0?spent/monthly:0, pctLab=Math.round(pct*100);
+  const monthly=Number(B.monthly||1000000), lunas=!!B.lunas||B.verdict==="LUNAS";
+  const spent=Math.max(0,Number(B.spent||0));
+  const remain=lunas?0:(B.remaining!=null?Math.max(0,Number(B.remaining)):Math.max(0,monthly-spent));
+  const actual=B.spent_actual!=null?Number(B.spent_actual):null;
+  const pct=lunas?1:(monthly>0?Math.min(1,spent/monthly):0), pctLab=Math.round(pct*100);
   const r=58,cx=80,cy=80,sw=18,C=2*Math.PI*r, spentLen=Math.max(0,Math.min(C,C*pct));
-  const svg=`<svg class="dca-donut" viewBox="0 0 160 160" role="img" aria-label="${pctLab} persen anggaran terpakai">
+  const mid=lunas
+    ?`<text x="${cx}" y="${cy-2}" text-anchor="middle" fill="#86efac" font-size="18" font-weight="800">Lunas ✓</text><text x="${cx}" y="${cy+18}" text-anchor="middle" fill="#8a93a6" font-size="11">100%</text>`
+    :`<text x="${cx}" y="${cy-6}" text-anchor="middle" fill="#e6e9ef" font-size="12" font-weight="700">${esc(idr(spent))}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" fill="#8a93a6" font-size="11">/ ${esc(dcaMonthShort(monthly))}</text>`;
+  const svg=`<svg class="dca-donut" viewBox="0 0 160 160" role="img" aria-label="${lunas?"Lunas":(idr(spent)+" / "+dcaMonthShort(monthly))}">
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1f2633" stroke-width="${sw}"/>
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#22c55e" stroke-width="${sw}" stroke-linecap="${spentLen>0&&spentLen<C?"round":"butt"}" stroke-dasharray="${spentLen.toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>
-    <text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#e6e9ef" font-size="26" font-weight="800">${pctLab}%</text>
-    <text x="${cx}" y="${cy+16}" text-anchor="middle" fill="#8a93a6" font-size="12">terpakai</text>
+    ${mid}
   </svg>`;
   const weeks=dcaWeekBars(B,orders);
   const strip=weeks.map(w=>{
-    const on=w.current, bought=(w.spent||0)>0||(w.buys||0)>0;
-    const st=bought?("beli · "+idr(w.spent)):(on?"berjalan":"belum beli");
-    return `<div class="dca-week${on?" now":""}${bought?" buy":""}"><div class="wn">M${w.week}${on?" · ini":""}</div><div class="ws">${esc(w.label||"")}</div><div class="ws">${st}</div></div>`;
+    const on=w.current, bought=(w.spent||0)>0||(w.buys||0)>0, done=!!w.done||bought||lunas;
+    const chk=done?" ✓":"";
+    const amt=bought?idr(w.spent):(done?"selesai":"—");
+    return `<div class="dca-week${on?" now":""}${done?" done":""}${bought?" buy":""}"><div class="wn">M${w.week}${chk}</div><div class="wa">${amt}</div></div>`;
   }).join("");
-  const sent=`Bulan ini sudah dipakai ${idr(spent)} dari anggaran ${idr(monthly)}, sisa ${idr(remain)}.`;
-  return `<div class="dca-hero"><div class="dca-donut-wrap">${svg}
-    <div class="dca-leg"><span><i style="background:#22c55e"></i>Terpakai ${idr(spent)}</span><span><i style="background:#1f2633"></i>Sisa ${idr(remain)}</span></div>
-    <p class="sent">${sent}</p>
+  let ver=String(B.verdict||"");
+  const chip=lunas?"November selesai":(ver==="BELI SEKARANG"||ver==="BELI"?"Saran: BELI":"Saran: TAHAN");
+  const chipCls=lunas?"lunas":(ver==="BELI SEKARANG"||ver==="BELI"?"beli":"tahan");
+  const asli=(actual!=null&&(lunas||actual!==spent))?`<p class="dca-asli">Pembelian asli: ${idr(actual)}</p>`:"";
+  return `<div class="dca-hero"><div class="dca-hero-top"><div class="dca-remain">Sisa budget bulan ini: ${idr(remain)}</div><span class="dca-saran ${chipCls}">${esc(chip)}</span></div>
+    <div class="dca-donut-wrap">${svg}
+    <div class="dca-stats"><div><span class="l">Terpakai</span><b>${idr(spent)}</b></div><div><span class="l">Sisa</span><b>${idr(remain)}</b></div></div>
+    ${asli}
     <div class="dca-weeks" aria-label="Isi per minggu">${strip}</div>
   </div></div>`;
 }
+
 
 const HOLD_COL={BTC:"#F7931A",USDT:"#26A17B",IDR:"#64748B"};
 function dcaAmt(asset,n){if(n==null||isNaN(n))return "—";const x=Number(n);
@@ -983,48 +1008,48 @@ function dcaGroupRiwayat(rows){
  all.sort((a,b)=>dcaTimeKey(b.parent.time_wib||b.parent.time).localeCompare(dcaTimeKey(a.parent.time_wib||a.parent.time)));
  return all;
 }
-function dcaHistLine(r,opt){opt=opt||{};
- const sell=String(r.side||"BUY").toUpperCase()==="SELL";
- const word=sell?"Jual":"Beli";
- const usdt=dcaIsUsdtBuy(r)||dcaPairOf(r)==="USDTIDR";
- const asset=usdt?"USDT":"BTC";
- const logo=coinIcon(asset,"sm");
- const kurs=r.kurs_idr!=null?r.kurs_idr:(r.price!=null&&usdt?r.price:r.price_idr);
- const idrV=dcaAmtIdr(r,opt.kurs!=null?opt.kurs:kurs);
- const idrS=idrV!=null?" ("+idr(idrV)+")":"";
- const sideS=`<span class="side ${sell?"dn":"up"}">${word}</span>`;
- let txt="";
- if(usdt){
-  const kursS=kurs!=null?" · kurs "+dcaIntSep(kurs):"";
-  txt=`${sideS} USDT ${dcaUsdtShort(r.qty)}${kursS}${idrS}`;
+function dcaWhenDate(s){const t=dcaWhen(s);const m=String(t).match(/^(.+?),\s*\d{2}:\d{2}/);return m?m[1]:t}
+function dcaHistCard(g){
+ const p=g.parent, kids=g.children||[], child=kids[0]||(!dcaIsUsdtBuy(p)&&p)||null;
+ const kurs=p.kurs_idr!=null?p.kurs_idr:(p.price!=null?p.price:p.price_idr);
+ const idrV=dcaIsUsdtBuy(p)?dcaAmtIdr(p):dcaAmtIdr(p,kurs);
+ const when=dcaWhenDate(p.time_wib||(child&&child.time_wib)||"");
+ let main="", sub="";
+ if(child&&(dcaIsBtcUsdtBuy(child)||dcaPairOf(child).startsWith("BTC"))){
+  const px=child.price!=null?child.price:(child.price_usdt!=null?child.price_usdt:child.price_idr);
+  main=`${idrV!=null?idr(idrV):"—"} → ${dcaBtcShort(child.qty)} BTC${px!=null?" @ "+dcaIntSep(px)+" USDT":""}`;
+  const q=dcaIsUsdtBuy(p)?p.qty:null;
+  const bits=[];
+  if(q!=null)bits.push(dcaUsdtShort(q)+" USDT"+(kurs!=null?" @ "+dcaIntSep(kurs):""));
+  if(g.left_usdt!=null)bits.push("sisa "+dcaUsdtShort(g.left_usdt)+" USDT");
+  sub=bits.join(" · ");
+ }else if(dcaIsUsdtBuy(p)){
+  main=`${idrV!=null?idr(idrV):"—"} → ${dcaUsdtShort(p.qty)} USDT${kurs!=null?" @ "+dcaIntSep(kurs):""}`;
  }else{
-  const px=r.price!=null?r.price:(r.price_usdt!=null?r.price_usdt:r.price_idr);
-  const pxS=px!=null?" @ "+dcaIntSep(px)+" USDT":"";
-  const amt=dcaRowAmt(r);
-  const amtS=amt!=null?" · "+dcaUsdtShort(amt)+" USDT":"";
-  txt=`${sideS} BTC ${dcaBtcShort(r.qty)}${pxS}${amtS}${idrS}`;
+  const px=p.price!=null?p.price:(p.price_usdt!=null?p.price_usdt:p.price_idr);
+  const amt=dcaRowAmt(p);
+  main=`${dcaBtcShort(p.qty)} BTC${px!=null?" @ "+dcaIntSep(px)+" USDT":""}${amt!=null?" · "+dcaUsdtShort(amt)+" USDT":""}${idrV!=null?" ("+idr(idrV)+")":""}`;
  }
- const arrow=opt.child?"<span class=\"arrow\">↳</span>":"";
- return `<div class="dca-hrow${opt.child?" child":""}${sell?" sell":" buy"}"><div class="when">${esc(dcaWhen(r.time_wib||""))}</div><div class="line">${arrow}${logo}<div class="txt">${txt}</div></div>${opt.sisa||""}</div>`;
+ return `<div class="dca-hcard"><div class="when">${esc(when)}</div><div class="main">${main}</div>${sub?`<div class="meta">${esc(sub)}</div>`:""}</div>`;
 }
 function dcaBuysHtml(P,orders){P=dcaLivePortfolio();
  const H=P.buys||{},btc=P.btc||{},lama=btc.lama||{};
  let rows=Array.isArray(H.rows)?H.rows.slice():(Array.isArray(H)?H.slice():[]);
  if(!rows.length)rows=dcaBuysFromOrders(orders,lama);
  rows=rows.filter(r=>r&&r.kind!=="lama"&&dcaRiwayatFrom(r.time_wib||r.time||""));
+ const groups=dcaGroupRiwayat(rows);
+ let total=H.total_idr;
+ if(total==null){total=0;rows.forEach(r=>{if(r.kind==="usdt"&&r.amount_idr!=null)total+=Number(r.amount_idr)});}
  const avg=H.avg_price_usdt!=null?Number(H.avg_price_usdt):(btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null);
  const avgIdr=H.avg_price_idr!=null?H.avg_price_idr:btc.avg_price_idr;
- let avgS=`<div class="st">Dari 5 Nov 2026</div>`;
- if(btc.invested_idr!=null)avgS+=`<div class="st">Modal ${idr(btc.invested_idr)}</div>`;
- if(avg!=null||avgIdr!=null)avgS+=`<div class="st">Rata-rata ${avg!=null?Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT":""}${avg!=null&&avgIdr!=null?" · ":""}${avgIdr!=null?idr(avgIdr):""}</div>`;
- const groups=dcaGroupRiwayat(rows);
- const body=groups.length?groups.map(g=>{
-  const kurs=g.parent.kurs_idr!=null?g.parent.kurs_idr:(g.parent.price!=null?g.parent.price:g.parent.price_idr);
-  let sisa="";
-  if(g.left_usdt!=null)sisa=`<div class="sisa">Sisa ${dcaUsdtShort(g.left_usdt)} USDT${g.left_idr!=null?" ("+idr(g.left_idr)+")":""}</div>`;
-  const kids=g.children.map(c=>dcaHistLine(c,{child:true,kurs:kurs})).join("");
-  return `<div class="dca-hgroup">${dcaHistLine(g.parent)}${kids}${sisa}</div>`;
- }).join(""):`<div class="empty">Belum ada transaksi yang dicatat.</div>`;
+ let avgS=`<div class="st">Total beli sejak 5 Nov: ${idr(total||0)}</div>`;
+ if(btc.invested_idr!=null||avg!=null){
+  const bits=[];
+  if(btc.invested_idr!=null)bits.push("Modal "+idr(btc.invested_idr));
+  if(avg!=null)bits.push("rata-rata "+Number(avg).toLocaleString("id-ID",{maximumFractionDigits:2})+" USDT");
+  avgS+=`<div class="st">${bits.join(" · ")}</div>`;
+ }
+ const body=groups.length?groups.map(dcaHistCard).join(""):`<div class="empty">Belum ada transaksi yang dicatat.</div>`;
  return `<div class="card dca-buys" id="dcabuys"><h2>Riwayat Beli</h2>${avgS}${body}</div>`}
 function dcaSaldoCard(){const P=dcaLivePortfolio(),h=dcaHoldAssets();
  if(!(h.rows||[]).length&&!h.tot)return `<div class="card dca-saldo" id="dcasaldo"><h2>Saldo Indodax</h2><div class="empty">Saldo belum tersedia.</div></div>`;
@@ -1059,27 +1084,32 @@ async function fetchDcaLive(){if(dcaLiveBusy||!D)return;dcaLiveBusy=true;
  finally{dcaLiveBusy=false}}
 
 function renderDca(){const A=D.dca||{};
- $("htitle").innerHTML=`Spot DCA BTC <span class="badge b-dca">SPOT</span> <span class="badge">ANALISIS SAJA</span>`;
- $("banner").hidden=false;
+ $("htitle").textContent="Spot DCA BTC";
+ $("banner").hidden=true;$("banner").innerHTML="";
+ const hideTot=true;
+ if($("tot"))$("tot").hidden=true;
+ if($("totsub"))$("totsub").hidden=true;
+ const dcaRight=$("upd")&&$("upd").parentElement;if(dcaRight)dcaRight.hidden=true;
  if(!dcaUnlocked()){
-  $("tot").textContent="Terkunci lunak";
-  $("totsub").textContent="Bukan keamanan · situs ini publik";
-  $("banner").innerHTML=`<b>Kunci lunak, bukan keamanan.</b> Situs ini publik (GitHub Pages). Siapa pun bisa baca kode halaman ini, jadi kunci ini tidak melindungi apa pun. Cuma biar tab ini nggak kebuka tanpa sengaja. Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
+  if($("tot")){$("tot").hidden=false;$("tot").textContent="Terkunci";}
+  if($("totsub")){$("totsub").hidden=false;$("totsub").textContent="Masukkan kunci untuk membuka tab ini";}
+  $("banner").hidden=true;$("banner").innerHTML="";
   $("dcasec").innerHTML=`<div class="card"><form onsubmit="unlockDca(event)" class="dca-form"><label>Kunci lunak <input id="dcapw" type="password" autocomplete="off"></label><button type="submit">Buka tab</button></form><div id="dcapwerr"></div><p class="sub" style="margin:10px 0 0">Tidak ada rahasia di balik kunci ini. Analisis DCA tetap data publik.</p></div>`;
-  $("foot").innerHTML=`Kunci lunak di halaman publik bukan keamanan. Tidak ada kunci exchange dan tidak ada order dari halaman ini.`;
+  $("foot").innerHTML=`Analisis saja · tidak ada order dari halaman ini`;
   const inp=$("dcapw");if(inp)inp.focus();return}
  const ok=A.ok!==false&&A.price!=null,B=A.budget||{};
  let ver=B.verdict||"";if(ver==="SKIP MINGGU INI")ver="SKIP";if(ver==="BELI MINGGU INI")ver="BELI SEKARANG";
- const buy=ver==="BELI SEKARANG",z=A.zone||"—";
- $("tot").textContent=buy?idr(B.suggest||0):"SKIP";
- $("totsub").textContent=ok?`${esc(ver||"—")} · ${esc(z)} · ${esc(A.asof||"")}`:esc(A.error||"Analisis belum tersedia");
- $("banner").innerHTML=`<b>Analisis DCA spot, bukan sinyal desk.</b> Tidak ada API key di situs ini, dan halaman ini tidak memasang order.`;
+ const lunas=!!B.lunas||ver==="LUNAS";
+ const buy=!lunas&&ver==="BELI SEKARANG",z=A.zone||"—";
+ if($("tot"))$("tot").hidden=true;
+ if($("totsub"))$("totsub").hidden=true;
  const kpi=(l,v,c)=>`<div class="kpi"><div class="l">${l}</div><div class="v${c?" "+c:""}">${v}</div></div>`;
- const vcls=buy?"go":"skip";
+ const vcls=lunas?"go":(buy?"go":"skip");
  const Bal=A.balances||{};
  const idrFree=(A.portfolio&&A.portfolio.idr_free!=null)?Math.floor(Number(A.portfolio.idr_free)):(Bal.idr_free!=null?Math.floor(Number(Bal.idr_free)):Math.floor(Number(((Bal.assets||[]).find(x=>x&&x.asset==="IDR")||{}).free||0)));
- const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(ver||"—")}</div>
-  <div class="v" style="font-size:28px;font-weight:700;margin:2px 0 8px">${buy?idr(B.suggest||0):"—"}</div>
+ const vd=lunas?"November selesai":(ver||"—");
+ const bud=`<div class="dca-verdict ${vcls}"><div class="vd">${esc(vd)}</div>
+  ${lunas?"":`<div class="v" style="font-size:28px;font-weight:700;margin:2px 0 8px">${buy?idr(B.suggest||0):"—"}</div>`}
   <p class="vr">${esc(B.reason||"Rencana anggaran belum tersedia.")}</p>
   <div class="dca-kpis compact">
    ${kpi("Terpakai bulan ini",idr(B.spent||0))}
@@ -1136,7 +1166,7 @@ function renderDca(){const A=D.dca||{};
  </details>`;
  const hero=dcaBudgetHero(B,A.orders||[]);$("dcasec").innerHTML=hero+bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
  if(!DCA_LIVE||!DCA_LIVE.ok||Date.now()-(DCA_LIVE.at||0)>10000)fetchDcaLive();
- $("foot").innerHTML=`Spot DCA adalah analisis saja. Tidak ada API key di situs ini, tidak ada order dari halaman ini. Mau beli? Kirim perintah ke Grok Bot di chat. Kunci tab ini cuma kunci lunak, bukan keamanan. ${esc(D.run?.archive||"")}`}
+ $("foot").innerHTML=`Analisis saja · tidak ada order dari halaman ini${A.asof?" · Data "+esc(A.asof):((D.updated)?" · Data "+esc(D.updated):"")}`}
 function render(){if(!D)return;
  const snap=snapUi();
  const real=VIEW==="real";
@@ -1154,8 +1184,18 @@ function render(){if(!D)return;
  else if(signals){if(!D.real_all){$("totsub").textContent="Data $37 Semua Sinyal belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Semua Sinyal muncul setelah data diperbarui."}else renderSignals()}
  else if(real){if(!D.real){$("totsub").textContent="Data Target $37 belum ada di build ini.";renderPaper();$("banner").hidden=false;$("banner").innerHTML="Tampilan Target $37 muncul setelah data diperbarui."}else renderReal()}
  else renderPaper();
- $("upd").textContent="Data desk per jam "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
- paintLive();
+ if(VIEW==="dca"){
+  const right=$("upd")&&$("upd").parentElement;if(right)right.hidden=true;
+  if($("upd"))$("upd").textContent="";
+  if($("livest"))$("livest").innerHTML="";
+  $("banner").hidden=true;
+ }else{
+  const right=$("upd")&&$("upd").parentElement;if(right)right.hidden=false;
+  if($("tot"))$("tot").hidden=false;
+  if($("totsub"))$("totsub").hidden=false;
+  $("upd").textContent="Diperbarui "+(D.updated||"")+(D.gen_ts?" ("+ago(D.gen_ts)+")":"");
+  paintLive();
+ }
  restoreUi(snap);
 }
 function paintLive(){const el=$("livest");if(!el)return;
