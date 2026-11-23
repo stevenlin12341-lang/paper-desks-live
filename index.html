@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Desk Majors (simulasi) · Sesi 2</title>
+<title>GROK BOT · Desk Majors (simulasi) · Sesi 2</title>
 <meta name="robots" content="noindex">
 <style>
 :root{--bg:#0b0e14;--card:#121722;--line:#1f2633;--tx:#e6e9ef;--mu:#8a93a6;--up:#22c55e;--dn:#ef4444;--ac:#60a5fa;--wa:#f59e0b}
@@ -40,6 +40,11 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .views{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
 .views button{background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
 .views button.on{color:var(--tx);border-color:var(--ac);background:#152238}
+.brand-switch{display:flex;gap:8px;align-items:center;margin:0 0 10px;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.brand-switch .brand-label{margin-right:auto;color:var(--mu);font-size:10px;font-weight:700;letter-spacing:.1em}
+.brand-switch a{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--mu);font-size:12px;font-weight:700;letter-spacing:.05em;text-decoration:none}
+.brand-switch a:hover{border-color:var(--ac);color:var(--tx)}
+.brand-switch a[aria-current="page"]{border-color:var(--ac);background:#152238;color:var(--tx)}
 .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--mu);margin-top:14px;line-height:1.45}
 .note b{color:var(--tx);font-weight:600}
 .addr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all}
@@ -368,6 +373,8 @@ h1{text-transform:none;letter-spacing:0}
 .dca-arah .srow .hd{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
 .dca-arah .srow .tx{font-size:12px;color:var(--mu);margin-top:2px}
 </style></head><body><div class="wrap">
+<nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">PAPER DESKS LIVE</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
+
 <nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-home" class="on">Beranda</button>
  <button type="button" id="v-paper">Paper $10K</button>
