@@ -1,0 +1,1055 @@
+{
+  "updated": "23 Nov 2026, 22:47 WIB",
+  "desks": [
+    {
+      "name": "Majors",
+      "eq": 10000,
+      "cash": 10000,
+      "open": 0,
+      "closed": 0,
+      "win": null,
+      "real": 0,
+      "unreal": 0,
+      "mdd": 0,
+      "last": "22:47",
+      "cycle": 1,
+      "ready": {
+        "overall": "NOT READY on any desk.",
+        "met": 2,
+        "gates": 9
+      },
+      "model": "v1",
+      "learn": {
+        "rows": 552,
+        "with4h": 477,
+        "train": 0,
+        "hold": 0
+      },
+      "changes": []
+    }
+  ],
+  "open": [],
+  "closed": [],
+  "latest": [
+    {
+      "desk": "Majors",
+      "cycle": 1,
+      "older": false,
+      "dry_run": true,
+      "items": [
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ETH",
+          "side": "long",
+          "sc": 73.75,
+          "r": "hard veto LONG: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 1h -3); agreeing: BOS bull 4h +1, HH/HL 1h +2, BOS bull 1h +1, Bullish FVG 1h +2; NEWS gate FAIL long: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance; hard veto LONG: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance; N/A: no OHLCV; -5.0 negative news ×1: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finan; +3.5 positive headline tailwind ×1",
+          "pat": "BOS bull 4h, HH/HL 1h, BOS bull 1h, Bearish OB 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "NEAR",
+          "side": "long",
+          "sc": 68.31,
+          "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: at support 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: at support 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1; NEWS gate PASS long: no headlines in 24h (treated as neutral); N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "Bearish FVG 4h, Fib 0.5-0.618 4h, at support 4h, LH/LL 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "BTC",
+          "side": "long",
+          "sc": 68.25,
+          "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, Bearish OB 1h -3); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, Bearish OB 1h -3); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "BOS bull 4h, Bearish FVG 4h, at resistance 4h, LH/LL 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "killed",
+          "a": "DOGE",
+          "side": "long",
+          "sc": 67.94,
+          "r": "Score 67.94 below minimum 75",
+          "rf": "DRY SCAN — no paper order. TA gate PASS long: HH/HL 4h +2, at support 4h +1, BOS bull 1h +1, Inverse H&S neck break 1h +3 (mild against: H&S 1h -1); NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.063% of circ in 7d)",
+          "pat": "HH/HL 4h, at support 4h, BOS bull 1h, H&S 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ADA",
+          "side": "long",
+          "sc": 66.44,
+          "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3); agreeing: HH/HL 4h +2, BOS bull 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3); agreeing: HH/HL 4h +2, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "HH/HL 4h, Bearish OB 4h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "TRX",
+          "side": "long",
+          "sc": 65.19,
+          "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: BOS bull 4h +1, Inverse H&S 4h +1, at support 4h +1, BOS bull 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: BOS bull 4h +1, Inverse H&S 4h +1, at support 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment positive, 10 headline(s), no negative-event hit; N/A: no OHLCV; +3.5 positive headline tailwind ×1; unlocks quiet (0.032% of circ in 7d)",
+          "pat": "BOS bull 4h, Bearish OB 4h, Bearish FVG 4h, Inverse H&S 4h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "HYPE",
+          "side": "long",
+          "sc": 62.94,
+          "r": "TA gate FAIL long: strong pattern against (Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Double Bottom 1h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Double Bottom 1h +2; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "BOS bull 4h, Fib 0.5-0.618 4h, LH/LL 1h, CHoCH bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "SOL",
+          "side": "long",
+          "sc": 61.44,
+          "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2; NEWS gate PASS long: sentiment positive, 25 headline(s), no negative-event hit; N/A: no OHLCV; +3.5 positive headline tailwind ×1; unlocks quiet (0.061% of circ in 7d)",
+          "pat": "BOS bull 4h, Bearish FVG 4h, Fib 0.5-0.618 4h, at resistance 4h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "XRP",
+          "side": "long",
+          "sc": 61.19,
+          "r": "TA gate FAIL long: strong pattern against (at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "BOS bull 4h, at resistance 4h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "LINK",
+          "side": "long",
+          "sc": 61.19,
+          "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1, Bullish FVG 1h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1, Bullish FVG 1h +2; NEWS gate PASS long: sentiment neutral, 5 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "BOS bull 4h, Bearish OB 4h, Bearish FVG 4h, Fib 0.5-0.618 4h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "BCH",
+          "side": "long",
+          "sc": 61.19,
+          "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: CHoCH bull 1h +2, Bullish FVG 1h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: CHoCH bull 1h +2, Bullish FVG 1h +2; NEWS gate PASS long: sentiment neutral, 1 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "Bearish OB 4h, Fib 0.5-0.618 4h, LH/LL 1h, CHoCH bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "SUI",
+          "side": "long",
+          "sc": 60.19,
+          "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2); agreeing: HH/HL 4h +2, BOS bull 4h +1, at support 4h +1, BOS bull 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2); agreeing: HH/HL 4h +2, BOS bull 4h +1, at support 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 8 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.050% of circ in 7d)",
+          "pat": "HH/HL 4h, BOS bull 4h, Bearish OB 4h, Fib 0.5-0.618 4h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ARB",
+          "side": "short",
+          "sc": 59.94,
+          "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2); agreeing: Bearish FVG 4h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2); agreeing: Bearish FVG 4h +2; NEWS gate PASS short: sentiment neutral, 12 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+          "pat": "HH/HL 4h, Bearish FVG 4h, BOS bull 1h, Bullish FVG 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "BNB",
+          "side": "short",
+          "sc": 59.44,
+          "r": "TA gate FAIL short: strong pattern against (Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2, at support 1h -2); agreeing: Bearish FVG 4h +2, H&S neck break 4h +3, Double Top 4h +2, Bearish OB 1h +3, H&S 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2, at support 1h -2); agreeing: Bearish FVG 4h +2, H&S neck break 4h +3, Double Top 4h +2, Bearish OB 1h +3, H&S 1h +1; NEWS gate FAIL short: 'hack' near BNB in 24h headline: Hacker exploits Fusionist token bridge to mint unbacked ACE on BNB Chain - Cryptonews.net; N/A: no OHLCV; +5.0 negative headline tailwind ×2; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "Bearish FVG 4h, H&S neck break 4h, Double Top 4h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ONDO",
+          "side": "long",
+          "sc": 58.94,
+          "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+          "rf": "DRY SCAN — no paper order. TA gate PASS long: BOS bull 4h +1, at support 4h +1, HH/HL 1h +2, BOS bull 1h +1, Bullish FVG 1h +2, Inverse H&S neck break 1h +3, Double Bottom 1h +2; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -5.0 negative news ×1: Ondo: Chemist allegedly swallows abortion drugs to evade arrest - Daily Trust; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+          "pat": "BOS bull 4h, at support 4h, HH/HL 1h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ZEC",
+          "side": "long",
+          "sc": 58.19,
+          "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 1h -2); agreeing: HH/HL 4h +2, BOS bull 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 1h -2); agreeing: HH/HL 4h +2, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "HH/HL 4h, Bearish FVG 4h, Fib 0.5-0.618 4h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "UNI",
+          "side": "long",
+          "sc": 56.19,
+          "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: at support 4h +1, HH/HL 1h +2, BOS bull 1h +1, Inverse H&S neck break 1h +3; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+          "pat": "Bearish OB 4h, Bearish FVG 4h, at support 4h, HH/HL 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "AAVE",
+          "side": "short",
+          "sc": 54.69,
+          "r": "TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2); agreeing: Bearish FVG 4h +2, at resistance 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2); agreeing: Bearish FVG 4h +2, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 11 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+          "pat": "Bearish FVG 4h, HH/HL 1h, BOS bull 1h, Bullish FVG 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "INJ",
+          "side": "long",
+          "sc": 52.19,
+          "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, at resistance 1h -2); agreeing: CHoCH bull 1h +2, Double Bottom 1h +2, at support 1h +1; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+          "pat": "Bearish FVG 4h, at resistance 4h, LH/LL 1h, CHoCH bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "XLM",
+          "side": "short",
+          "sc": 48.19,
+          "r": "TA gate FAIL short: strong pattern against (CHoCH bull 1h -2); agreeing: Bearish OB 4h +3, LH/LL 1h +2, H&S 1h +1, at resistance 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (CHoCH bull 1h -2); agreeing: Bearish OB 4h +3, LH/LL 1h +2, H&S 1h +1, at resistance 1h +1; NEWS gate PASS short: sentiment positive, 2 headline(s), no negative-event hit; N/A: no OHLCV; -5.0 positive news ×1: Stellar CEO warns tokenized asset growth alone does not prove adoption - Crypto Briefing; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "Bearish OB 4h, LH/LL 1h, CHoCH bull 1h, H&S 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "FIL",
+          "side": "short",
+          "sc": 44.94,
+          "r": "TA gate FAIL short: strong pattern against (Double Bottom 1h -2); agreeing: Bearish OB 4h +3",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (Double Bottom 1h -2); agreeing: Bearish OB 4h +3; NEWS gate PASS short: sentiment neutral, 22 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+          "pat": "Bearish OB 4h, BOS bull 1h, Double Bottom 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "killed",
+          "a": "LTC",
+          "side": "short",
+          "sc": 42.94,
+          "r": "Score 42.94 below minimum 75",
+          "rf": "DRY SCAN — no paper order. TA gate PASS short: H&S neck break 4h +3, at resistance 1h +1 (mild against: BOS bull 1h -1); NEWS gate PASS short: sentiment neutral, 15 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.032% of circ in 7d)",
+          "pat": "H&S neck break 4h, BOS bull 1h, at resistance 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "DOT",
+          "side": "short",
+          "sc": 42.94,
+          "r": "TA gate FAIL short: strong pattern against (CHoCH bull 4h -2, HH/HL 1h -2); agreeing: LH/LL 4h +2, Bearish OB 4h +3, Bearish FVG 4h +2, at resistance 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (CHoCH bull 4h -2, HH/HL 1h -2); agreeing: LH/LL 4h +2, Bearish OB 4h +3, Bearish FVG 4h +2, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 5 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.072% of circ in 7d)",
+          "pat": "LH/LL 4h, CHoCH bull 4h, Bearish OB 4h, Bearish FVG 4h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "WLD",
+          "side": "short",
+          "sc": 42.94,
+          "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish OB 4h +3, Bearish FVG 4h +2, H&S 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish OB 4h +3, Bearish FVG 4h +2, H&S 1h +1; NEWS gate PASS short: sentiment neutral, 2 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+          "pat": "HH/HL 4h, Bearish OB 4h, Bearish FVG 4h, BOS bull 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "AVAX",
+          "side": "short",
+          "sc": 39.69,
+          "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, at support 1h -2); agreeing: Bearish OB 4h +3, at resistance 1h +1",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, at support 1h -2); agreeing: Bearish OB 4h +3, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+          "pat": "HH/HL 4h, Bearish OB 4h, BOS bull 1h, Bullish FVG 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "vetoed",
+          "a": "ENA",
+          "side": "short",
+          "sc": 36.94,
+          "r": "TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish FVG 4h +2",
+          "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish FVG 4h +2; NEWS gate PASS short: sentiment positive, 23 headline(s), no negative-event hit; N/A: no OHLCV; -5.0 positive news ×1: Petrosyan rejects link between regional energy integration and ENA developments (PAN.am) - PanARMENI; +5 unlock overhang 2.99% of circ in 7d",
+          "pat": "Bearish FVG 4h, HH/HL 1h, BOS bull 1h, Bullish FVG 1h"
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "killed",
+          "a": "XMR",
+          "r": "stale data: last 1h candle closed 24181.8h ago (> 2 intervals)",
+          "rf": "DRY SCAN — no paper order. stale data: last 1h candle closed 24181.8h ago (> 2 intervals)",
+          "pat": "",
+          "side": null
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "killed",
+          "a": "WBT",
+          "r": "unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+          "rf": "DRY SCAN — no paper order. unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+          "pat": "",
+          "side": null
+        },
+        {
+          "desk": "Majors",
+          "cy": 1,
+          "ts": 1795448833,
+          "k": "killed",
+          "a": "PEPE",
+          "r": "unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+          "rf": "DRY SCAN — no paper order. unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+          "pat": "",
+          "side": null
+        }
+      ]
+    }
+  ],
+  "full": [
+    {
+      "desk": "Majors",
+      "pts": [
+        [
+          1795448833,
+          10000
+        ]
+      ]
+    }
+  ],
+  "dec": [
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ETH",
+      "side": "long",
+      "sc": 73.75,
+      "r": "hard veto LONG: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 1h -3); agreeing: BOS bull 4h +1, HH/HL 1h +2, BOS bull 1h +1, Bullish FVG 1h +2; NEWS gate FAIL long: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance; hard veto LONG: 'hack' near ETH in 24h headline: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finance; N/A: no OHLCV; -5.0 negative news ×1: Binance ETH Outflows Fall to Record 3.58 Million in 30 Days Despite $6.34 Billion Hack - BigGo Finan; +3.5 positive headline tailwind ×1",
+      "pat": "BOS bull 4h, HH/HL 1h, BOS bull 1h, Bearish OB 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "NEAR",
+      "side": "long",
+      "sc": 68.31,
+      "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: at support 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: at support 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1; NEWS gate PASS long: no headlines in 24h (treated as neutral); N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "Bearish FVG 4h, Fib 0.5-0.618 4h, at support 4h, LH/LL 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "BTC",
+      "side": "long",
+      "sc": 68.25,
+      "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, Bearish OB 1h -3); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, Bearish OB 1h -3); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2, at support 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "BOS bull 4h, Bearish FVG 4h, at resistance 4h, LH/LL 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "killed",
+      "a": "DOGE",
+      "side": "long",
+      "sc": 67.94,
+      "r": "Score 67.94 below minimum 75",
+      "rf": "DRY SCAN — no paper order. TA gate PASS long: HH/HL 4h +2, at support 4h +1, BOS bull 1h +1, Inverse H&S neck break 1h +3 (mild against: H&S 1h -1); NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.063% of circ in 7d)",
+      "pat": "HH/HL 4h, at support 4h, BOS bull 1h, H&S 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ADA",
+      "side": "long",
+      "sc": 66.44,
+      "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3); agreeing: HH/HL 4h +2, BOS bull 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3); agreeing: HH/HL 4h +2, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "HH/HL 4h, Bearish OB 4h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "TRX",
+      "side": "long",
+      "sc": 65.19,
+      "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: BOS bull 4h +1, Inverse H&S 4h +1, at support 4h +1, BOS bull 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: BOS bull 4h +1, Inverse H&S 4h +1, at support 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment positive, 10 headline(s), no negative-event hit; N/A: no OHLCV; +3.5 positive headline tailwind ×1; unlocks quiet (0.032% of circ in 7d)",
+      "pat": "BOS bull 4h, Bearish OB 4h, Bearish FVG 4h, Inverse H&S 4h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "HYPE",
+      "side": "long",
+      "sc": 62.94,
+      "r": "TA gate FAIL long: strong pattern against (Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Double Bottom 1h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Double Bottom 1h +2; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "BOS bull 4h, Fib 0.5-0.618 4h, LH/LL 1h, CHoCH bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "SOL",
+      "side": "long",
+      "sc": 61.44,
+      "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2, LH/LL 1h -2); agreeing: BOS bull 4h +1, CHoCH bull 1h +2, Bullish FVG 1h +2; NEWS gate PASS long: sentiment positive, 25 headline(s), no negative-event hit; N/A: no OHLCV; +3.5 positive headline tailwind ×1; unlocks quiet (0.061% of circ in 7d)",
+      "pat": "BOS bull 4h, Bearish FVG 4h, Fib 0.5-0.618 4h, at resistance 4h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "XRP",
+      "side": "long",
+      "sc": 61.19,
+      "r": "TA gate FAIL long: strong pattern against (at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "BOS bull 4h, at resistance 4h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "LINK",
+      "side": "long",
+      "sc": 61.19,
+      "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1, Bullish FVG 1h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 4h -2); agreeing: BOS bull 4h +1, BOS bull 1h +1, Bullish FVG 1h +2; NEWS gate PASS long: sentiment neutral, 5 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "BOS bull 4h, Bearish OB 4h, Bearish FVG 4h, Fib 0.5-0.618 4h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "BCH",
+      "side": "long",
+      "sc": 61.19,
+      "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: CHoCH bull 1h +2, Bullish FVG 1h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2, LH/LL 1h -2); agreeing: CHoCH bull 1h +2, Bullish FVG 1h +2; NEWS gate PASS long: sentiment neutral, 1 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "Bearish OB 4h, Fib 0.5-0.618 4h, LH/LL 1h, CHoCH bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "SUI",
+      "side": "long",
+      "sc": 60.19,
+      "r": "TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2); agreeing: HH/HL 4h +2, BOS bull 4h +1, at support 4h +1, BOS bull 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Fib 0.5-0.618 4h -2); agreeing: HH/HL 4h +2, BOS bull 4h +1, at support 4h +1, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 8 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.050% of circ in 7d)",
+      "pat": "HH/HL 4h, BOS bull 4h, Bearish OB 4h, Fib 0.5-0.618 4h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ARB",
+      "side": "short",
+      "sc": 59.94,
+      "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2); agreeing: Bearish FVG 4h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2); agreeing: Bearish FVG 4h +2; NEWS gate PASS short: sentiment neutral, 12 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+      "pat": "HH/HL 4h, Bearish FVG 4h, BOS bull 1h, Bullish FVG 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "BNB",
+      "side": "short",
+      "sc": 59.44,
+      "r": "TA gate FAIL short: strong pattern against (Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2, at support 1h -2); agreeing: Bearish FVG 4h +2, H&S neck break 4h +3, Double Top 4h +2, Bearish OB 1h +3, H&S 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2, at support 1h -2); agreeing: Bearish FVG 4h +2, H&S neck break 4h +3, Double Top 4h +2, Bearish OB 1h +3, H&S 1h +1; NEWS gate FAIL short: 'hack' near BNB in 24h headline: Hacker exploits Fusionist token bridge to mint unbacked ACE on BNB Chain - Cryptonews.net; N/A: no OHLCV; +5.0 negative headline tailwind ×2; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "Bearish FVG 4h, H&S neck break 4h, Double Top 4h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ONDO",
+      "side": "long",
+      "sc": 58.94,
+      "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+      "rf": "DRY SCAN — no paper order. TA gate PASS long: BOS bull 4h +1, at support 4h +1, HH/HL 1h +2, BOS bull 1h +1, Bullish FVG 1h +2, Inverse H&S neck break 1h +3, Double Bottom 1h +2; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -5.0 negative news ×1: Ondo: Chemist allegedly swallows abortion drugs to evade arrest - Daily Trust; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+      "pat": "BOS bull 4h, at support 4h, HH/HL 1h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ZEC",
+      "side": "long",
+      "sc": 58.19,
+      "r": "TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 1h -2); agreeing: HH/HL 4h +2, BOS bull 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, Fib 0.5-0.618 4h -2, at resistance 1h -2); agreeing: HH/HL 4h +2, BOS bull 1h +1; NEWS gate PASS long: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "HH/HL 4h, Bearish FVG 4h, Fib 0.5-0.618 4h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "UNI",
+      "side": "long",
+      "sc": 56.19,
+      "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish OB 4h -3, Bearish FVG 4h -2); agreeing: at support 4h +1, HH/HL 1h +2, BOS bull 1h +1, Inverse H&S neck break 1h +3; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+      "pat": "Bearish OB 4h, Bearish FVG 4h, at support 4h, HH/HL 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "AAVE",
+      "side": "short",
+      "sc": 54.69,
+      "r": "TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2); agreeing: Bearish FVG 4h +2, at resistance 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, Double Bottom 1h -2); agreeing: Bearish FVG 4h +2, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 11 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+      "pat": "Bearish FVG 4h, HH/HL 1h, BOS bull 1h, Bullish FVG 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "INJ",
+      "side": "long",
+      "sc": 52.19,
+      "r": "hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%)",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL long: strong pattern against (Bearish FVG 4h -2, at resistance 4h -2, LH/LL 1h -2, at resistance 1h -2); agreeing: CHoCH bull 1h +2, Double Bottom 1h +2, at support 1h +1; NEWS gate FAIL long: hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); hard veto LONG: unlock 2.99% of circ in 7d (≥1.0%); N/A: no OHLCV; -6 big unlock 2.99% of circ in 7d (>1.0%)",
+      "pat": "Bearish FVG 4h, at resistance 4h, LH/LL 1h, CHoCH bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "XLM",
+      "side": "short",
+      "sc": 48.19,
+      "r": "TA gate FAIL short: strong pattern against (CHoCH bull 1h -2); agreeing: Bearish OB 4h +3, LH/LL 1h +2, H&S 1h +1, at resistance 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (CHoCH bull 1h -2); agreeing: Bearish OB 4h +3, LH/LL 1h +2, H&S 1h +1, at resistance 1h +1; NEWS gate PASS short: sentiment positive, 2 headline(s), no negative-event hit; N/A: no OHLCV; -5.0 positive news ×1: Stellar CEO warns tokenized asset growth alone does not prove adoption - Crypto Briefing; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "Bearish OB 4h, LH/LL 1h, CHoCH bull 1h, H&S 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "FIL",
+      "side": "short",
+      "sc": 44.94,
+      "r": "TA gate FAIL short: strong pattern against (Double Bottom 1h -2); agreeing: Bearish OB 4h +3",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (Double Bottom 1h -2); agreeing: Bearish OB 4h +3; NEWS gate PASS short: sentiment neutral, 22 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+      "pat": "Bearish OB 4h, BOS bull 1h, Double Bottom 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "killed",
+      "a": "LTC",
+      "side": "short",
+      "sc": 42.94,
+      "r": "Score 42.94 below minimum 75",
+      "rf": "DRY SCAN — no paper order. TA gate PASS short: H&S neck break 4h +3, at resistance 1h +1 (mild against: BOS bull 1h -1); NEWS gate PASS short: sentiment neutral, 15 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.032% of circ in 7d)",
+      "pat": "H&S neck break 4h, BOS bull 1h, at resistance 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "DOT",
+      "side": "short",
+      "sc": 42.94,
+      "r": "TA gate FAIL short: strong pattern against (CHoCH bull 4h -2, HH/HL 1h -2); agreeing: LH/LL 4h +2, Bearish OB 4h +3, Bearish FVG 4h +2, at resistance 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (CHoCH bull 4h -2, HH/HL 1h -2); agreeing: LH/LL 4h +2, Bearish OB 4h +3, Bearish FVG 4h +2, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 5 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.072% of circ in 7d)",
+      "pat": "LH/LL 4h, CHoCH bull 4h, Bearish OB 4h, Bearish FVG 4h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "WLD",
+      "side": "short",
+      "sc": 42.94,
+      "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish OB 4h +3, Bearish FVG 4h +2, H&S 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish OB 4h +3, Bearish FVG 4h +2, H&S 1h +1; NEWS gate PASS short: sentiment neutral, 2 headline(s), no negative-event hit; N/A: no OHLCV; +5 unlock overhang 2.99% of circ in 7d",
+      "pat": "HH/HL 4h, Bearish OB 4h, Bearish FVG 4h, BOS bull 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "AVAX",
+      "side": "short",
+      "sc": 39.69,
+      "r": "TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, at support 1h -2); agreeing: Bearish OB 4h +3, at resistance 1h +1",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 4h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3, at support 1h -2); agreeing: Bearish OB 4h +3, at resistance 1h +1; NEWS gate PASS short: sentiment neutral, 25 headline(s), no negative-event hit; N/A: no OHLCV; unlocks quiet (0.000% of circ in 7d)",
+      "pat": "HH/HL 4h, Bearish OB 4h, BOS bull 1h, Bullish FVG 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "vetoed",
+      "a": "ENA",
+      "side": "short",
+      "sc": 36.94,
+      "r": "TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish FVG 4h +2",
+      "rf": "DRY SCAN — no paper order. TA gate FAIL short: strong pattern against (HH/HL 1h -2, Bullish FVG 1h -2, Inverse H&S neck break 1h -3); agreeing: Bearish FVG 4h +2; NEWS gate PASS short: sentiment positive, 23 headline(s), no negative-event hit; N/A: no OHLCV; -5.0 positive news ×1: Petrosyan rejects link between regional energy integration and ENA developments (PAN.am) - PanARMENI; +5 unlock overhang 2.99% of circ in 7d",
+      "pat": "Bearish FVG 4h, HH/HL 1h, BOS bull 1h, Bullish FVG 1h"
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "killed",
+      "a": "XMR",
+      "r": "stale data: last 1h candle closed 24181.8h ago (> 2 intervals)",
+      "rf": "DRY SCAN — no paper order. stale data: last 1h candle closed 24181.8h ago (> 2 intervals)",
+      "pat": "",
+      "side": null
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "killed",
+      "a": "WBT",
+      "r": "unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+      "rf": "DRY SCAN — no paper order. unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+      "pat": "",
+      "side": null
+    },
+    {
+      "desk": "Majors",
+      "cy": 1,
+      "ts": 1795448833,
+      "k": "killed",
+      "a": "PEPE",
+      "r": "unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+      "rf": "DRY SCAN — no paper order. unverifiable: spread/liquidity (no book, no Binance klines); unverifiable: 200-period 1h EMA (closed_bars=0; need ≥210)",
+      "pat": "",
+      "side": null
+    }
+  ],
+  "act": [
+    {
+      "ts": 1795330845,
+      "desk": "Majors",
+      "txt": "Closed SHORT LINK",
+      "role": "Risk",
+      "d": "swing plan stale (no +0.5R by 40% of 96h) · -$19.32",
+      "side": "s"
+    },
+    {
+      "ts": 1795330840,
+      "desk": "Majors",
+      "txt": "Closed SHORT XRP",
+      "role": "Risk",
+      "d": "swing plan stale (no +0.5R by 40% of 96h) · -$0.96",
+      "side": "s"
+    },
+    {
+      "ts": 1795244313,
+      "desk": "Majors",
+      "txt": "Closed SHORT SOL",
+      "role": "Risk",
+      "d": "trail stop · +$22.76",
+      "side": "s"
+    },
+    {
+      "ts": 1795244309,
+      "desk": "Majors",
+      "txt": "Closed SHORT HYPE",
+      "role": "Risk",
+      "d": "trail stop · +$44.61",
+      "side": "s"
+    },
+    {
+      "ts": 1795240755,
+      "desk": "Majors",
+      "txt": "Closed SHORT SOL",
+      "role": "Risk",
+      "d": "tp2 partial · +$42.20",
+      "side": "s"
+    },
+    {
+      "ts": 1795233687,
+      "desk": "Majors",
+      "txt": "Closed SHORT BTC",
+      "role": "Risk",
+      "d": "tp3 · +$58.00",
+      "side": "s"
+    },
+    {
+      "ts": 1795233675,
+      "desk": "Majors",
+      "txt": "Closed SHORT HYPE",
+      "role": "Risk",
+      "d": "tp2 partial · +$52.51",
+      "side": "s"
+    },
+    {
+      "ts": 1795191029,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x LINK",
+      "role": "Executor",
+      "d": "$328.93 at 8.3870",
+      "side": "b"
+    },
+    {
+      "ts": 1795191011,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x XRP",
+      "role": "Executor",
+      "d": "$328.99 at 0.9145",
+      "side": "b"
+    },
+    {
+      "ts": 1795190579,
+      "desk": "Majors",
+      "txt": "Closed SHORT BTC",
+      "role": "Risk",
+      "d": "tp1 partial · +$64.32",
+      "side": "s"
+    },
+    {
+      "ts": 1795190579,
+      "desk": "Majors",
+      "txt": "Closed SHORT BTC",
+      "role": "Risk",
+      "d": "tp2 partial · +$32.16",
+      "side": "s"
+    },
+    {
+      "ts": 1795190574,
+      "desk": "Majors",
+      "txt": "Closed SHORT SOL",
+      "role": "Risk",
+      "d": "tp1 partial · +$48.05",
+      "side": "s"
+    },
+    {
+      "ts": 1795190568,
+      "desk": "Majors",
+      "txt": "Closed SHORT HYPE",
+      "role": "Risk",
+      "d": "tp1 partial · +$60.54",
+      "side": "s"
+    },
+    {
+      "ts": 1795183828,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x BTC",
+      "role": "Executor",
+      "d": "$472.25 at 61,884.60",
+      "side": "b"
+    },
+    {
+      "ts": 1795183828,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x BTC",
+      "role": "Executor",
+      "d": "$236.12 at 61,884.60",
+      "side": "b"
+    },
+    {
+      "ts": 1795183828,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x BTC",
+      "role": "Executor",
+      "d": "$236.12 at 61,884.60",
+      "side": "b"
+    },
+    {
+      "ts": 1795183413,
+      "desk": "Majors",
+      "txt": "Closed SHORT BTC",
+      "role": "Risk",
+      "d": "swing plan stale (no +0.5R by 40% of 96h) · +$11.33",
+      "side": "s"
+    },
+    {
+      "ts": 1795176147,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x SOL",
+      "role": "Executor",
+      "d": "$328.85 at 71.6300",
+      "side": "b"
+    },
+    {
+      "ts": 1795176147,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x SOL",
+      "role": "Executor",
+      "d": "$164.42 at 71.6300",
+      "side": "b"
+    },
+    {
+      "ts": 1795176147,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x SOL",
+      "role": "Executor",
+      "d": "$164.42 at 71.6300",
+      "side": "b"
+    },
+    {
+      "ts": 1795064342,
+      "desk": "Majors",
+      "txt": "Closed SHORT ARB",
+      "role": "Risk",
+      "d": "trail stop · +$31.20",
+      "side": "s"
+    },
+    {
+      "ts": 1795046643,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x HYPE",
+      "role": "Executor",
+      "d": "$242.31 at 66.8360",
+      "side": "b"
+    },
+    {
+      "ts": 1795046643,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x HYPE",
+      "role": "Executor",
+      "d": "$121.16 at 66.8360",
+      "side": "b"
+    },
+    {
+      "ts": 1795046643,
+      "desk": "Majors",
+      "txt": "Opened SHORT 3x HYPE",
+      "role": "Executor",
+      "d": "$121.16 at 66.8360",
+      "side": "b"
+    },
+    {
+      "ts": 1795046244,
+      "desk": "Majors",
+      "txt": "Closed SHORT HYPE",
+      "role": "Risk",
+      "d": "trail stop · +$29.00",
+      "side": "s"
+    }
+  ],
+  "agents": [
+    {
+      "desk": "Majors",
+      "cycle": 1,
+      "tm": "22:47",
+      "rows": [
+        {
+          "n": "Scout",
+          "role": "Finds coins",
+          "did": "Scanned 200 markets across 29 symbols; 26 passed initial filters",
+          "coin": "26 candidates",
+          "st": "active",
+          "why": ""
+        },
+        {
+          "n": "Filter",
+          "role": "Safety checks",
+          "did": "Filtered 3 symbols (2 stale or unverifiable data; 1 other filter)",
+          "coin": "3 filtered",
+          "st": "active",
+          "why": "No entries unless data and safety checks pass"
+        },
+        {
+          "n": "Analyst",
+          "role": "Scores entries",
+          "did": "Scored 26; none reached the minimum 75",
+          "coin": "Top: ETH 73.75",
+          "st": "idle",
+          "why": "ETH blocked by headline and technical gates"
+        },
+        {
+          "n": "Executor",
+          "role": "Paper execution",
+          "did": "Dry-score only; no paper orders placed",
+          "coin": "none",
+          "st": "idle",
+          "why": ""
+        },
+        {
+          "n": "Risk",
+          "role": "Stops and limits",
+          "did": "No positions opened",
+          "coin": "none",
+          "st": "idle",
+          "why": ""
+        },
+        {
+          "n": "Logger",
+          "role": "Records results",
+          "did": "Reset Majors simulation to $10,000; cycle 1",
+          "coin": "whole desk",
+          "st": "active",
+          "why": "Scan completed 2026-11-23 22:47 WIB"
+        }
+      ]
+    }
+  ],
+  "run": {
+    "n": 3,
+    "archive": "Run 1 (Nov 4-10) archived on disk: <desk>/archive/run1_2026-11-10/",
+    "start": "2026-11-23 22:46",
+    "mode": "DRY_SCORE"
+  },
+  "gen_ts": "2026-11-23 22:47:13 Asia/Jakarta",
+  "focus": "Majors",
+  "stats": {
+    "Majors": {
+      "scanned": 200,
+      "blocked": 3,
+      "entered": 0,
+      "stopped": 0,
+      "closed": 0,
+      "real": 0,
+      "real_pc": 0,
+      "unreal": 0,
+      "wins": 0,
+      "win": null,
+      "open": 0
+    }
+  },
+  "learn": {
+    "n": 0,
+    "u": 0,
+    "losses": [],
+    "rules": [],
+    "causes": [],
+    "adj": [],
+    "cooldowns": []
+  },
+  "paused_note": "Desk copy sedang dijeda.",
+  "codex_scan": {
+    "mode": "DRY_SCORE",
+    "started": "2026-11-23 22:46:03 Asia/Jakarta",
+    "finished": "2026-11-23 22:47:13 Asia/Jakarta",
+    "universe": 29,
+    "scanned": 200,
+    "filter_passed": 26,
+    "filter_kills": 3,
+    "scored": 26,
+    "score_pass": 0,
+    "gate_pass": 2,
+    "top_score": 73.75,
+    "top_ticker": "ETH",
+    "threshold": 75,
+    "no_paper_orders": true,
+    "notes": "Dry-score scan only; levels reported N/A where OHLCV was unavailable."
+  }
+}
