@@ -322,6 +322,25 @@ h1{text-transform:none;letter-spacing:0}
 .home-card h2{margin:0 0 6px;font-size:13px;font-weight:600}
 .home-card .eq{font-size:22px;margin:0 0 8px}
 .home-card .kpis{grid-template-columns:repeat(2,1fr)}
+
+.sentimen-card{margin:0 0 12px}
+.sentimen-card>h2{margin:0 0 10px;font-size:13px;font-weight:600}
+.sent-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.sent-grid{grid-template-columns:1fr}}
+.sent-half{background:#0b0e14;border:1px solid var(--line);border-radius:10px;padding:12px}
+.sent-k{font-size:11px;color:var(--mu);letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px;font-weight:600}
+.sent-bias{margin:0 0 4px}
+.badge.b-bull{color:#86efac;border-color:#14532d;background:#0f2e1c}
+.badge.b-neut{color:#fcd34d;border-color:#854d0e;background:#1c1508}
+.badge.b-bear{color:#fca5a5;border-color:#7f1d1d;background:#3a1212}
+.sent-meter{height:10px;border-radius:99px;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 50%,#22c55e 100%);position:relative;margin:10px 0 6px;box-shadow:inset 0 0 0 1px #0006}
+.sent-meter i{position:absolute;top:-4px;width:5px;height:18px;background:#fff;border-radius:3px;transform:translateX(-50%);box-shadow:0 0 0 2px #0008}
+.sent-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin:0 0 10px}
+.sent-vals{display:flex;flex-direction:column;gap:5px}
+.sent-vals div{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.sent-vals span{color:var(--mu)}
+.sent-vals b{font-weight:700}
+.sent-why{margin:0;font-size:13px;line-height:1.4}
 .home-go{display:inline-block;margin-top:10px;background:transparent;color:var(--ac);border:1px solid var(--ac);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
 .home-go.off{color:var(--mu);border-color:var(--line);cursor:default}
 .btc-box{margin:0 0 12px}
@@ -1279,6 +1298,29 @@ function renderMeme(){const M=D.meme||{};
  const fomoC=`<div class="card"><h2>Kuota data FOMO</h2>${homeKpis([[left!=null?Number(left).toLocaleString("id-ID"):"—","Sisa bulan ini"],[used!=null?`${Number(used).toLocaleString("id-ID")} / ${Number(F.cap||7500).toLocaleString("id-ID")}`:"—","Terpakai hari ini"]])}</div>`;
  $("memesec").innerHTML=`<div class="tw2">${status}${scanC}</div><div class="tw2" style="margin-top:12px">${openC}${killC}</div><div class="tw2" style="margin-top:12px">${clC}${fomoC}</div>`;
  $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Data token dari DexScreener, RugCheck dan FOMO API."}
+
+function sentBias(b){return b==="Bullish"?"b-bull":b==="Bearish"?"b-bear":b==="Netral"?"b-neut":""}
+function sentMeter(score){const x=(score==null||isNaN(Number(score)))?null:Math.max(0,Math.min(100,Number(score)));
+ const left=x==null?50:x;
+ return `<div class="sent-meter" aria-hidden="true"><i style="left:${left}%;opacity:${x==null?.35:1}"></i></div><div class="sent-ends"><span>Bearish</span><span>Netral</span><span>Bullish</span></div>`}
+function sentimenCard(){const S=(D&&D.sentimen)||{},P=S.public||{},K=S.desk||{};
+ const pb=P.bias||"N/A",db=K.bias||"N/A";
+ const fng=P.fng==null?"N/A":`${P.fng}${P.fng_label?" · "+esc(P.fng_label):""}`;
+ const fund=P.funding_pct==null?"N/A":`${Number(P.funding_pct)>0?"+":""}${Number(P.funding_pct).toFixed(3)}%`;
+ const ls=P.long_pct==null?"N/A":`Long ${Math.round(Number(P.long_pct))}%`;
+ return `<div class="card sentimen-card"><h2>Sentimen BTC</h2>
+  <div class="sent-grid">
+   <div class="sent-half"><div class="sent-k">Sentimen publik</div>
+    <div class="sent-bias"><span class="badge ${sentBias(pb)}">${esc(pb)}</span></div>
+    ${sentMeter(P.score)}
+    <div class="sent-vals"><div><span>Fear &amp; Greed</span><b>${fng}</b></div>
+     <div><span>Funding</span><b>${fund}</b></div>
+     <div><span>Akun long</span><b>${ls}</b></div></div></div>
+   <div class="sent-half"><div class="sent-k">Bias aku (desk)</div>
+    <div class="sent-bias"><span class="badge ${sentBias(db)}">${esc(db)}</span></div>
+    ${sentMeter(K.score)}
+    <p class="sent-why">${esc(K.reason||"Data desk belum ada.")}</p></div>
+  </div></div>`}
 function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;
@@ -1286,7 +1328,7 @@ function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
  $("banner").hidden=true;$("banner").innerHTML="";
  const paused=(D.paused_desks||[]).map(homePausedCard).join("");
- $("homesec").innerHTML=btcKondisiCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
+ $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
  $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
