@@ -1548,7 +1548,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
   walletAt=Date.now();if(wantsWallet())render();else paintLive()}
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
-async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
+async function load(){try{const q="?t="+Date.now(),[base,patch]=await Promise.all([fetch("data.json"+q,{cache:"no-store"}),fetch("codex-data.json"+q,{cache:"no-store"})]);if(!base.ok||!patch.ok)throw new Error("data fetch failed");D=await base.json();Object.assign(D,await patch.json());render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data"}}
 $("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-meme").addEventListener("click",()=>setView("meme"));
