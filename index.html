@@ -401,22 +401,38 @@ h1{text-transform:none;letter-spacing:0}
 .twx-hist{margin:0 0 12px}
 .twx-old{padding:10px 0;border-top:1px solid var(--line)}
 .twx-old:first-child{border-top:0;padding-top:4px}
+
+.help-hint{display:none}
+.brand-switch{padding:6px 8px;margin:0 0 8px}
+.brand-switch .brand-label{letter-spacing:.08em;font-size:10px;text-transform:uppercase}
+.views{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 0 10px;gap:6px}
+.views::-webkit-scrollbar{display:none}
+.views button{flex:0 0 auto;padding:8px 14px;min-height:40px;font-size:13px}
+.home-stack{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.home-more{margin:0}
+.home-more-links{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 2px}
+.home-bitget .eq.locked{font-size:20px;color:var(--mu);font-weight:600}
+@media(max-width:640px){
+  .views button{min-height:40px;padding:8px 12px}
+  .big{font-size:28px}
+  header{padding:6px 0 10px}
+}
 </style></head><body><div class="wrap">
-<nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">PAPER DESKS LIVE</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
+<nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">Paper Desks</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
 
 <nav class="views" id="views" aria-label="Tampilan">
  <button type="button" id="v-home" class="on">Beranda</button>
- <button type="button" id="v-paper">Paper $10K</button>
- <button type="button" id="v-meme">🐸 Memecoin <span class="badge b-live" style="font-size:9px;padding:1px 5px">BARU</span></button>
- <button type="button" id="v-real">Target $37</button>
- <button type="button" id="v-signals">$37 Semua Sinyal</button>
- <button type="button" id="v-steven" hidden>Dompet Steven</button>
- <button type="button" id="v-russel" hidden>Dompet Russel</button>
- <button type="button" id="v-trend">Tes tren</button>
+ <button type="button" id="v-paper">Paper</button>
  <button type="button" id="v-dca">Cicilan BTC</button>
  <button type="button" id="v-bitget">🔐 Bitget</button>
+ <button type="button" id="v-meme" hidden>Memecoin</button>
+ <button type="button" id="v-real" hidden>Target $37</button>
+ <button type="button" id="v-signals" hidden>Semua sinyal</button>
+ <button type="button" id="v-steven" hidden>Dompet Steven</button>
+ <button type="button" id="v-russel" hidden>Dompet Russel</button>
+ <button type="button" id="v-trend" hidden>Tes tren</button>
 </nav>
-<p class="help-hint sub">Arahkan ke kata yang bergaris putus (seperti SL, TP, LONG, SHORT) untuk arti singkatnya. Angka besar = yang paling penting. Tabel lengkap ada di tombol Detail.</p>
+<p class="help-hint sub" hidden>Arahkan ke kata yang bergaris putus (seperti SL, TP, LONG, SHORT) untuk arti singkatnya. Angka besar = yang paling penting. Tabel lengkap ada di tombol Detail.</p>
 <header>
  <div><h1 id="htitle">Desk Majors <span class="badge b-paper">HANYA SIMULASI</span> <span class="badge" id="runb">Sesi 2</span></h1>
   <div class="big" id="tot">—</div><div class="sub" id="totsub">memuat…</div></div>
@@ -650,8 +666,8 @@ function renderPaper(){
   <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">${tip("Siklus",TIPS.cycle)}</div></div></div>
   ${d.paused?'<div class="sub" style="margin-top:10px">Dijeda di sesi 2. Tidak ada transaksi.</div>':chart(full)}</div>`}).join("");
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
- $("htitle").innerHTML=`Desk Majors <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span> <span class="badge" id="runb">Sesi ${D.run?.n||2}</span>`;
- $("totsub").textContent=`Nilai simulasi Majors (modal $10K) · Sesi ${D.run?.n||2} mulai ${D.run?.start||""} WIB`;
+ $("htitle").innerHTML=`Desk Majors <span class="badge b-paper">${tip("Simulasi",TIPS.paper)}</span>`;
+ $("totsub").textContent=`Paper Majors · modal $10K`;
  $("ottitle").innerHTML=`Posisi terbuka <span class="badge" id="otn">0</span>`;
  const cards=openCards(opens,false);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
  $("otsum").innerHTML=opens.length?`${tip("Untung/rugi terbuka",TIPS.upnl)} <b class="${cls(cards.tu)}">${money(cards.tu)}</b> <span class="${cls(cards.tu)}">${pct(cards.tm?cards.tu/cards.tm*100:0)}</span> dari ${tip("modal",TIPS.margin)} ${money(cards.tm)}`:"";
@@ -1420,15 +1436,53 @@ function twxHomeSection(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
  const latest=U[0],older=U.slice(1);
  const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(u=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(u.date))}</div>${twxUpdateBody(u,true)}</div>`).join("")}</details>`:"";
  return `<div class="card twx-box latest"><h2>Update Sistem TWX <span class="badge b-live">TERBARU</span></h2>${twxUpdateBody(latest,false)}</div>${twxSnapshot(TWX.snapshot)}${hist}`}
-function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
- $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
+function homeOpenSection(){const opens=(D.open||[]).slice();
+ opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p)});
+ if(!opens.length)return`<div class="card"><h2>Posisi terbuka</h2><p class="sub" style="margin:0">Tidak ada posisi paper sekarang.</p></div>`;
+ let tu=0;
+ const cards=opens.map(o=>{const u=o._u,p=o._p,sz=o.inst==="perp"?o.m:o.z,pc=sz?u/sz*100:0;tu+=u;
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${coinLabel(o.a)}</div>${sideBadge(o.side,o.lev)}</div>
+  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  <div class="g"><div><span>Masuk</span>${px(o.e)}</div><div><span>Sekarang</span>${px(p)}</div>
+  <div><span>SL</span>${px(o.s)}</div><div><span>TP1</span>${px(o.tp1)}</div></div></div>`}).join("");
+ return`<div><div class="oth"><h3>Posisi terbuka <span class="badge">${opens.length}</span></h3><div class="sub">P/L <b class="${cls(tu)}">${money(tu)}</b></div></div><div class="ogrid">${cards}</div></div>`}
+function homeBitgetCard(){const unlocked=typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&BG_DATA;
+ if(!unlocked)return`<div class="card home-card home-bitget"><h2>Bitget <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span></h2>
+  <div class="eq locked">Terkunci</div>
+  <p class="sub" style="margin:0 0 4px">Masukkan PIN di tab Bitget untuk lihat saldo dan posisi.</p>
+  ${homeGo("bitget","Buka Bitget")}</div>`;
+ const B=BG_DATA,eq=+B.equity,st=+B.start_equity||eq,L=B.limits||{},mode=B.killed?"Mati":B.halted?"Stop harian":(B.mode||"—"),n=(B.positions||[]).length,pl=st?eq/st*100-100:0;
+ return`<div class="card home-card home-bitget"><h2>Bitget <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span></h2>
+  <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:13px">${pct(pl)}</span></div>
+  ${homeKpis([[esc(mode),"Status"],[n+" / "+(L.max_open??"—"),"Posisi"],[`<span class="${cls(+B.upnl)}">${money(+B.upnl)}</span>`,"P/L terbuka"],[money(+B.available),"Tersedia"]])}
+  ${homeGo("bitget","Buka Bitget")}</div>`}
+function twxHomeCompact(){const U=(TWX&&TWX.updates)||[];if(!U.length)return twxHomeSection();
+ const u=U[0],older=U.slice(1),mt=u.mtpi||{},lt=u.ltpi||{},rg=u.btc_regime||{};
+ let portS="N/A";const port=u.rsps_portfolio;if(Array.isArray(port)&&port.length)portS=port.map(p=>`${p.pct}% ${p.asset}`).join(" · ");
+ const chips=[twxChip("MTPI",twxState(mt.state),mt.change,twxTone(mt.state)),twxChip("LTPI",twxState(lt.state),lt.change,twxTone(lt.state)),twxChip("Rezim BTC",twxState(rg.state),rg.change,twxTone(rg.state)),twxChip("Fokus",u.rsps_dominant_major||"N/A",""," "),twxChip("Portofolio",portS,"","")].join("");
+ const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}</details>`:"";
+ return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2><div class="twx-chips">${chips}</div>${hist}</div>`}
+function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPaused=(D.paused_desks||[]).some(d=>/copy/i.test(d.name||""));
+ return`<details class="more home-more"><summary>Lainnya</summary><div class="home-more-links">
+  <button type="button" class="home-go" onclick="setView('meme')">Memecoin${memeLive?"":" (menunggu)"}</button>
+  <button type="button" class="home-go" onclick="setView('real')">Target $37${copyPaused?" (dijeda)":""}</button>
+  <button type="button" class="home-go" onclick="setView('signals')">Semua sinyal</button>
+  <button type="button" class="home-go" onclick="setView('trend')">Tes tren</button>
+ </div></details>`}
+function syncTabVisibility(){const memeLive=!!(D&&D.meme&&D.meme.status==="live");
+ const show={"v-meme":memeLive||VIEW==="meme","v-real":VIEW==="real","v-signals":VIEW==="signals","v-trend":VIEW==="trend","v-steven":!!(SHOW_HL_WALLETS&&VIEW==="steven"),"v-russel":!!(SHOW_HL_WALLETS&&VIEW==="russel")};
+ Object.keys(show).forEach(id=>{const b=$(id);if(b)b.hidden=!show[id]})}
+function renderHome(){const d=(D.desks||[]).find(x=>x.name==="Majors")||{},opens=(D.open||[]).filter(o=>(o.desk||o.name)==="Majors");
+ let liveAdj=0;opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;const u=upnl(o,o._p);o._u=u;liveAdj+=u-(o.u||0)});
+ const eq=(d.eq||START)+liveAdj,pl=(eq/START-1)*100,win=d.win==null?"—":d.win+"%";
+ $("htitle").innerHTML=`Beranda <span class="badge b-paper">Simulasi</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;
- $("tot").innerHTML=pxv>0?`${usdtId(pxv,2)} USDT`: "—";
- $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
+ $("tot").innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
+ $("totsub").textContent=`Paper Majors · modal $10K · ${opens.length} posisi · menang ${win}`;
  $("banner").hidden=true;$("banner").innerHTML="";
- const paused=(D.paused_desks||[]).map(homePausedCard).join("");
- $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+twxHomeSection()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${SHOW_HL_WALLETS?homeWalletCard("Steven")+homeWalletCard("Russel"):""}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
- $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
+ if(typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&!BG_DATA&&typeof bgFetch==="function"&&!BG_BUSY){bgFetch().then(()=>{if(VIEW==="home")renderHome()})}
+ $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${twxHomeCompact()}${homeMoreLinks()}</div>`;
+ $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini."}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
  const avgI=btc.avg_price_idr!=null?Number(btc.avg_price_idr):null;
@@ -1549,7 +1603,7 @@ async function bgFetch(pin){if(BG_BUSY)return;BG_BUSY=true;BG_ERR="";
   try{BG_DATA=await bgDecrypt(blob,kh);try{sessionStorage.setItem("bgKey",kh)}catch(e){}}
   catch(e){BG_DATA=null;try{sessionStorage.removeItem("bgKey")}catch(_){}BG_ERR="PIN salah."}}
  catch(e){BG_ERR="Gagal memuat data Bitget."}
- finally{BG_BUSY=false;if(VIEW==="bitget")render()}}
+ finally{BG_BUSY=false;if(VIEW==="bitget"||VIEW==="home")render()}}
 function bgUnlock(ev){if(ev)ev.preventDefault();const v=(($("bgpin")||{}).value||"");if(v)bgFetch(v)}
 function bgLock(){try{sessionStorage.removeItem("bgKey")}catch(e){}BG_DATA=null;render()}
 async function bgControl(act){const kh=bgKeyHex();if(!kh)return;
@@ -1580,7 +1634,7 @@ function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
 setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
 /* BITGET-VIEW-END */
 function render(){if(!D)return;
- if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));renderBitget();return}
+ if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));if(typeof syncTabVisibility==="function")syncTabVisibility();renderBitget();return}
  $("bitgetsec")&&($("bitgetsec").hidden=true);$("v-bitget")&&$("v-bitget").classList.remove("on");
  const snap=snapUi();
  const home=VIEW==="home";
@@ -1593,6 +1647,7 @@ function render(){if(!D)return;
  $("v-home")&&$("v-home").classList.toggle("on",home);
  $("v-paper").classList.toggle("on",VIEW==="paper");$("v-real").classList.toggle("on",real);$("v-signals")&&$("v-signals").classList.toggle("on",signals);$("v-trend").classList.toggle("on",trend);
  $("v-steven").classList.toggle("on",VIEW==="steven");$("v-russel").classList.toggle("on",VIEW==="russel");$("v-dca").classList.toggle("on",dca);$("v-meme")&&$("v-meme").classList.toggle("on",meme);
+ if(typeof syncTabVisibility==="function")syncTabVisibility();
  $("memesec").hidden=!meme;
  $("banner").hidden=!(real||signals||walt||dca);$("wallet").hidden=!walt;$("dcasec").hidden=!dca;$("homesec")&&($("homesec").hidden=!home);$("learnsec").hidden=real||signals||trend||walt||dca||home||meme;$("shadowsec").hidden=real||signals||trend||walt||dca||home||meme;
  $("trendsec").hidden=!trend;["ot","desksec","twosec"].forEach(k=>$(k).hidden=trend||walt||dca||home||meme);
