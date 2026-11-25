@@ -1612,25 +1612,64 @@ async function bgControl(act){const kh=bgKeyHex();if(!kh)return;
  const sig=bgToHex(await crypto.subtle.sign("HMAC",k,new TextEncoder().encode(act+"|"+t)));
  const url=`https://github.com/${BG_REPO}/issues/new?title=${encodeURIComponent("BITGET-CONTROL "+act)}&body=${encodeURIComponent("action="+act+" ts="+t+" sig="+sig+"\n\n(Klik Submit. Bot membaca perintah ini di siklus berikutnya.)")}`;
  window.open(url,"_blank","noopener")}
+function bgCoin(sym){return String(sym||"").replace(/USDT$/i,"")}
+function bgTps(p){const e=p.entry!=null?+p.entry:NaN,side=String(p.side||"").toLowerCase();
+ let tps=(p.tps||[]).map(t=>[t[0]!=null?+t[0]:NaN,t[1]]).filter(t=>!isNaN(t[0]));
+ if(!isNaN(e))tps.sort((a,b)=>side==="short"?b[0]-a[0]:a[0]-b[0]);
+ return{tp1:tps[0]&&tps[0][0],tp2:tps[1]&&tps[1][0],tp3:tps[2]&&tps[2][0]}}
+function bgOpenCards(pos){let tu=0,tm=0;
+ const html=pos.length?pos.map(p=>{const a=bgCoin(p.sym),e=p.entry!=null?+p.entry:NaN,mark=p.mark!=null?+p.mark:NaN,u=+p.upnl||0;
+  const size=p.size!=null?+p.size:NaN,notion=(!isNaN(e)&&!isNaN(size))?Math.abs(e*size):0,pc=notion?u/notion*100:0;
+  tu+=u;tm+=notion;const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
+  const dist=(!isNaN(sl)&&!isNaN(mark)&&mark)?(short?(sl-mark)/mark*100:(mark-sl)/mark*100):null;
+  const t=bgTps(p);
+  return`<div class="oc ${u>0?"pos":u<0?"neg":""}" data-a="${esc(a)}"><div class="t"><div>${coinLabel(a)}</div>${sideBadge(p.side,p.lev)}</div>
+  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  <div class="g"><div><span>Masuk</span>${px(e)}</div><div><span>Sekarang</span>${px(mark)}</div>
+  <div><span>SL</span>${px(sl)}</div><div><span>Jarak ke SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+  <div><span>TP1</span>${px(t.tp1!=null?+t.tp1:NaN)}</div><div><span>TP2</span>${px(t.tp2!=null?+t.tp2:NaN)}</div>
+  <div><span>TP3</span>${px(t.tp3!=null?+t.tp3:NaN)}</div><div><span>Likuidasi</span>${px(p.liq!=null?+p.liq:NaN)}</div></div></div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
+ return{html,tu,tm}}
+function bgMode(B){const L=B.limits||{};return B.killed?"Mati":B.halted?"Stop harian":(B.mode||"—")}
 function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
- ["banner","ot","wallet","shadowsec","trendsec","learnsec","desksec","twosec","homesec","dcasec","memesec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
- sec.hidden=false;$("htitle").innerHTML=`Bitget Futures <span class="badge" style="color:#f59e0b;border-color:#f59e0b">UANG ASLI</span>`;
- $("foot").innerHTML="Akun Bitget asli. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order. Data dienkripsi dengan kunci dari PIN; tombol kontrol hanya membuat perintah bertanda tangan yang dibaca bot di komputer Grok Bot.";
- if(!bgKeyHex()||!BG_DATA){$("tot").textContent="Terkunci";$("totsub").textContent="Masukkan PIN untuk membuka";
-  sec.innerHTML=`<div class="card"><form onsubmit="bgUnlock(event)" class="dca-form"><label>PIN <input id="bgpin" type="password" inputmode="numeric" autocomplete="off"></label><button type="submit">Buka</button></form><div id="bgerr" class="sub">${esc(BG_ERR)}</div><p class="sub" style="margin:10px 0 0">Data akun dienkripsi (AES-GCM, kunci PBKDF2-SHA256 600rb iterasi). Catatan: PIN pendek tetap bisa ditebak offline oleh orang yang niat, jadi isinya hanya angka akun, bukan kunci.</p></div>`;
+ ["banner","wallet","shadowsec","trendsec","learnsec","homesec","dcasec","memesec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
+ $("htitle").innerHTML=`Bitget Futures <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span>`;
+ $("foot").innerHTML="Akun Bitget asli. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order.";
+ if(!bgKeyHex()||!BG_DATA){
+  ["ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
+  sec.hidden=false;$("tot").textContent="Terkunci";$("totsub").textContent="Masukkan PIN untuk membuka";
+  sec.innerHTML=`<div class="card"><form onsubmit="bgUnlock(event)" class="dca-form"><label>PIN <input id="bgpin" type="password" inputmode="numeric" autocomplete="off"></label><button type="submit">Buka</button></form><div id="bgerr" class="sub">${esc(BG_ERR)}</div><p class="sub" style="margin:10px 0 0">Data akun dikunci dengan PIN. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order.</p></div>`;
   if(bgKeyHex()&&!BG_DATA&&!BG_BUSY)bgFetch();return}
+ sec.hidden=true;sec.innerHTML="";
+ ["ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=false});
  const B=BG_DATA,eq=+B.equity,st=+B.start_equity||eq,ds=+B.day_start_equity||eq;
- $("tot").textContent=money(eq);$("totsub").innerHTML=`Modal awal bot ${money(st)} · <span class="${cls(eq-st)}">${(eq/st*100-100).toFixed(2)}%</span> · hari ini <span class="${cls(eq-ds)}">${(eq/ds*100-100).toFixed(2)}%</span>`;
- const L=B.limits||{},mode=B.killed?"MATI (−"+L.kill_dd_pct+"%)":B.halted?"STOP HARIAN":B.mode;
- const stat=`<div class="card"><h2>Status bot</h2>${homeKpis([[esc(mode),"Mode"],[money(+B.available),"Tersedia"],[`<span class="${cls(+B.upnl)}">${money(+B.upnl)}</span>`,"Belum dikunci"],[(B.positions||[]).length+" / "+L.max_open,"Posisi"]])}
-  <p class="sub" style="margin:8px 0 0">Risiko ${L.risk_pct}% per trade · leverage maks ${L.max_lev}x isolated · stop harian −${L.daily_halt_pct}% · mati total −${L.kill_dd_pct}%. Diperbarui ${esc(B.updated)}.${B.kill_reason?" "+esc(B.kill_reason):""}</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="home-go" onclick="bgControl('ON')">ON</button><button type="button" class="home-go" onclick="bgControl('PAUSE')">PAUSE (tanpa entry baru)</button><button type="button" class="home-go" style="color:var(--dn);border-color:var(--dn)" onclick="bgControl('STOP')">STOP</button><button type="button" class="home-go" onclick="bgLock()">Kunci lagi</button></div>
-  <p class="sub" style="margin:8px 0 0">Tombol membuka GitHub dengan perintah bertanda tangan PIN; klik Submit. Bot menjalankannya di siklus berikutnya (tiap jam 06–23 WIB). Paling cepat: ketik STOP di chat.</p></div>`;
- const rows=(B.positions||[]).map(p=>`<tr><td><b>${esc(p.sym.replace("USDT",""))}</b> ${esc(p.side.toUpperCase())}</td><td>${esc(p.size)}</td><td>${esc(p.entry&&(+p.entry).toPrecision(6))}</td><td>${esc(p.mark)}</td><td class="${cls(+p.upnl)}">${money(+p.upnl)}</td><td>${esc(p.sl||"—")}</td><td>${(p.tps||[]).map(t=>esc(t[0])+" ("+esc(t[1])+")").join("<br>")||"—"}</td><td>${esc(p.mode)} ${esc(p.lev)}x</td><td>${esc(p.liq&&(+p.liq).toPrecision(6))}</td><td class="sub">${p.mirror==="orphan"?"manual (aturan desk)":p.mirror==="untracked"?"tidak dilacak":"mirror desk"}${p.tp1_done?" · TP1 ✓":""}${p.tp2_done?" · TP2 ✓":""}</td></tr>`).join("");
- const pos=`<div class="card"><h2>Posisi terbuka</h2>${rows?`<div class="tw"><table><thead><tr><th>Koin</th><th>Size</th><th>Entry</th><th>Mark</th><th>PnL</th><th>SL</th><th>TP (size)</th><th>Margin</th><th>Liq</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="sub">Tidak ada posisi.</p>`}</div>`;
- const acts=(B.actions||[]).map(a=>`<div class="sub" style="margin-top:4px"><b>${esc(a.t)}</b> ${a.ok?"✓":"✗"} ${esc(a.a)}${a.err?" — "+esc(a.err):""}</div>`).join("")||`<p class="sub">Belum ada aksi.</p>`;
- const sk=(B.skipped||[]).map(s=>`<div class="sub" style="margin-top:4px">${esc(s.k.split("|").slice(0,2).join(" "))}: ${esc(s.reason)}</div>`).join("");
- sec.innerHTML=stat+pos+`<div class="card"><h2>Aksi terakhir bot</h2>${acts}${sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""}</div>`}
+ const pl=st?eq/st*100-100:0,daypl=ds?eq/ds*100-100:0,mode=bgMode(B),L=B.limits||{},pos=B.positions||[];
+ $("tot").innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
+ $("totsub").textContent=`${mode} · modal ${money(st)} · hari ini ${pct(daypl)} · ${pos.length} posisi terbuka`;
+ const cards=bgOpenCards(pos);
+ if($("ottitle"))$("ottitle").innerHTML=`Posisi terbuka <span class="badge" id="otn">${pos.length}</span>`;
+ if($("open"))$("open").innerHTML=cards.html;
+ if($("otsum"))$("otsum").innerHTML=pos.length?`P/L terbuka <b class="${cls(cards.tu)}">${money(cards.tu)}</b>`:"";
+ const curve=B.curve||B.equity_curve||[];
+ if($("desktitle"))$("desktitle").textContent="Ringkasan";
+ if($("desks"))$("desks").innerHTML=`<div class="card"><h2>Bitget <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span> <span class="badge ${mode==="ON"?"b-live":"b-paused"}">${esc(mode)}</span></h2>
+  <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
+  <div class="kpis" style="grid-template-columns:repeat(2,1fr);max-width:420px"><div class="kpi"><div class="v ${cls(+B.upnl)}">${money(+B.upnl)}</div><div class="l">Belum dikunci</div></div>
+  <div class="kpi"><div class="v">${money(+B.available)}</div><div class="l">Tersedia</div></div>
+  <div class="kpi"><div class="v">${pos.length} / ${L.max_open??"—"}</div><div class="l">Posisi</div></div>
+  <div class="kpi"><div class="v ${cls(daypl)}">${pct(daypl)}</div><div class="l">Hari ini</div></div></div>
+  ${typeof chart==="function"?chart(curve,st):""}
+  <div class="sub" style="margin-top:8px">Risiko ${L.risk_pct}% · lev maks ${L.max_lev}x · stop harian −${L.daily_halt_pct}% · mati −${L.kill_dd_pct}%. ${esc(B.updated||"")}${B.kill_reason?" · "+esc(B.kill_reason):""}</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="home-go" onclick="bgControl('ON')">ON</button><button type="button" class="home-go" onclick="bgControl('PAUSE')">PAUSE</button><button type="button" class="home-go" style="color:var(--dn);border-color:var(--dn)" onclick="bgControl('STOP')">STOP</button><button type="button" class="home-go" onclick="bgLock()">Kunci lagi</button></div>
+  <p class="sub" style="margin:8px 0 0">Tombol membuka GitHub; klik Submit. Atau ketik STOP di chat.</p></div>`;
+ if($("cltitle"))$("cltitle").textContent="Transaksi yang sudah ditutup";
+ const cl=B.closed||[];
+ if($("closed"))$("closed").innerHTML=typeof closedTable==="function"?closedTable(cl,false):'<div class="empty">Belum ada transaksi yang ditutup.</div>';
+ if($("righttitle"))$("righttitle").textContent="Aksi bot";
+ if($("dtabs")){$("dtabs").style.display="none";$("dtabs").innerHTML=""}
+ const acts=(B.actions||[]).map(a=>`<div class="it"><div class="h"><b>${esc(a.t)}</b> <span class="${a.ok?"up":"dn"}">${a.ok?"✓":"✗"}</span></div><div class="r">${esc(a.a)}${a.err?" — "+esc(a.err):""}</div></div>`).join("")||'<div class="it mu">Belum ada aksi.</div>';
+ const sk=(B.skipped||[]).map(s=>`<div class="sub" style="margin-top:4px">${esc((s.k||"").split("|").slice(0,2).join(" "))}: ${esc(s.reason||"")}</div>`).join("");
+ if($("dec"))$("dec").innerHTML=more("det-bg-act","Detail aksi terakhir",acts+(sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""))}
 setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
 /* BITGET-VIEW-END */
 function render(){if(!D)return;
