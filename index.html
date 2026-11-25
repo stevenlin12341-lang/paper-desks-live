@@ -410,8 +410,8 @@ h1{text-transform:none;letter-spacing:0}
  <button type="button" id="v-meme">🐸 Memecoin <span class="badge b-live" style="font-size:9px;padding:1px 5px">BARU</span></button>
  <button type="button" id="v-real">Target $37</button>
  <button type="button" id="v-signals">$37 Semua Sinyal</button>
- <button type="button" id="v-steven">Dompet Steven</button>
- <button type="button" id="v-russel">Dompet Russel</button>
+ <button type="button" id="v-steven" hidden>Dompet Steven</button>
+ <button type="button" id="v-russel" hidden>Dompet Russel</button>
  <button type="button" id="v-trend">Tes tren</button>
  <button type="button" id="v-dca">Cicilan BTC</button>
 </nav>
@@ -440,6 +440,7 @@ h1{text-transform:none;letter-spacing:0}
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Buka ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analisis"></div>
 <script>
 const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";
+const SHOW_HL_WALLETS=false; // reversible; Steven/Russel Hyperliquid tracking off
 const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
 const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b",url:"https://app.hyperliquid.xyz/explorer/address/0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b"},{name:"Russel",address:"0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB",url:"https://app.hyperliquid.xyz/explorer/address/0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB"}];
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
@@ -449,9 +450,10 @@ let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","ste
   const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
   if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
   const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
+if(!SHOW_HL_WALLETS&&(VIEW==="steven"||VIEW==="russel"))VIEW="home";
 const isWalletView=()=>VIEW==="steven"||VIEW==="russel";
 const walletViewName=()=>VIEW==="steven"?"Steven":VIEW==="russel"?"Russel":"";
-const wantsWallet=()=>VIEW==="real"||VIEW==="home"||isWalletView();
+const wantsWallet=()=>SHOW_HL_WALLETS&&(VIEW==="real"||VIEW==="home"||isWalletView());
 function walletForView(){const name=walletViewName();return walletsNow().find(w=>(w.name||"").toLowerCase()===name.toLowerCase())||WALLETS_FALLBACK.find(w=>w.name===name)||{name,ok:false,error:"No wallet data in this build."}}
 const money=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const moneyR=n=>n==null||isNaN(n)?"—":(n<0?"-$":"$")+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
@@ -529,7 +531,7 @@ function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)re
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
  const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=start?"#22c55e":"#ef4444";
  return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(start)}" y2="${Y(start)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
-function setView(v){VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
+function setView(v){if(!SHOW_HL_WALLETS&&(v==="steven"||v==="russel"))v="home";VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
 function snapUi(){return{y:window.scrollY,open:[...document.querySelectorAll("details[open]")].map(d=>{const card=d.closest("[data-a]");return{a:card&&card.dataset.a,cls:d.className,sum:(d.querySelector("summary")||{}).textContent||"",id:d.id||""}})}}
 function restoreUi(s){if(!s)return;document.querySelectorAll(".oc[data-a],#wallet [data-a]").forEach(card=>{s.open.forEach(o=>{if(!o.a||card.dataset.a!==o.a)return;card.querySelectorAll("details").forEach(d=>{if(d.className===o.cls||((d.querySelector("summary")||{}).textContent||"")===o.sum)d.open=true})})});(s.open||[]).forEach(o=>{if(o.id){const d=document.getElementById(o.id);if(d&&d.tagName==="DETAILS")d.open=true}});if(s.y!=null)window.scrollTo(0,s.y)}
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
@@ -810,12 +812,12 @@ function renderGoal(kind){
   $("htitle").innerHTML=`Target $37 → $1000K <span class="badge b-real">MIRROR SIMULASI</span>`;
   $("totsub").textContent=`Buku simulasi $37 yang meniru setiap transaksi paper Majors dengan ukuran 0,37%. Mulai ${M.started||""}. Bukan dompet live.`;
   $("banner").hidden=false;
-  $("banner").innerHTML=`<b>Mirror paper $37 (simulasi).</b> Angka di atas dan posisi terbuka di bawah meniru desk $10K: koin, arah, ${tip("leverage",TIPS.lev)}, serta ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} yang sama, ukurannya × 37/10.000. ${esc(M.init_note||"Dimulai dari posisi yang saat itu terbuka, tanpa mengisi transaksi lama.")} Dompet Hyperliquid live ada di tab Steven dan Russel, hanya lihat.`;
+  $("banner").innerHTML=`<b>Mirror paper $37 (simulasi).</b> Angka di atas dan posisi terbuka di bawah meniru desk $10K: koin, arah, ${tip("leverage",TIPS.lev)}, serta ${tip("SL",TIPS.sl)}/${tip("TP",TIPS.tp)} yang sama, ukurannya × 37/10.000. ${esc(M.init_note||"Dimulai dari posisi yang saat itu terbuka, tanpa mengisi transaksi lama.")}`;
   $("ottitle").innerHTML=`Posisi terbuka mirror <span class="badge" id="otn">0</span> <span class="badge b-real">SIMULASI</span>`;
   $("desktitle").innerHTML=`Buku mirror $37 <span class="badge b-real">SIMULASI</span>`;
   $("cltitle").textContent="Transaksi mirror yang sudah ditutup (sejak mulai saja)";
   $("righttitle").textContent="Cara kerja buku ini";
-  $("dec").innerHTML=`<div class="it"><div class="r">Buku $37 buka dan tutup bersamaan dengan desk Majors $10K setiap ${tip("siklus",TIPS.cycle)}. Entri paper baru disalin otomatis; penutupan dan ${tip("TP",TIPS.tp)} sebagian setelah ${esc(M.started||"mulai")} dicatat di sini dengan ukuran 0,37%. Hasil lama $10K tidak diisi mundur, jadi ${tip("menang",TIPS.wr)} ini catatan buku ini sendiri. Dompet live ada di tab Steven dan Russel — posisi yang Anda buka sendiri ditandai di sini kalau cocok dengan transaksi desk.</div></div>`;
+  $("dec").innerHTML=`<div class="it"><div class="r">Buku $37 buka dan tutup bersamaan dengan desk Majors $10K setiap ${tip("siklus",TIPS.cycle)}. Entri paper baru disalin otomatis; penutupan dan ${tip("TP",TIPS.tp)} sebagian setelah ${esc(M.started||"mulai")} dicatat di sini dengan ukuran 0,37%. Hasil lama $10K tidak diisi mundur, jadi ${tip("menang",TIPS.wr)} ini catatan buku ini sendiri.</div></div>`;
  }
  $("tot").innerHTML=`${moneyR(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
  const cards=openCards(opens,true);$("otn").textContent=opens.length;$("open").innerHTML=cards.html;
@@ -837,7 +839,7 @@ function renderGoal(kind){
   ${metodeSection(M)}</div>`;
  $("closed").innerHTML=closedTable(M.closes||[],true);
  $("dtabs").style.display="none";$("dtabs").innerHTML="";
- $("foot").innerHTML=`Buku $37 adalah simulasi, bukan order live. Dompet live ada di tab Steven dan Russel (bacaan publik Hyperliquid). Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
+ $("foot").innerHTML=`Buku $37 adalah simulasi, bukan order live. Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"")}`
 }
 function renderReal(){renderGoal("real")}
 function renderSignals(){renderGoal("signals")}
@@ -1423,7 +1425,7 @@ function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
  $("banner").hidden=true;$("banner").innerHTML="";
  const paused=(D.paused_desks||[]).map(homePausedCard).join("");
- $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+twxHomeSection()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
+ $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+twxHomeSection()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${SHOW_HL_WALLETS?homeWalletCard("Steven")+homeWalletCard("Russel"):""}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
  $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
@@ -1623,7 +1625,7 @@ async function fetchOneWallet(spec){const user=spec.address,prev=walletNow(user)
   tagMatches(positions);
   const equity=perps_eq+spot_total-hold_adj;
   return{ok:true,live:true,name:spec.name||prev.name,venue:"Hyperliquid",address:user,url:prev.url||spec.url||("https://app.hyperliquid.xyz/explorer/address/"+user),eq:equity,perps_eq,spot_eq:spot_total-hold_adj,spot_usdc:usdc_total,spot_usdc_free:usdc_total-usdc_hold,portfolio_eq:prev.portfolio_eq,withdrawable,margin:margin_used,notional,unreal,asof:"Live",spot:spot_rows,positions,fills:prev.fills||[]}}
-async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
+async function fetchWallet(){if(!SHOW_HL_WALLETS||!D||walletBusy)return;walletBusy=true;
  try{if(!HLMIDS||!Object.keys(HLMIDS).length){try{HLMIDS=await hl("allMids")||{}}catch(e){}}
   const specs=walletSpecs();
   const results=await Promise.all(specs.map(s=>fetchOneWallet(s).then(w=>{WALLETS_LIVE[(w.address||s.address).toLowerCase()]=w;return w}).catch(()=>{
