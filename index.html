@@ -399,6 +399,45 @@ h1{text-transform:none;letter-spacing:0}
 .own-vs{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
 .own-vs.ok{border-color:#14532d;color:#86efac}.own-vs.no{border-color:#5a4410;color:#fcd34d}
 .own-dec{font-size:13px;line-height:1.5;margin:2px 0 8px}
+
+.sk-dash{margin:0 0 12px;background:#d5d5d5;color:#1a1a1a;border:1px solid #b5b5b5;border-radius:12px;padding:12px 10px 10px;box-shadow:inset 0 1px 0 #efefef}
+.sk-dash,.sk-dash *{box-sizing:border-box}
+.sk-title{text-align:center;font-weight:800;letter-spacing:.12em;font-size:15px;margin:2px 0 2px;color:#111;text-transform:uppercase}
+.sk-sub{text-align:center;font-size:11px;color:#444;margin:0 0 8px}
+.sk-gauges{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 8px;scrollbar-width:thin}
+.sk-gauges::-webkit-scrollbar{height:6px}
+.sk-gauge{flex:0 0 148px;width:148px;text-align:center}
+.sk-roc{font-size:11px;font-weight:700;height:16px;line-height:16px}
+.sk-lab{margin:4px 10px 0;padding:3px 4px;border-radius:3px;color:#fff;font-size:11px;font-weight:700;letter-spacing:.02em;line-height:1.2}
+.sk-name{font-weight:800;font-size:13px;margin:5px 0 2px;color:#111;letter-spacing:.02em}
+.sk-coins{display:flex;justify-content:center;gap:4px;height:22px;align-items:center;margin-bottom:2px}
+.sk-coins svg{display:block}
+.sk-dial{width:132px;height:118px;margin:0 auto;display:block}
+.sk-val{font-weight:800;font-size:17px;margin:0 0 4px;color:#111}
+.sk-lower{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-around;padding:10px 0 8px;align-items:flex-start;border-top:1px solid #c0c0c0}
+.sk-col{flex:1 1 156px;min-width:148px;max-width:210px;text-align:center}
+.sk-col h3{font-size:11px;font-weight:800;letter-spacing:.06em;margin:0 0 6px;color:#111;text-transform:uppercase}
+.sk-vbar{width:150px;height:210px;margin:0 auto;display:block}
+.sk-donut{width:150px;height:150px;margin:0 auto;display:block}
+.sk-leg{font-size:11px;font-weight:600;margin-top:4px;color:#222}
+.sk-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 8px;vertical-align:middle}
+.sk-leg i:first-child{margin-left:0}
+.sk-strip{display:flex;flex-wrap:wrap;gap:10px 16px;background:#c8c8c8;border-radius:8px;padding:8px 10px;margin:4px 0}
+.sk-cell{min-width:120px}
+.sk-cell .k{font-size:10px;font-weight:800;letter-spacing:.06em;color:#333;margin:0 0 4px;text-transform:uppercase}
+.sk-pill{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:800;color:#fff;margin:0 3px 3px 0;letter-spacing:.02em}
+.sk-sum{background:#ececec;border:1px solid #c0c0c0;border-radius:8px;padding:8px 10px;margin:6px 0 4px}
+.sk-sum h3{font-size:11px;font-weight:800;letter-spacing:.06em;margin:0 0 6px;color:#111;text-transform:uppercase}
+.sk-sum ul{margin:0;padding:0 0 0 16px}
+.sk-sum li{font-size:12px;color:#222;padding:1px 0;line-height:1.45}
+.sk-rsps-wrap{margin:8px 0 0;border:1px solid #b5b5b5;border-radius:8px;background:#cecece;padding:2px 10px 8px}
+.sk-rsps-wrap>summary{cursor:pointer;font-weight:800;letter-spacing:.1em;padding:8px 0;list-style:none;font-size:13px;color:#111;text-transform:uppercase;text-align:center}
+.sk-rsps-wrap>summary::-webkit-details-marker{display:none}
+.sk-rsps-wrap>summary::after{content:" ▾";font-size:11px;color:#555}
+.sk-rsps-wrap[open]>summary::after{content:" ▴"}
+.sk-rsps-wrap .sk-gauges{flex-wrap:wrap;overflow:visible;justify-content:center;padding-bottom:4px}
+.sk-na .sk-lab{background:#9e9e9e}
+.sk-na .sk-val{color:#666}
 .twx-snap{margin:0 0 12px}
 .twx-pairs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .twx-pair{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
@@ -1470,45 +1509,156 @@ function twxHomeCompact(){const U=(TWX&&TWX.updates)||[];if(!U.length)return twx
  return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2><div class="twx-chips">${chips}</div>${hist}</div>`}
 function ownF(v){return v==null||isNaN(Number(v))?"N/A":(Number(v)>0?"+":"")+Number(v).toFixed(2).replace(".",",")}
 function ownTone(v){return v==null?"":v>0.15?"up":v<-0.15?"dn":"wa"}
-function ownChip(l,v,sub,tip,tone){return`<span class="twx-chip ${tone??ownTone(v)}" title="${esc(tip||"")}"><span class="l">${esc(l)}</span><b>${ownF(v)}</b>${sub?`<span class="sub"> · ${esc(sub)}</span>`:""}</span>`}
-function ownVs(){const U=(TWX&&TWX.updates)||[],u=U[0],O=OWN;if(!u||!O)return"";
- const rs=O.rsps||{},up=x=>String(x||"").toUpperCase().replace(/\s|\$/g,""),rows=[];
- const st=(o)=>o&&o.state?String(o.state).toUpperCase():null;
- const cmp=(l,a,b)=>{if(a==null||b==null)return;rows.push(`<span class="own-vs ${up(a)===up(b)?"ok":"no"}">${esc(l)}: ${up(a)===up(b)?"✓ "+esc(a):"≠ kita "+esc(a)+" · TWX "+esc(b)}</span>`)};
- cmp("MTPI",st(O.mtpi),st(u.mtpi));cmp("LTPI",st(O.ltpi),st(u.ltpi));
- cmp("Mayor",rs.dominant_major,u.rsps_dominant_major);
- cmp("Higher beta",rs.higher_beta_active?rs.higher_beta:"tidak ada",u.optional_higher_beta||"tidak ada");
- cmp("Denominator",rs.denominator,u.denominator);
- cmp("Rezim",O.regime&&O.regime.state,u.btc_regime&&u.btc_regime.state);
- let pr="";const sp=(((TWX.snapshot||{}).twx||{}).pairs||[]).concat(((TWX.snapshot||{}).rsps||{}).pairs||[]);
- if(sp.length&&(rs.pairs||[]).length){const m={};rs.pairs.forEach(p=>m[p.pair]=p.value);let n=0,ok=0;
-  sp.forEach(x=>{if(m[x.pair]!=null&&x.value!=null){n++;if(Math.sign(m[x.pair])===Math.sign(x.value)||(Math.abs(m[x.pair])<=0.15&&Math.abs(x.value)<=0.2))ok++}});
-  if(n)pr=`<span class="own-vs ${ok/n>=0.7?"ok":"no"}">Pair arah sama: ${ok} dari ${n} <span class="sub">(snapshot TWX ${esc(twxDate(TWX.snapshot.as_of))})</span></span>`}
- return`<div class="own-k">vs TWX ${esc(twxDate(u.date))}</div><div class="own-row">${rows.join("")}${pr}</div>`}
-function ownHomeCard(){const O=OWN;if(!O||!O.mtpi)return"";
- const rs=O.rsps||{},P=O.portfolio||{},sd=O.sdca,mc=O.macro,rg=O.regime;
- const chips=ownChip("MTPI (harian)",O.mtpi&&O.mtpi.value,O.mtpi&&O.mtpi.state,"Rata-rata 9 indikator tren BTC harian. +1 naik, -1 turun.")
-  +ownChip("LTPI (mingguan)",O.ltpi&&O.ltpi.value,O.ltpi&&O.ltpi.state,"Sama, tapi pakai candle mingguan. Tren besar.")
-  +(O.trash_tpi?ownChip("Altcoin",O.trash_tpi.value,O.trash_tpi.state,"Tren keranjang 10 altcoin (bobot sama)."):"")
-  +(rg?ownChip("Rezim BTC",rg.value,rg.state==="TRENDING"?"trending":"mean-reverting","+ = pasar trending, - = bolak-balik (mean-reverting). Dari ADX, Choppiness, Hurst.","wa"):"")
-  +(sd?ownChip("Nilai BTC",sd.value,sd.bias,"Skor murah/mahal dari MVRV, MA 200 minggu, power-law. +1,5 ke atas = waktunya akumulasi.",sd.value>=1.5?"up":sd.value<=-1.5?"dn":"wa"):`<span class="twx-chip"><span class="l">Nilai BTC</span><b>N/A</b></span>`)
-  +(mc?ownChip("Likuiditas",mc.value,mc.bias,"Net liquidity The Fed (neraca - TGA - RRP), perubahan 4 minggu."):`<span class="twx-chip"><span class="l">Likuiditas</span><b>N/A</b></span>`);
- const pf=P.exposure?(P.cash_pct>=100?"100% cash":`${P.asset_pct}% ${esc(P.asset||"")} · ${P.cash_pct}% cash`):"N/A";
- const lev=P.leverage==="permissible"?"boleh (hati-hati)":P.leverage?"dilarang":"N/A";
- const dca=!P.dca_known?"N/A":P.dca?"ya, saatnya akumulasi":"belum";
- const hb=rs.higher_beta_candidate?(rs.higher_beta_active?rs.higher_beta:`${rs.higher_beta_candidate} (belum aktif)`):"—";
- const dec=`<div class="own-dec"><b>${esc(P.exposure||"N/A")}</b> · Portofolio: <b>${pf}</b> · Leverage: <b>${lev}</b> · DCA spot: <b>${dca}</b><br><span class="mu">Mayor ${esc(rs.dominant_major||"N/A")} · Higher beta ${esc(hb)} · Denominator ${esc(rs.denominator||"N/A")}</span></div>`;
- const comp=(o,t)=>o&&o.components?`<div class="own-k">${t}</div><div class="own-row">${Object.entries(o.components).map(([k,v])=>`<span class="twx-pair ${v>0?"up":v<0?"dn":"wa"}"><span>${esc(k)}</span><span class="pv">${v>0?"+1":v<0?"−1":"0"}</span></span>`).join("")}</div>`:"";
- const sc=rs.scores?`<div class="own-k">Peringkat kekuatan (RSPS)</div><div class="own-row">${Object.entries(rs.scores).map(([k,v])=>`<span class="twx-pair ${ownTone(v/3)}"><span>${esc(k)}</span><span class="pv">${ownF(v)}</span></span>`).join("")}</div>`:"";
- const pairs=(rs.pairs||[]).length?`<div class="own-k">Pair RSPS (harian)</div><div class="twx-pairs">${rs.pairs.map(twxPairChip).join("")}</div>`:"";
- const na=(O.na&&O.na.length)?`<div class="sub">N/A: ${esc(O.na.join(", "))}</div>`:"";
- const M=O.method||{},S=O.sources||{};
- const det=`<details class="more"><summary>Detail &amp; cara hitung</summary>${sc}${pairs}${comp(O.mtpi,"Indikator MTPI")}${comp(O.ltpi,"Indikator LTPI")}
-  <ul class="twx-notes"><li>${esc(M.tpi||"")}</li><li>${esc(M.sdca||"")}${sd&&sd.inputs?` (MVRV ${sd.inputs.MVRV}, Mayer 200W ${sd.inputs.Mayer200W}, z ${sd.inputs.z_MVRV}/${sd.inputs.z_MA200W}/${sd.inputs.z_PowerLaw})`:""}</li><li>${esc(M.makro||"")}</li><li>${esc(M.rezim||"")}${rg&&rg.inputs?` (ADX ${rg.inputs.ADX14}, CI ${rg.inputs.Choppiness14}, Hurst ${rg.inputs.Hurst250})`:""}</li>
-  <li>Sumber: ${esc(Object.values(S).join(" · "))}. Hitungan sendiri, bukan rumus TWX.</li></ul>${na}</details>`;
- return`<div class="card own-card"><h2>Sistem Kita <span class="badge b-live">${esc(twxDate(O.date_wib))}</span></h2>
-  <div class="sub" style="margin:-4px 0 8px">Hitungan sendiri dari data gratis. Arahkan kursor ke kotak untuk penjelasan.</div>
-  <div class="twx-chips">${chips}</div>${dec}${ownVs()}${det}</div>`}
+const SK_COL={BTC:"#f7931a",ETH:"#627eea",SOL:"#9945ff",SUI:"#4da6ff",DOGE:"#c2a633",XRP:"#23292f",HYPE:"#0ed3a3",USD:"#16a34a",USDT:"#16a34a",GOLD:"#d4af37",EUR:"#003399"};
+function skState(v){if(v==null||isNaN(Number(v)))return{t:"N/A",bar:"N/A",col:"#9e9e9e",fg:"#666"};
+ v=Number(v);if(v>=0.5)return{t:"Bullish",bar:"Bullish State",col:"#1b7a2f",fg:"#1b7a2f"};
+ if(v>0.15)return{t:"Slight Bull",bar:"Slight Bull State",col:"#5aaa4a",fg:"#2e7d32"};
+ if(v>=-0.15)return{t:"Neutral",bar:"Neutral State",col:"#757575",fg:"#444"};
+ if(v>-0.5)return{t:"Slight Bear",bar:"Slight Bear State",col:"#d45b5b",fg:"#b71c1c"};
+ return{t:"Bearish",bar:"Bearish State",col:"#b71c1c",fg:"#b71c1c"}}
+function skRoc(v,p){if(v==null||p==null||Number(v)===Number(p))return{t:"No Change",c:"#333"};
+ return Number(v)>Number(p)?{t:"Slight +ROC",c:"#1b7a2f"}:{t:"Slight -ROC",c:"#b71c1c"}}
+function skCoin(sym,r){r=r||10;const c=SK_COL[sym]||"#888",fg=(sym==="XRP"||sym==="EUR"||sym==="USD")?"#fff":"#111",t=sym==="USDT"||sym==="USD"?"$":sym.slice(0,1);
+ return `<svg width="${r*2}" height="${r*2}" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="${c}" stroke="#fff" stroke-width="1.2"/><text x="10" y="13.6" text-anchor="middle" font-size="8.5" font-weight="800" fill="${fg}" font-family="system-ui,sans-serif">${t}</text></svg>`}
+function skPairMap(O){const m={};((O&&O.rsps&&O.rsps.pairs)||[]).forEach(p=>m[p.pair]=p);return m}
+function skPrevPair(O,pair){return O&&O.prev&&O.prev.pairs?O.prev.pairs[pair]:null}
+function skWinner(a,b,v){if(v==null||Math.abs(v)<=0.15)return null;return v>0?a:b}
+function skGauge(opt){const v=opt.v,na=v==null||isNaN(Number(v)),n=na?null:Math.max(-1,Math.min(1,Number(v)));
+ const st=skState(n),roc=skRoc(n,opt.prev);
+ let lab=opt.lab, labc=opt.labc||st.col;
+ if(!lab){const w=opt.a&&opt.b?skWinner(opt.a,opt.b,n):opt.asset;lab=w?(w+" Bias"):st.bar;if(w)labc=SK_COL[w]||labc}
+ const W=140,H=118,cx=70,cy=72,R=52;
+ const track=`M ${cx-R} ${cy} A ${R} ${R} 0 0 1 ${cx+R} ${cy}`;
+ let needle="";
+ if(n!=null){const a=Math.PI-((n+1)/2)*Math.PI,x2=cx+Math.cos(a)*(R-4),y2=cy-Math.sin(a)*(R-4),x3=cx+Math.cos(a)*8,y3=cy-Math.sin(a)*8;
+  const nx=Math.cos(a+Math.PI/2)*3.2,ny=-Math.sin(a+Math.PI/2)*3.2;
+  needle=`<polygon points="${x2},${y2} ${cx+nx},${cy+ny} ${cx-nx},${cy-ny}" fill="#222"/>
+   <circle cx="${cx}" cy="${cy}" r="5.2" fill="#222" stroke="#f4f4f4" stroke-width="1.6"/>`;}
+ const ticks=[-1,-0.5,0,0.5,1].map(t=>{const a=Math.PI-((t+1)/2)*Math.PI,x1=cx+Math.cos(a)*(R-1),y1=cy-Math.sin(a)*(R-1),x0=cx+Math.cos(a)*(R-6),y0=cy-Math.sin(a)*(R-6);
+  return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#555" stroke-width="${t%1===0?1.6:1}"/>`}).join("");
+ const gid="skg"+(opt.id||opt.name||"").replace(/[^A-Za-z0-9]/g,"");
+ const face=`<svg class="sk-dial" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c62828"/><stop offset="50%" stop-color="#f3c010"/><stop offset="100%" stop-color="#1b7a2f"/></linearGradient></defs>
+  <circle cx="${cx}" cy="${cy}" r="58" fill="#f7f7f7" stroke="#cfcfcf" stroke-width="1"/>
+  <path d="${track}" fill="none" stroke="#e0e0e0" stroke-width="12" stroke-linecap="butt"/>
+  ${na?"":`<path d="${track}" fill="none" stroke="url(#${gid})" stroke-width="11" stroke-linecap="butt"/>`}
+  ${ticks}${needle}
+  <text x="${cx}" y="${cy+28}" text-anchor="middle" font-size="12" font-weight="800" fill="${st.fg}" font-family="system-ui,sans-serif">${st.t}</text>
+ </svg>`;
+ const coins=(opt.a&&opt.b)?`<div class="sk-coins">${skCoin(opt.a,11)}${skCoin(opt.b,11)}</div>`:`<div class="sk-coins" style="height:22px"></div>`;
+ const val=na?"N/A":ownF(n);
+ return `<div class="sk-gauge${na?" sk-na":""}" title="${esc(opt.tip||opt.name||"")}">
+  <div class="sk-roc" style="color:${roc.c}">${esc(roc.t)}</div>
+  <div class="sk-lab" style="background:${labc}">${esc(lab)}</div>
+  <div class="sk-name">${esc(opt.name)}</div>
+  ${coins}${face}<div class="sk-val" style="color:${st.fg}">${val}</div></div>`}
+function skVBar(opt){const lo=opt.lo,hi=opt.hi,na=opt.v==null||isNaN(Number(opt.v));
+ const raw=na?null:Math.max(lo,Math.min(hi,Number(opt.v)));
+ const x=40,y=22,w=36,h=160,W=150,H=210;
+ const yOf=val=>y+((hi-val)/(hi-lo))*h;
+ const mid=yOf(0), ticks=[];
+ const step=opt.step||((hi-lo)<=2?0.5:1);
+ for(let t=hi;t>=lo-1e-9;t-=step){const yy=yOf(t),lab=t>0?"+"+t.toFixed(t%1?1:0):String(t.toFixed(t%1?1:0));
+  ticks.push(`<line x1="${x-5}" y1="${yy}" x2="${x+w+5}" y2="${yy}" stroke="${t===0?"#333":"#bbb"}" stroke-width="${t===0?1.2:0.6}"/>
+   <text x="${x-8}" y="${yy+3}" text-anchor="end" font-size="9" fill="#333" font-family="system-ui,sans-serif">${lab}</text>`)}
+ let mark="";
+ if(raw!=null){const yy=yOf(raw),col=opt.color||(raw>0.15?"#1b7a2f":raw<-0.15?"#b71c1c":"#555");
+  mark=`<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="#111" stroke-width="1.4"/>
+   <polygon points="${x+w+6},${yy} ${x+w+16},${yy-7} ${x+w+26},${yy} ${x+w+16},${yy+7}" fill="${col}" stroke="#111" stroke-width="0.8"/>
+   <text x="${x+w+30}" y="${yy+4}" font-size="11" font-weight="800" fill="#111" font-family="system-ui,sans-serif">${ownF(opt.show==null?raw:opt.show)}</text>`}
+ const gid="skb"+(opt.id||"k");
+ return `<div class="sk-col"><h3>${esc(opt.title)}</h3>
+ <svg class="sk-vbar" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">${opt.grad}</linearGradient></defs>
+  <text x="${W/2}" y="12" text-anchor="middle" font-size="9" font-weight="800" fill="${opt.topc||"#1b7a2f"}" font-family="system-ui,sans-serif">${esc(opt.topLab)}</text>
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="url(#${gid})" stroke="#9a9a9a" stroke-width="0.8"/>
+  ${ticks}${mark}
+  <text x="${W/2}" y="${H-6}" text-anchor="middle" font-size="9" font-weight="800" fill="${opt.botc||"#b71c1c"}" font-family="system-ui,sans-serif">${esc(opt.botLab)}</text>
+ </svg></div>`}
+function skDonut(opt){const legs=opt.legs||[], tot=legs.reduce((s,l)=>s+(+l.pct||0),0), na=!tot;
+ const cx=75,cy=72,R=48,sw=18,C=2*Math.PI*R;
+ let ang=-Math.PI/2, arcs="";
+ if(!na){legs.forEach(l=>{const frac=Math.max(0,Math.min(1,(+l.pct)/tot)),len=C*frac,dash=`${len} ${C-len}`,rot=ang*180/Math.PI;
+  arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${l.color}" stroke-width="${sw}" stroke-dasharray="${dash}" stroke-dashoffset="${C*0.25}" transform="rotate(${(ang*180/Math.PI)+90} ${cx} ${cy})" transform-origin="${cx} ${cy}"/>`;
+  /* simpler: use path or cumulative offset */
+  ang+=frac*2*Math.PI})}
+ /* rebuild with dashoffset cumulative for correct order */
+ if(!na){arcs="";let off=0;legs.forEach(l=>{const frac=Math.max(0,Math.min(1,(+l.pct)/tot)),len=C*frac;
+  arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${l.color}" stroke-width="${sw}" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${C*0.25-off}" stroke-linecap="butt"/>`;
+  off+=len})}
+ const mid=na?"N/A":(legs.length===1||(legs[0]&&legs[0].pct>=99.5)?`${Math.round(legs[0].pct)}%`:(legs.map(l=>Math.round(l.pct)).join(" / ")));
+ const mid2=na?"":esc(opt.center||"");
+ const leg=na?`<div class="sk-leg">N/A</div>`:`<div class="sk-leg">${legs.map(l=>`<i style="background:${l.color}"></i>${esc(l.name)} ${Math.round(l.pct)}%`).join(" ")}</div>`;
+ return `<div class="sk-col"><h3>${esc(opt.title)}</h3>
+  <svg class="sk-donut" viewBox="0 0 150 150" aria-hidden="true">
+   <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e6e6e6" stroke-width="${sw}"/>
+   ${arcs}
+   <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="16" font-weight="800" fill="#111" font-family="system-ui,sans-serif">${mid}</text>
+   ${mid2?`<text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#444" font-family="system-ui,sans-serif">${mid2}</text>`:""}
+  </svg>${leg}</div>`}
+function skPill(txt,on,ok){const bg=!on?"#9e9e9e":ok?"#1b7a2f":"#b71c1c";
+ return `<span class="sk-pill" style="background:${bg}">${esc(txt)}</span>`}
+function ownHomeCard(){const O=OWN;if(!O||!(O.mtpi||O.ltpi))return"";
+ const P=O.portfolio||{},rs=O.rsps||{},pm=skPairMap(O),pv=k=>pm[k]?pm[k].value:null;
+ const pairG=(pair,a,b)=>skGauge({id:pair,name:pair+" TPI",v:pv(pair),prev:skPrevPair(O,pair),a,b,tip:a+" vs "+b});
+ const row=[skGauge({id:"LTPI",name:"L-TPI",v:O.ltpi&&O.ltpi.value,prev:O.prev&&O.prev.ltpi,asset:"BTC",lab:"BTC Bias",labc:SK_COL.BTC,tip:"Tren BTC mingguan"}),
+  skGauge({id:"MTPI",name:"M-TPI",v:O.mtpi&&O.mtpi.value,prev:O.prev&&O.prev.mtpi,asset:"BTC",lab:"BTC Bias",labc:SK_COL.BTC,tip:"Tren BTC harian"}),
+  skGauge({id:"TRASH",name:"TRASH TPI",v:O.trash_tpi&&O.trash_tpi.value,prev:O.prev&&O.prev.trash_tpi,tip:"Keranjang 10 altcoin"}),
+  pairG("ETHBTC","ETH","BTC"),pairG("SOLETH","SOL","ETH"),pairG("SOLBTC","SOL","BTC")].join("");
+ const rg=O.regime,sd=O.sdca,mc=O.macro;
+ const bars=skVBar({id:"reg",title:"BTC Market State",topLab:"TRENDING",botLab:"MEAN REVERTING",v:rg&&rg.value,lo:-1,hi:1,step:0.5,
+    grad:'<stop offset="0%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#c62828"/>',topc:"#1b7a2f",botc:"#b71c1c"})
+  +skVBar({id:"val",title:"Cycle Valuation",topLab:"OVERBOUGHT",botLab:"OVERSOLD",v:sd&&sd.value!=null?-sd.value:null,show:sd&&sd.value,lo:-2,hi:2,step:1,
+    grad:'<stop offset="0%" stop-color="#c62828"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#1565c0"/>',topc:"#b71c1c",botc:"#1565c0",color:"#1565c0"})
+  +skVBar({id:"mac",title:"Macro Environment",topLab:"POSITIVE",botLab:"NEGATIVE",v:mc&&mc.value,lo:-1,hi:1,step:0.5,
+    grad:'<stop offset="0%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#c62828"/>',topc:"#1b7a2f",botc:"#b71c1c"});
+ const cash=P.cash_pct,asset=P.asset||"BTC",ap=P.asset_pct||0;
+ const legs=[];if(ap>0)legs.push({name:asset,pct:ap,color:SK_COL[asset]||"#f7931a"});if(cash>0)legs.push({name:"USD",pct:cash,color:SK_COL.USD});
+ const dons=skDonut({title:"Current Portfolio",legs,center:P.exposure||""})
+  +skDonut({title:"Conservative Portfolio",legs:[],center:""});
+ const mtS=O.mtpi&&O.mtpi.value>0,ltS=O.ltpi&&O.ltpi.value>0,mtU=!(O.mtpi&&O.mtpi.value!=null),ltU=!(O.ltpi&&O.ltpi.value!=null);
+ const trend=rg&&rg.state==="TRENDING",levOk=P.leverage==="permissible",riskOn=P.exposure==="RISK ON";
+ const strip=`<div class="sk-strip">
+  <div class="sk-cell"><div class="k">TPI Conditions</div>${skPill("M-TPI "+(mtU?"N/A":mtS?"Long":"Short"),!mtU,mtS)}${skPill("L-TPI "+(ltU?"N/A":ltS?"Long":"Short"),!ltU,ltS)}</div>
+  <div class="sk-cell"><div class="k">Regime</div>${skPill(rg? (trend?"TREND":"MR"):"N/A",!!rg,trend)}</div>
+  <div class="sk-cell"><div class="k">Exposure Type</div>${skPill(P.exposure||"N/A",!!P.exposure,riskOn)}</div>
+  <div class="sk-cell"><div class="k">Available Leverage</div>${skPill(P.leverage?String(P.leverage).toUpperCase():"N/A",!!P.leverage,levOk)}</div>
+ </div>`;
+ const U=(TWX&&TWX.updates)||[],u=U[0];
+ const same=(a,b)=>a&&b&&String(a).toUpperCase().replace(/\s/g,"")===String(b).toUpperCase().replace(/\s/g,"");
+ let vs=[];
+ if(u){const st=o=>o&&o.state; vs.push(same(st(O.mtpi),st(u.mtpi))?"MTPI sama":"MTPI beda");
+  vs.push(same(st(O.ltpi),st(u.ltpi))?"LTPI sama":"LTPI beda");
+  vs.push(same(rs.dominant_major,u.rsps_dominant_major)?"mayor "+(rs.dominant_major||"?")+" sama":"mayor beda");
+  vs.push(same(rs.denominator,u.denominator)?"denominator sama":"denominator beda");
+  const rgs=rg&&rg.state, twr=u.btc_regime&&u.btc_regime.state;
+  vs.push(same(rgs,twr)?"rezim sama":("rezim beda (kita "+(rgs||"N/A")+", TWX "+(twr||"N/A")+")"));
+  const sp=(((TWX.snapshot||{}).twx||{}).pairs||[]).concat(((TWX.snapshot||{}).rsps||{}).pairs||[]);
+  if(sp.length){let n=0,ok=0;sp.forEach(x=>{const v=pv(x.pair);if(v!=null&&x.value!=null){n++;if(Math.sign(v)===Math.sign(x.value)||(Math.abs(v)<=0.15&&Math.abs(x.value)<=0.2))ok++}});if(n)vs.push("arah pair sama "+ok+" dari "+n)}
+ }
+ const bullets=[];
+ bullets.push("Hitungan sendiri dari data gratis, bukan rumus TWX.");
+ if(vs.length)bullets.push("vs TWX "+(u?twxDate(u.date):"")+": "+vs.join("; ")+".");
+ if(sd)bullets.push("Nilai BTC "+ownF(sd.value)+" ("+(sd.bias||"")+") — akumulasi spot hanya jika ≥ +1,50."+(sd.inputs?` MVRV ${sd.inputs.MVRV}, Mayer 200W ${sd.inputs.Mayer200W}.`:"" )+(sd.as_of?" Data "+sd.as_of+".":""));
+ if(mc)bullets.push("Likuiditas "+ownF(mc.value)+" ("+(mc.bias||"")+")."+(mc.inputs&&mc.inputs.net_liquidity_$T!=null?` Net liquidity $${mc.inputs.net_liquidity_$T}T, 4 minggu ${mc.inputs["perubahan_4mgg_%"]}%.`:"")+(mc.as_of?" Data FRED "+mc.as_of+".":""));
+ else bullets.push("Likuiditas: N/A.");
+ if(P.dca_known)bullets.push(P.dca?"Sinyal DCA spot: ya, saatnya akumulasi.":"Sinyal DCA spot: belum.");
+ if(rs.dominant_major)bullets.push("Mayor RSPS: "+rs.dominant_major+" · Higher beta: "+(rs.higher_beta_active?rs.higher_beta:(rs.higher_beta_candidate?rs.higher_beta_candidate+" (belum aktif)":"tidak ada"))+" · Denominator: "+(rs.denominator||"N/A")+".");
+ if(O.sources)bullets.push("Sumber: "+Object.values(O.sources).join(" · ")+".");
+ if(O.na&&O.na.length)bullets.push("N/A: "+O.na.join(", ")+".");
+ const sum=`<div class="sk-sum"><h3>Associated Data and Summary</h3><ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>`;
+ const RSPS_ORDER=[["SUIBTC","SUI","BTC"],["SUIETH","SUI","ETH"],["SUISOL","SUI","SOL"],
+  ["DOGEBTC","DOGE","BTC"],["DOGEETH","DOGE","ETH"],["DOGESOL","DOGE","SOL"],["DOGESUI","DOGE","SUI"],
+  ["XRPBTC","XRP","BTC"],["XRPETH","XRP","ETH"],["XRPSOL","XRP","SOL"],["XRPSUI","XRP","SUI"],["XRPDOGE","XRP","DOGE"],
+  ["HYPEBTC","HYPE","BTC"],["HYPEETH","HYPE","ETH"],["HYPESOL","HYPE","SOL"],["HYPESUI","HYPE","SUI"],["HYPEDOGE","HYPE","DOGE"],["HYPEXRP","HYPE","XRP"],
+  ["GOLDUSD","GOLD","USD"],["EURGOLD","EUR","GOLD"],["EURUSD","EUR","USD"]];
+ const rspsG=RSPS_ORDER.map(([p,a,b])=>skGauge({id:"r"+p,name:p+" TPI",v:pv(p),prev:skPrevPair(O,p),a,b,tip:a+" vs "+b})).join("");
+ const rsps=`<details class="sk-rsps-wrap"><summary>-RSPS Dashboard-</summary><div class="sk-gauges">${rspsG}</div></details>`;
+ return `<div class="sk-dash"><div class="sk-title">-Sistem Kita Dashboard-</div>
+  <div class="sk-sub">${esc((function(){const g=String(O.generated||""),m=g.match(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2} WIB)/);return m?twxDate(m[1])+", "+m[2]:(O.date_wib?twxDate(O.date_wib):g)})())}</div>
+  <div class="sk-gauges">${row}</div>
+  <div class="sk-lower">${bars}${dons}</div>
+  ${strip}${sum}${rsps}</div>`}
 function twxHistoryDetails(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
  return`<details class="more twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`}
 function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPaused=(D.paused_desks||[]).some(d=>/copy/i.test(d.name||""));
