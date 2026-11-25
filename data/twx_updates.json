@@ -1,0 +1,331 @@
+{
+  "updated": "2026-11-25",
+  "source": "Update sistem TWX/RSPS dari Discord; mention role sudah dihapus.",
+  "snapshot": {
+    "as_of": "2026-11-25",
+    "label": "Cuplikan dasbor TWX / RSPS (dari screenshot)",
+    "twx": {
+      "ltpi": {
+        "value": -1.0,
+        "bias": "bearish"
+      },
+      "mtpi": {
+        "value": -1.0,
+        "bias": "bearish"
+      },
+      "trash_tpi": {
+        "value": -0.2,
+        "bias": "slight bear"
+      },
+      "pairs": [
+        {
+          "pair": "ETHBTC",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "SOLETH",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "SOLBTC",
+          "value": -1.0,
+          "bias": "bearish"
+        }
+      ],
+      "btc_market_state": {
+        "value": -0.58,
+        "bias": "mean reverting"
+      },
+      "macro": {
+        "value": -0.06,
+        "bias": null
+      },
+      "tpi_conditions": "short/short",
+      "exposure": "RISK OFF",
+      "leverage": "impermissible"
+    },
+    "rsps": {
+      "pairs": [
+        {
+          "pair": "HYPEBTC",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "HYPEETH",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "HYPESOL",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "HYPESUI",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "HYPEDOGE",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "HYPEXRP",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "SUIBTC",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "SUIETH",
+          "value": -0.6,
+          "bias": "bearish"
+        },
+        {
+          "pair": "SUISOL",
+          "value": 0.6,
+          "bias": "bullish"
+        },
+        {
+          "pair": "DOGEBTC",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "DOGEETH",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "DOGESOL",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "DOGESUI",
+          "value": -0.6,
+          "bias": "bearish"
+        },
+        {
+          "pair": "GOLDUSD",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "EURGOLD",
+          "value": 1.0,
+          "bias": "bullish"
+        },
+        {
+          "pair": "EURUSD",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "XRPBTC",
+          "value": -1.0,
+          "bias": "bearish"
+        },
+        {
+          "pair": "XRPETH",
+          "value": 0.2,
+          "bias": "slight bull"
+        },
+        {
+          "pair": "XRPSOL",
+          "value": 0.67,
+          "bias": "bullish"
+        },
+        {
+          "pair": "XRPSUI",
+          "value": -0.6,
+          "bias": "bearish"
+        },
+        {
+          "pair": "XRPDOGE",
+          "value": -0.6,
+          "bias": "bearish"
+        }
+      ]
+    }
+  },
+  "updates": [
+    {
+      "date": "2026-11-25",
+      "mtpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "ltpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "rsps_dominant_major": "BTC",
+      "optional_higher_beta": null,
+      "denominator": "USD",
+      "btc_regime": {
+        "state": "MEAN-REVERTING",
+        "change": "no change"
+      },
+      "rsps_portfolio": [
+        {
+          "asset": "USDT",
+          "pct": 100,
+          "kind": "cash"
+        }
+      ],
+      "twx_portfolio": null,
+      "conservative_portfolio": null,
+      "notes": null
+    },
+    {
+      "date": "2026-11-22",
+      "mtpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "ltpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "rsps_dominant_major": "BTC",
+      "optional_higher_beta": null,
+      "denominator": "USD",
+      "btc_regime": {
+        "state": "MEAN-REVERTING",
+        "change": "no change"
+      },
+      "rsps_portfolio": [
+        {
+          "asset": "USDT",
+          "pct": 100,
+          "kind": "cash"
+        }
+      ],
+      "twx_portfolio": [
+        {
+          "asset": "BTC",
+          "pct": 50,
+          "kind": "spot"
+        },
+        {
+          "asset": "USDT",
+          "pct": 50,
+          "kind": "cash"
+        }
+      ],
+      "conservative_portfolio": null,
+      "notes": [
+        "No change in positions, hanya sedikit change in logic view. Di sini gw akan display balik RSPS portfolio / Strategy Portfolio tanpa include DCA portfolio.",
+        "SDCA Valuation Score of 2SD, TIME TO ACCUMULATE !",
+        "Positive liquidity impacting the market",
+        "Leverage is impermissible"
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "mtpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "ltpi": {
+        "state": "BEARISH",
+        "change": "slight -ROC"
+      },
+      "rsps_dominant_major": "BTC",
+      "optional_higher_beta": null,
+      "denominator": "USD",
+      "btc_regime": {
+        "state": "MEAN-REVERTING",
+        "change": "no change"
+      },
+      "rsps_portfolio": null,
+      "twx_portfolio": [
+        {
+          "asset": "BTC",
+          "pct": 50,
+          "kind": "spot"
+        },
+        {
+          "asset": "USDT",
+          "pct": 50,
+          "kind": "cash"
+        }
+      ],
+      "conservative_portfolio": [
+        {
+          "asset": "BTC",
+          "pct": 40,
+          "kind": "spot"
+        },
+        {
+          "asset": "USDT",
+          "pct": 60,
+          "kind": "cash"
+        }
+      ],
+      "notes": [
+        "No change in positions.",
+        "SDCA Valuation Score of 2SD, TIME TO ACCUMULATE !",
+        "Positive liquidity impacting the market",
+        "Leverage is impermissible"
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "mtpi": {
+        "state": "BEARISH",
+        "change": "no change"
+      },
+      "ltpi": {
+        "state": "BEARISH",
+        "change": "slight -ROC"
+      },
+      "rsps_dominant_major": "BTC",
+      "optional_higher_beta": null,
+      "denominator": "USD",
+      "btc_regime": {
+        "state": "MEAN-REVERTING",
+        "change": "no change"
+      },
+      "rsps_portfolio": null,
+      "twx_portfolio": [
+        {
+          "asset": "BTC",
+          "pct": 50,
+          "kind": "spot"
+        },
+        {
+          "asset": "USDT",
+          "pct": 50,
+          "kind": "cash"
+        }
+      ],
+      "conservative_portfolio": [
+        {
+          "asset": "BTC",
+          "pct": 40,
+          "kind": "spot"
+        },
+        {
+          "asset": "USDT",
+          "pct": 60,
+          "kind": "cash"
+        }
+      ],
+      "notes": [
+        "No change in positions.",
+        "Cycle bags accumulated and in PROFIT already.",
+        "Positive liquidity impacting the market",
+        "Leverage is impermissible"
+      ]
+    }
+  ]
+}

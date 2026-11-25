@@ -372,6 +372,35 @@ h1{text-transform:none;letter-spacing:0}
 .dca-arah .srow:last-child{border-bottom:0}
 .dca-arah .srow .hd{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
 .dca-arah .srow .tx{font-size:12px;color:var(--mu);margin-top:2px}
+
+.twx-box{margin:0 0 12px}
+.twx-box.latest{border-color:#1e3a5f}
+.twx-date{font-size:14px;font-weight:700;margin:0 0 8px}
+.twx-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.twx-chip{display:inline-block;padding:5px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
+.twx-chip .l{color:var(--mu);font-size:11px;display:block}
+.twx-chip b{font-weight:700}
+.twx-chip.up{border-color:#14532d}
+.twx-chip.dn{border-color:#7f1d1d}
+.twx-chip.wa{border-color:#5a4410}
+.twx-ports{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin:0 0 8px}
+.twx-port{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#0b0e14}
+.twx-port .l{font-size:11px;color:var(--mu)}
+.twx-bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:#0b0e14;border:1px solid var(--line);margin:6px 0 4px}
+.twx-bar i{display:block;height:100%}
+.twx-bar i.btc{background:#f59e0b}
+.twx-bar i.usdt{background:#22c55e}
+.twx-legs{font-size:12px}
+.twx-notes{margin:8px 0 0;padding:0;list-style:none}
+.twx-notes li{font-size:12px;color:var(--mu);padding:2px 0;line-height:1.45}
+.twx-snap{margin:0 0 12px}
+.twx-pairs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.twx-pair{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
+.twx-pair .pv{font-weight:700}
+.twx-k{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 0}
+.twx-hist{margin:0 0 12px}
+.twx-old{padding:10px 0;border-top:1px solid var(--line)}
+.twx-old:first-child{border-top:0;padding-top:4px}
 </style></head><body><div class="wrap">
 <nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">PAPER DESKS LIVE</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
 
@@ -414,7 +443,7 @@ const $=s=>document.getElementById(s),START=10000,FOCUS="Majors";
 const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
 const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b",url:"https://app.hyperliquid.xyz/explorer/address/0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b"},{name:"Russel",address:"0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB",url:"https://app.hyperliquid.xyz/explorer/address/0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB"}];
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
-let D=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
+let D=null,TWX=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
 let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca"];
   const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
@@ -1328,6 +1357,65 @@ function sentimenCard(){const S=(D&&D.sentimen)||{},P=S.public||{},K=S.desk||{};
     ${sentMeter(K.score)}
     <p class="sent-why">${esc(K.reason||"Data desk belum ada.")}</p></div>
   </div></div>`}
+
+function twxDate(iso){const p=String(iso||"").split("-"),mo=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+ return p.length===3?`${Number(p[2])} ${mo[Number(p[1])-1]||p[1]} ${p[0]}`:(iso||"—")}
+function twxTone(s){s=String(s||"").toLowerCase();
+ if(/slight/.test(s))return"wa";
+ if(/bull|accumulate|profit|positive liquidity/.test(s))return"up";
+ if(/bear|risk off|impermissible|trash|short/.test(s))return"dn";
+ if(/mean|revert|netral/.test(s))return"wa";
+ return""}
+function twxState(s){if(s==null||s===""||s==="N/A")return"N/A";
+ const u=String(s).toUpperCase();return u==="BEARISH"?"Bearish":u==="BULLISH"?"Bullish":u==="MEAN-REVERTING"?"Mean-reverting":s}
+function twxChange(c){if(!c||c==="N/A")return"";return c==="no change"?"tanpa perubahan":c==="slight -ROC"?"sedikit -ROC":c}
+function twxSigned(v){if(v==null||isNaN(Number(v)))return"N/A";const n=Number(v),t=n.toFixed(2);return(n>0?"+":"")+t}
+function twxPairName(p){p=String(p||"");const map=[["HYPE","HYPE"],["GOLD","GOLD"],["DOGE","DOGE"],["EUR","EUR"],["XRP","XRP"],["SUI","SUI"],["SOL","SOL"],["ETH","ETH"],["BTC","BTC"],["USD","USD"]];
+ for(const [a] of map){if(p.indexOf(a)===0&&p.length>a.length){const b=p.slice(a.length);if(map.some(([x])=>x===b))return a+"/"+b}}return p}
+function twxChip(lab,val,chg,tone){const t=tone||twxTone(val),c=twxChange(chg);
+ return `<span class="twx-chip ${t}"><span class="l">${esc(lab)}</span><b>${esc(val||"N/A")}</b>${c?`<span class="sub"> · ${esc(c)}</span>`:""}</span>`}
+function twxPort(title,legs){if(!legs||legs==="N/A"||(Array.isArray(legs)&&!legs.length))
+  return `<div class="twx-port"><div class="l">${esc(title)}</div><div class="twx-legs mu">N/A</div></div>`;
+ const bar=legs.map(x=>{const k=String((x.kind||"")+" "+(x.asset||"")).toLowerCase();const cls=k.indexOf("btc")>=0?"btc":"usdt";return `<i class="${cls}" style="width:${Number(x.pct)||0}%"></i>`}).join("");
+ const labs=legs.map(x=>{const k=x.kind==="spot"?"Spot ":x.kind==="cash"?"Cash ":"";return `${x.pct}% ${k}$${x.asset}`}).join(" · ");
+ return `<div class="twx-port"><div class="l">${esc(title)}</div><div class="twx-bar">${bar}</div><div class="twx-legs">${esc(labs)}</div></div>`}
+function twxNotes(notes){if(!notes||(Array.isArray(notes)&&!notes.length))return`<div class="sub" style="margin-top:6px">Catatan: N/A</div>`;
+ const arr=Array.isArray(notes)?notes:[notes];
+ return `<ul class="twx-notes">${arr.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`}
+function twxUpdateBody(u,compact){u=u||{};
+ const mt=u.mtpi||{},lt=u.ltpi||{},rg=u.btc_regime||{};
+ const beta=u.optional_higher_beta==null||u.optional_higher_beta===""?"Tidak ada":u.optional_higher_beta;
+ const chips=twxChip("MTPI",twxState(mt.state),mt.change)+twxChip("LTPI",twxState(lt.state),lt.change)
+  +twxChip("Mayor RSPS",u.rsps_dominant_major||"N/A","","wa")
+  +twxChip("Higher beta",beta)
+  +twxChip("Denominator",u.denominator||"N/A","","up")
+  +twxChip("Rezim BTC",twxState(rg.state),rg.change,twxTone(rg.state));
+ const ports=twxPort("Portofolio RSPS",u.rsps_portfolio)+twxPort("Portofolio TWX",u.twx_portfolio)+twxPort("Portofolio konservatif",u.conservative_portfolio);
+ return `${compact?"":`<div class="twx-date">${esc(twxDate(u.date))}</div>`}<div class="twx-chips">${chips}</div><div class="twx-ports">${ports}</div>${twxNotes(u.notes)}`}
+function twxPairChip(x){x=x||{};const t=twxTone(x.bias||x.value);const bias=x.bias?` <span class="sub">${esc(x.bias)}</span>`:"";
+ return `<span class="twx-pair ${t}"><span>${esc(twxPairName(x.pair))}</span><span class="pv ${t}">${esc(twxSigned(x.value))}</span>${bias}</span>`}
+function twxSnapshot(S){if(!S)return"";const T=S.twx||{},R=S.rsps||{};
+ const meta=[
+  twxChip("L-TPI",`${twxSigned(T.ltpi&&T.ltpi.value)} · ${twxState((T.ltpi&&T.ltpi.bias)||"")}`, "", twxTone(T.ltpi&&T.ltpi.bias)),
+  twxChip("M-TPI",`${twxSigned(T.mtpi&&T.mtpi.value)} · ${twxState((T.mtpi&&T.mtpi.bias)||"")}`, "", twxTone(T.mtpi&&T.mtpi.bias)),
+  twxChip("TRASH TPI",`${twxSigned(T.trash_tpi&&T.trash_tpi.value)} · ${esc((T.trash_tpi&&T.trash_tpi.bias)||"N/A")}`, "", twxTone(T.trash_tpi&&T.trash_tpi.bias)),
+  twxChip("State BTC",`${twxSigned(T.btc_market_state&&T.btc_market_state.value)} · ${esc((T.btc_market_state&&T.btc_market_state.bias)||"N/A")}`, "", twxTone(T.btc_market_state&&T.btc_market_state.bias)),
+  twxChip("Makro",twxSigned(T.macro&&T.macro.value),"",twxTone(T.macro&&T.macro.bias)),
+  twxChip("Kondisi TPI",T.tpi_conditions||"N/A","",twxTone(T.tpi_conditions)),
+  twxChip("Eksposur",T.exposure||"N/A","",twxTone(T.exposure)),
+  twxChip("Leverage",T.leverage||"N/A","",twxTone(T.leverage))
+ ].join("");
+ const twxPairs=(T.pairs||[]).map(twxPairChip).join("");
+ const rspsPairs=(R.pairs||[]).map(twxPairChip).join("");
+ return `<div class="card twx-snap"><h2>Cuplikan dasbor TWX / RSPS</h2>
+  <div class="sub">${esc(S.label||"Dari screenshot")}${S.as_of?" · "+esc(twxDate(S.as_of)):""}</div>
+  <div class="twx-chips" style="margin-top:8px">${meta}</div>
+  ${twxPairs?`<div class="twx-k">Pair TWX</div><div class="twx-pairs">${twxPairs}</div>`:""}
+  ${rspsPairs?`<div class="twx-k">Pair RSPS</div><div class="twx-pairs">${rspsPairs}</div>`:""}</div>`}
+function twxHomeSection(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
+ const latest=U[0],older=U.slice(1);
+ const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(u=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(u.date))}</div>${twxUpdateBody(u,true)}</div>`).join("")}</details>`:"";
+ return `<div class="card twx-box latest"><h2>Update Sistem TWX <span class="badge b-live">TERBARU</span></h2>${twxUpdateBody(latest,false)}</div>${twxSnapshot(TWX.snapshot)}${hist}`}
 function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("htitle").innerHTML=`Beranda <span class="badge b-paper">${tip("HANYA SIMULASI",TIPS.paper)}</span>`;
  $("tot").hidden=false;$("totsub").hidden=false;
@@ -1335,7 +1423,7 @@ function renderHome(){const B=btcOutlook(),pxv=btcLivePx();
  $("totsub").textContent=B.arah||"Kondisi BTC diperbarui tiap jam";
  $("banner").hidden=true;$("banner").innerHTML="";
  const paused=(D.paused_desks||[]).map(homePausedCard).join("");
- $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
+ $("homesec").innerHTML=btcKondisiCard()+sentimenCard()+twxHomeSection()+`<div class="home-grid">${homeMajorsCard()}${homeGoalCard("real")}${homeGoalCard("signals")}${homeWalletCard("Steven")}${homeWalletCard("Russel")}${homeTrendCard()}${homeMemeCard()}${paused}</div>`;
  $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. Kondisi BTC dari Binance USDT-M, dihitung ulang tiap jam bersama data desk. ${esc(B.disclaimer||"Ilustrasi, bukan prediksi.")}`}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
@@ -1548,7 +1636,7 @@ async function fetchWallet(){if(!D||walletBusy)return;walletBusy=true;
   walletAt=Date.now();if(wantsWallet())render();else paintLive()}
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
-async function load(){try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
+async function load(){try{const [r,t]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("data/twx_updates.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);D=await r.json();if(t&&t.ok){try{TWX=await t.json()}catch(e){}}render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-meme").addEventListener("click",()=>setView("meme"));
