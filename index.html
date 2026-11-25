@@ -614,12 +614,15 @@ document.addEventListener("toggle",e=>{const d=e.target;if(!d||d.tagName!=="DETA
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
+  const pxPct=(o.e&&p)?(short?(o.e-p)/o.e*100:(p-o.e)/o.e*100):null;
+  const roe=sz?u/sz*100:null;
   const tag=slTag(o),flags=crossFlags(o,p);
   const match=walletMatchBadge(o);
   const tagLab=tag==="trail"?tip("trail",TIPS.trail):tag==="BE"?tip("BE",TIPS.be):tag;
+  const pctLine=(roe!=null&&pxPct!=null)?`ROE ${pct(roe)} <span class="sub">(harga ${pct(pxPct)})</span>`:pct(pc);
   return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${coinLabel(o.a,o.link)} <span class="sub">${esc(o.desk)}</span></div>
   ${sideBadge(o.side,perp?o.lev:null)}</div>
-  <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pct(pc)}</span></div>
+  <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pctLine}</span></div>
   ${o.entered?`<div class="when">Masuk: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
   <div class="g"><div><span>Masuk</span>${px(o.e)}</div><div><span>Sekarang</span>${px(p)}${LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':''}</div>
   <div><span>${tip("Likuidasi",TIPS.liq)}</span>${px(o.liq)}</div><div><span>Jarak ke ${tip("SL",TIPS.sl)}</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
@@ -1733,6 +1736,8 @@ function renderDca(){const A=D.dca||{};
  $("foot").innerHTML=`Analisis saja · tidak ada order dari halaman ini${A.asof?" · Data "+esc(A.asof):((D.updated)?" · Data "+esc(D.updated):"")}`}
 /* BITGET-VIEW-START (Grok Bot). Real Bitget account, encrypted with a PIN-derived key. No API keys, no orders from this page. */
 const BG_REPO="stevenlin12341-lang/paper-desks-live";let BG_DATA=null,BG_ERR="",BG_BUSY=false;
+const BG_LIVE={},BG_WS_URL="wss://ws.bitget.com/v2/ws/public",BG_TICKERS="https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES";
+let BG_WS=null,BG_WS_RETRY=null,BG_POLL=null,BG_PING=null,BG_TICKS=0;
 const bgHex=h=>new Uint8Array((h.match(/../g)||[]).map(x=>parseInt(x,16)));
 const bgToHex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
 function bgKeyHex(){try{return sessionStorage.getItem("bgKey")||""}catch(e){return""}}
@@ -1749,7 +1754,7 @@ async function bgFetch(pin){if(BG_BUSY)return;BG_BUSY=true;BG_ERR="";
  catch(e){BG_ERR="Gagal memuat data Bitget."}
  finally{BG_BUSY=false;if(VIEW==="bitget"||VIEW==="home")render()}}
 function bgUnlock(ev){if(ev)ev.preventDefault();const v=(($("bgpin")||{}).value||"");if(v)bgFetch(v)}
-function bgLock(){try{sessionStorage.removeItem("bgKey")}catch(e){}BG_DATA=null;render()}
+function bgLock(){try{sessionStorage.removeItem("bgKey")}catch(e){}BG_DATA=null;bgLiveStop();render()}
 async function bgControl(act){const kh=bgKeyHex();if(!kh)return;
  if(act!=="STOP"&&!confirm("Kirim perintah "+act+" ke bot Bitget? Ini akun uang asli."))return;
  const t=Math.floor(Date.now()/1000),k=await crypto.subtle.importKey("raw",bgHex(kh.slice(64)),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
@@ -1761,47 +1766,102 @@ function bgTps(p){const e=p.entry!=null?+p.entry:NaN,side=String(p.side||"").toL
  let tps=(p.tps||[]).map(t=>[t[0]!=null?+t[0]:NaN,t[1]]).filter(t=>!isNaN(t[0]));
  if(!isNaN(e))tps.sort((a,b)=>side==="short"?b[0]-a[0]:a[0]-b[0]);
  return{tp1:tps[0]&&tps[0][0],tp2:tps[1]&&tps[1][0],tp3:tps[2]&&tps[2][0]}}
+function bgLivePx(sym){const s=String(sym||"");if(BG_LIVE[s]!=null)return BG_LIVE[s];if(typeof LIVE!=="undefined"&&LIVE[s]!=null)return LIVE[s];return null}
+function bgPnl(p,mark){const e=p.entry!=null?+p.entry:NaN,size=p.size!=null?+p.size:NaN,short=String(p.side||"").toLowerCase()==="short";
+ const m=mark!=null&&!isNaN(+mark)?+mark:NaN;
+ if(isNaN(e)||isNaN(size)||isNaN(m)){const u=+p.upnl||0;return{u,pxPct:null,roe:null,mark:isNaN(m)?null:m,live:false}}
+ const u=(short?-1:1)*size*(m-e),pxPct=e?(short?(e-m)/e:(m-e)/e)*100:null,lev=p.lev!=null?+p.lev:0;
+ let margin=p.margin!=null&&+p.margin>0?+p.margin:null;
+ if(margin==null&&lev>0&&e)margin=Math.abs(e*size)/lev;
+ const roe=margin?u/margin*100:(pxPct!=null&&lev?pxPct*lev:null);
+ return{u,pxPct,roe,mark:m,live:true,margin}}
+function bgPctLine(roe,pxPct){if(roe==null&&pxPct==null)return"";
+ if(roe==null)return`<span class="sub">(harga ${pct(pxPct)})</span>`;
+ if(pxPct==null)return`ROE ${pct(roe)}`;
+ return`ROE ${pct(roe)} <span class="sub">(harga ${pct(pxPct)})</span>`}
+function bgSyms(){return((BG_DATA&&BG_DATA.positions)||[]).map(p=>p.sym).filter(Boolean)}
+function bgApplyTick(sym,mark,last){const v=mark!=null&&mark!==""&&!isNaN(+mark)?+mark:(last!=null&&last!==""&&!isNaN(+last)?+last:null);
+ if(v==null||!sym)return;const changed=BG_LIVE[sym]!==v;BG_LIVE[sym]=v;if(typeof LIVE!=="undefined"){LIVE[sym]=v;const c=bgCoin(sym);if(c)LIVE[c]=v}BG_TICKS++;if(changed)paintBgLive();else if(typeof marksAt!=="undefined"){marksAt=Date.now();marksSrc="Bitget";marksN=Object.keys(BG_LIVE).length;liveFail=false}}
+function paintBgLive(){if(typeof VIEW!=="undefined"&&VIEW!=="bitget"||!BG_DATA)return;
+ const pos=BG_DATA.positions||[];let tu=0,nLive=0;
+ pos.forEach(p=>{const live=bgLivePx(p.sym),mark=live!=null?live:(p.mark!=null?+p.mark:NaN),r=bgPnl(p,mark);
+  tu+=r.u;if(live!=null)nLive++;
+  const card=document.querySelector('#open .oc[data-sym="'+esc(p.sym)+'"]');if(!card)return;
+  card.classList.toggle("pos",r.u>0);card.classList.toggle("neg",r.u<0);
+  const pl=card.querySelector(".pl");if(pl){pl.className="pl "+cls(r.u);pl.innerHTML=`${money(r.u)} <span style="font-size:13px">${bgPctLine(r.roe,r.pxPct)}</span>`}
+  const nowEl=card.querySelector("[data-bg-now]");if(nowEl)nowEl.innerHTML=`${px(r.mark)}${live!=null?' <span class="up">●</span>':''}`;
+  const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
+  const dist=(!isNaN(sl)&&!isNaN(r.mark)&&r.mark)?(short?(sl-r.mark)/r.mark*100:(r.mark-sl)/r.mark*100):null;
+  const distEl=card.querySelector("[data-bg-sldist]");if(distEl){distEl.className=dist!=null&&dist<1?"dn":"";distEl.textContent=dist==null?"—":dist.toFixed(2)+"%"}});
+ if($("otsum")&&pos.length)$("otsum").innerHTML=`P/L terbuka <b class="${cls(tu)}">${money(tu)}</b>`;
+ const B=BG_DATA,st=+B.start_equity||+B.equity,ds=+B.day_start_equity||+B.equity,up0=+B.upnl||0,eq0=+B.equity;
+ const eq=nLive?eq0-up0+tu:eq0,pl=st?eq/st*100-100:0,daypl=ds?eq/ds*100-100:0;
+ if($("tot"))$("tot").innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
+ const eqEl=document.querySelector("#desks [data-bg-eq]");if(eqEl)eqEl.innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span>`;
+ const upEl=document.querySelector("#desks [data-bg-upnl]");if(upEl){upEl.className="v "+cls(tu);upEl.textContent=money(tu)}
+ const dayEl=document.querySelector("#desks [data-bg-day]");if(dayEl){dayEl.className="v "+cls(daypl);dayEl.textContent=pct(daypl)}
+ if(nLive&&typeof marksAt!=="undefined"){marksAt=Date.now();marksSrc="Bitget";marksN=nLive;liveFail=false;if(typeof paintLive==="function")paintLive()}
+ try{window.__bgLive={ticks:BG_TICKS,n:nLive,src:"Bitget",at:Date.now(),syms:Object.assign({},BG_LIVE)}}catch(e){}}
+async function bgPoll(){const want=new Set(bgSyms());if(!want.size)return;
+ try{const j=await fetchJson(BG_TICKERS,{timeout:8000});const arr=(j&&j.data)||(Array.isArray(j)?j:[]);
+  (arr||[]).forEach(x=>{const id=x.symbol||x.instId;if(want.has(id))bgApplyTick(id,x.markPrice,x.lastPr)})}
+ catch(e){}}
+function bgWsStop(){if(BG_WS_RETRY){clearTimeout(BG_WS_RETRY);BG_WS_RETRY=null}if(BG_PING){clearInterval(BG_PING);BG_PING=null}
+ if(BG_WS){try{BG_WS.onclose=null;BG_WS.close()}catch(e){}BG_WS=null}}
+function bgWsStart(){if(typeof WebSocket==="undefined")return;const syms=bgSyms();if(!syms.length)return;bgWsStop();
+ let ws;try{ws=new WebSocket(BG_WS_URL)}catch(e){BG_WS_RETRY=setTimeout(bgWsStart,3000);return}
+ BG_WS=ws;
+ ws.onopen=()=>{try{ws.send(JSON.stringify({op:"subscribe",args:syms.map(s=>({instType:"USDT-FUTURES",channel:"ticker",instId:s}))}))}catch(e){}
+  BG_PING=setInterval(()=>{try{if(ws.readyState===1)ws.send("ping")}catch(e){}},25000)};
+ ws.onmessage=ev=>{const raw=typeof ev.data==="string"?ev.data:"";if(raw==="ping"){try{ws.send("pong")}catch(e){}return}if(raw==="pong")return;
+  let j;try{j=JSON.parse(raw)}catch(e){return}const inst=(j.arg&&j.arg.instId)||"";
+  (j.data||[]).forEach(x=>bgApplyTick(x.instId||x.symbol||inst,x.markPrice,x.lastPr))};
+ ws.onclose=()=>{if(BG_WS===ws)BG_WS=null;if(BG_DATA&&bgKeyHex())BG_WS_RETRY=setTimeout(bgWsStart,2000)};
+ ws.onerror=()=>{}}
+function bgLiveStart(){bgPoll();if(!BG_POLL)BG_POLL=setInterval(bgPoll,3000);bgWsStart()}
+function bgLiveStop(){if(BG_POLL){clearInterval(BG_POLL);BG_POLL=null}bgWsStop()}
 function bgOpenCards(pos){let tu=0,tm=0;
- const html=pos.length?pos.map(p=>{const a=bgCoin(p.sym),e=p.entry!=null?+p.entry:NaN,mark=p.mark!=null?+p.mark:NaN,u=+p.upnl||0;
-  const size=p.size!=null?+p.size:NaN,notion=(!isNaN(e)&&!isNaN(size))?Math.abs(e*size):0,pc=notion?u/notion*100:0;
-  tu+=u;tm+=notion;const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
-  const dist=(!isNaN(sl)&&!isNaN(mark)&&mark)?(short?(sl-mark)/mark*100:(mark-sl)/mark*100):null;
-  const t=bgTps(p);
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}" data-a="${esc(a)}"><div class="t"><div>${coinLabel(a)}</div>${sideBadge(p.side,p.lev)}</div>
-  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
-  <div class="g"><div><span>Masuk</span>${px(e)}</div><div><span>Sekarang</span>${px(mark)}</div>
-  <div><span>SL</span>${px(sl)}</div><div><span>Jarak ke SL</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
+ const html=pos.length?pos.map(p=>{const a=bgCoin(p.sym),live=bgLivePx(p.sym),mark=live!=null?live:(p.mark!=null?+p.mark:NaN),r=bgPnl(p,mark);
+  const e=p.entry!=null?+p.entry:NaN,size=p.size!=null?+p.size:NaN,notion=(!isNaN(e)&&!isNaN(size))?Math.abs(e*size):0;
+  tu+=r.u;tm+=notion;const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
+  const dist=(!isNaN(sl)&&r.mark)?(short?(sl-r.mark)/r.mark*100:(r.mark-sl)/r.mark*100):null;
+  const t=bgTps(p),margin=p.margin!=null?p.margin:(r.margin!=null?r.margin:"");
+  return`<div class="oc ${r.u>0?"pos":r.u<0?"neg":""}" data-a="${esc(a)}" data-sym="${esc(p.sym)}"><div class="t"><div>${coinLabel(a)}</div>${sideBadge(p.side,p.lev)}</div>
+  <div class="pl ${cls(r.u)}">${money(r.u)} <span style="font-size:13px">${bgPctLine(r.roe,r.pxPct)}</span></div>
+  <div class="g"><div><span>Masuk</span>${px(e)}</div><div><span>Sekarang</span><span data-bg-now>${px(r.mark)}${live!=null?' <span class="up">●</span>':''}</span></div>
+  <div><span>SL</span>${px(sl)}</div><div><span>Jarak ke SL</span><b data-bg-sldist class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
   <div><span>TP1</span>${px(t.tp1!=null?+t.tp1:NaN)}</div><div><span>TP2</span>${px(t.tp2!=null?+t.tp2:NaN)}</div>
   <div><span>TP3</span>${px(t.tp3!=null?+t.tp3:NaN)}</div><div><span>Likuidasi</span>${px(p.liq!=null?+p.liq:NaN)}</div></div></div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
  return{html,tu,tm}}
-function bgMode(B){const L=B.limits||{};return B.killed?"Mati":B.halted?"Stop harian":(B.mode||"—")}
+function bgMode(B){return B.killed?"Mati":B.halted?"Stop harian":(B.mode||"—")}
 function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
  ["banner","wallet","shadowsec","trendsec","learnsec","homesec","dcasec","memesec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
  $("htitle").innerHTML=`Bitget Futures <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span>`;
- $("foot").innerHTML="Akun Bitget asli. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order.";
+ $("foot").innerHTML="Akun Bitget asli. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order. Harga live dari ticker publik Bitget.";
  if(!bgKeyHex()||!BG_DATA){
+  bgLiveStop();
   ["ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
   sec.hidden=false;$("tot").textContent="Terkunci";$("totsub").textContent="Masukkan PIN untuk membuka";
   sec.innerHTML=`<div class="card"><form onsubmit="bgUnlock(event)" class="dca-form"><label>PIN <input id="bgpin" type="password" inputmode="numeric" autocomplete="off"></label><button type="submit">Buka</button></form><div id="bgerr" class="sub">${esc(BG_ERR)}</div><p class="sub" style="margin:10px 0 0">Data akun dikunci dengan PIN. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order.</p></div>`;
   if(bgKeyHex()&&!BG_DATA&&!BG_BUSY)bgFetch();return}
  sec.hidden=true;sec.innerHTML="";
  ["ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=false});
- const B=BG_DATA,eq=+B.equity,st=+B.start_equity||eq,ds=+B.day_start_equity||eq;
- const pl=st?eq/st*100-100:0,daypl=ds?eq/ds*100-100:0,mode=bgMode(B),L=B.limits||{},pos=B.positions||[];
+ const B=BG_DATA,st=+B.start_equity||+B.equity,ds=+B.day_start_equity||+B.equity,mode=bgMode(B),L=B.limits||{},pos=B.positions||[];
+ const cards=bgOpenCards(pos);let tu=cards.tu,nLive=pos.filter(p=>bgLivePx(p.sym)!=null).length,up0=+B.upnl||0,eq0=+B.equity;
+ const eq=nLive?eq0-up0+tu:eq0,pl=st?eq/st*100-100:0,daypl=ds?eq/ds*100-100:0;
  $("tot").innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
  $("totsub").textContent=`${mode} · modal ${money(st)} · hari ini ${pct(daypl)} · ${pos.length} posisi terbuka`;
- const cards=bgOpenCards(pos);
  if($("ottitle"))$("ottitle").innerHTML=`Posisi terbuka <span class="badge" id="otn">${pos.length}</span>`;
  if($("open"))$("open").innerHTML=cards.html;
- if($("otsum"))$("otsum").innerHTML=pos.length?`P/L terbuka <b class="${cls(cards.tu)}">${money(cards.tu)}</b>`:"";
+ if($("otsum"))$("otsum").innerHTML=pos.length?`P/L terbuka <b class="${cls(tu)}">${money(tu)}</b>`:"";
  const curve=B.curve||B.equity_curve||[];
  if($("desktitle"))$("desktitle").textContent="Ringkasan";
  if($("desks"))$("desks").innerHTML=`<div class="card"><h2>Bitget <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span> <span class="badge ${mode==="ON"?"b-live":"b-paused"}">${esc(mode)}</span></h2>
-  <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
-  <div class="kpis" style="grid-template-columns:repeat(2,1fr);max-width:420px"><div class="kpi"><div class="v ${cls(+B.upnl)}">${money(+B.upnl)}</div><div class="l">Belum dikunci</div></div>
+  <div class="eq" data-bg-eq>${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
+  <div class="kpis" style="grid-template-columns:repeat(2,1fr);max-width:420px"><div class="kpi"><div class="v ${cls(tu)}" data-bg-upnl>${money(tu)}</div><div class="l">Belum dikunci</div></div>
   <div class="kpi"><div class="v">${money(+B.available)}</div><div class="l">Tersedia</div></div>
   <div class="kpi"><div class="v">${pos.length} / ${L.max_open??"—"}</div><div class="l">Posisi</div></div>
-  <div class="kpi"><div class="v ${cls(daypl)}">${pct(daypl)}</div><div class="l">Hari ini</div></div></div>
+  <div class="kpi"><div class="v ${cls(daypl)}" data-bg-day>${pct(daypl)}</div><div class="l">Hari ini</div></div></div>
   ${typeof chart==="function"?chart(curve,st):""}
   <div class="sub" style="margin-top:8px">Risiko ${L.risk_pct}% · lev maks ${L.max_lev}x · stop harian −${L.daily_halt_pct}% · mati −${L.kill_dd_pct}%. ${esc(B.updated||"")}${B.kill_reason?" · "+esc(B.kill_reason):""}</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="home-go" onclick="bgControl('ON')">ON</button><button type="button" class="home-go" onclick="bgControl('PAUSE')">PAUSE</button><button type="button" class="home-go" style="color:var(--dn);border-color:var(--dn)" onclick="bgControl('STOP')">STOP</button><button type="button" class="home-go" onclick="bgLock()">Kunci lagi</button></div>
@@ -1813,7 +1873,8 @@ function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
  if($("dtabs")){$("dtabs").style.display="none";$("dtabs").innerHTML=""}
  const acts=(B.actions||[]).map(a=>`<div class="it"><div class="h"><b>${esc(a.t)}</b> <span class="${a.ok?"up":"dn"}">${a.ok?"✓":"✗"}</span></div><div class="r">${esc(a.a)}${a.err?" — "+esc(a.err):""}</div></div>`).join("")||'<div class="it mu">Belum ada aksi.</div>';
  const sk=(B.skipped||[]).map(s=>`<div class="sub" style="margin-top:4px">${esc((s.k||"").split("|").slice(0,2).join(" "))}: ${esc(s.reason||"")}</div>`).join("");
- if($("dec"))$("dec").innerHTML=more("det-bg-act","Detail aksi terakhir",acts+(sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""))}
+ if($("dec"))$("dec").innerHTML=more("det-bg-act","Detail aksi terakhir",acts+(sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""));
+ bgLiveStart();paintBgLive()}
 setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
 /* BITGET-VIEW-END */
 function render(opt){if(!D)return;
@@ -1883,7 +1944,8 @@ async function fetchMarks(){if(!D||marksBusy)return;marksBusy=true;
     const use=(c,sym)=>{const v=mids[c];if(v==null)return;const p=+v;if(sym&&got[sym]==null){got[sym]=p;n++}got[c]=p};
     coins.forEach(c=>use(c,c+"USDT"));missing.forEach(s=>use(s.replace(/USDT$/,""),s));
     if(!src)src="Hyperliquid";else if(missing.some(s=>got[s]!=null))src="Binance+HL"}catch(e){}}
-  if(n){Object.assign(LIVE,got);const wanted=[...syms,...mints];marksN=wanted.filter(k=>got[k]!=null).length;marksSrc=src||marksSrc;marksAt=Date.now();liveFail=false;render()}
+  if(n){Object.assign(LIVE,got);const wanted=[...syms,...mints];marksN=wanted.filter(k=>got[k]!=null).length;marksSrc=src||marksSrc;marksAt=Date.now();liveFail=false;
+   if(VIEW==="bitget"&&typeof paintBgLive==="function"){paintBgLive();paintLive()}else render()}
   else{liveFail=true;paintLive()}}
  catch(e){liveFail=true;paintLive()}
  finally{marksBusy=false}}
