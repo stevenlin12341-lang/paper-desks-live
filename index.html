@@ -414,6 +414,7 @@ h1{text-transform:none;letter-spacing:0}
  <button type="button" id="v-russel" hidden>Dompet Russel</button>
  <button type="button" id="v-trend">Tes tren</button>
  <button type="button" id="v-dca">Cicilan BTC</button>
+ <button type="button" id="v-bitget">🔐 Bitget</button>
 </nav>
 <p class="help-hint sub">Arahkan ke kata yang bergaris putus (seperti SL, TP, LONG, SHORT) untuk arti singkatnya. Angka besar = yang paling penting. Tabel lengkap ada di tombol Detail.</p>
 <header>
@@ -435,6 +436,7 @@ h1{text-transform:none;letter-spacing:0}
 <section id="homesec" hidden></section>
 <section id="dcasec" hidden></section>
 <section id="memesec" hidden></section>
+<section id="bitgetsec" hidden></section>
 <footer id="foot">Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.</footer>
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Buka ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analisis"></div>
@@ -446,7 +448,7 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,TWX=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca"];
+let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca","bitget"];
   const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
   if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
   const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
@@ -1531,7 +1533,55 @@ function renderDca(){const A=D.dca||{};
  const hero=dcaBudgetHero(B,A.orders||[]);$("dcasec").innerHTML=hero+bud+keys+port+detail;if(dcaBuyAmt!=null)dcaShowBuy(dcaBuyAmt);
  if(!DCA_LIVE||!DCA_LIVE.ok||Date.now()-(DCA_LIVE.at||0)>10000)fetchDcaLive();
  $("foot").innerHTML=`Analisis saja · tidak ada order dari halaman ini${A.asof?" · Data "+esc(A.asof):((D.updated)?" · Data "+esc(D.updated):"")}`}
+/* BITGET-VIEW-START (Grok Bot). Real Bitget account, encrypted with a PIN-derived key. No API keys, no orders from this page. */
+const BG_REPO="stevenlin12341-lang/paper-desks-live";let BG_DATA=null,BG_ERR="",BG_BUSY=false;
+const bgHex=h=>new Uint8Array((h.match(/../g)||[]).map(x=>parseInt(x,16)));
+const bgToHex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+function bgKeyHex(){try{return sessionStorage.getItem("bgKey")||""}catch(e){return""}}
+async function bgDerive(pin,salt,iter){const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pin),"PBKDF2",false,["deriveBits"]);
+ return bgToHex(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:bgHex(salt),iterations:iter},base,512))}
+async function bgDecrypt(blob,keyHex){const k=await crypto.subtle.importKey("raw",bgHex(keyHex.slice(0,64)),"AES-GCM",false,["decrypt"]);
+ const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:bgHex(blob.iv),additionalData:new TextEncoder().encode("bitget-v1")},k,bgHex(blob.ct));return JSON.parse(new TextDecoder().decode(pt))}
+async function bgFetch(pin){if(BG_BUSY)return;BG_BUSY=true;BG_ERR="";
+ try{const blob=await fetchJson("data/bitget.json?t="+Date.now());let kh=bgKeyHex();
+  if(pin){$("bgerr")&&($("bgerr").textContent="Memeriksa PIN… (beberapa detik)");kh=await bgDerive(pin,blob.salt,blob.iter)}
+  if(!kh){BG_DATA=null;return}
+  try{BG_DATA=await bgDecrypt(blob,kh);try{sessionStorage.setItem("bgKey",kh)}catch(e){}}
+  catch(e){BG_DATA=null;try{sessionStorage.removeItem("bgKey")}catch(_){}BG_ERR="PIN salah."}}
+ catch(e){BG_ERR="Gagal memuat data Bitget."}
+ finally{BG_BUSY=false;if(VIEW==="bitget")render()}}
+function bgUnlock(ev){if(ev)ev.preventDefault();const v=(($("bgpin")||{}).value||"");if(v)bgFetch(v)}
+function bgLock(){try{sessionStorage.removeItem("bgKey")}catch(e){}BG_DATA=null;render()}
+async function bgControl(act){const kh=bgKeyHex();if(!kh)return;
+ if(act!=="STOP"&&!confirm("Kirim perintah "+act+" ke bot Bitget? Ini akun uang asli."))return;
+ const t=Math.floor(Date.now()/1000),k=await crypto.subtle.importKey("raw",bgHex(kh.slice(64)),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+ const sig=bgToHex(await crypto.subtle.sign("HMAC",k,new TextEncoder().encode(act+"|"+t)));
+ const url=`https://github.com/${BG_REPO}/issues/new?title=${encodeURIComponent("BITGET-CONTROL "+act)}&body=${encodeURIComponent("action="+act+" ts="+t+" sig="+sig+"\n\n(Klik Submit. Bot membaca perintah ini di siklus berikutnya.)")}`;
+ window.open(url,"_blank","noopener")}
+function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
+ ["banner","ot","wallet","shadowsec","trendsec","learnsec","desksec","twosec","homesec","dcasec","memesec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
+ sec.hidden=false;$("htitle").innerHTML=`Bitget Futures <span class="badge" style="color:#f59e0b;border-color:#f59e0b">UANG ASLI</span>`;
+ $("foot").innerHTML="Akun Bitget asli. Halaman ini tidak menyimpan API key dan tidak bisa mengirim order. Data dienkripsi dengan kunci dari PIN; tombol kontrol hanya membuat perintah bertanda tangan yang dibaca bot di komputer Grok Bot.";
+ if(!bgKeyHex()||!BG_DATA){$("tot").textContent="Terkunci";$("totsub").textContent="Masukkan PIN untuk membuka";
+  sec.innerHTML=`<div class="card"><form onsubmit="bgUnlock(event)" class="dca-form"><label>PIN <input id="bgpin" type="password" inputmode="numeric" autocomplete="off"></label><button type="submit">Buka</button></form><div id="bgerr" class="sub">${esc(BG_ERR)}</div><p class="sub" style="margin:10px 0 0">Data akun dienkripsi (AES-GCM, kunci PBKDF2-SHA256 600rb iterasi). Catatan: PIN pendek tetap bisa ditebak offline oleh orang yang niat, jadi isinya hanya angka akun, bukan kunci.</p></div>`;
+  if(bgKeyHex()&&!BG_DATA&&!BG_BUSY)bgFetch();return}
+ const B=BG_DATA,eq=+B.equity,st=+B.start_equity||eq,ds=+B.day_start_equity||eq;
+ $("tot").textContent=money(eq);$("totsub").innerHTML=`Modal awal bot ${money(st)} · <span class="${cls(eq-st)}">${(eq/st*100-100).toFixed(2)}%</span> · hari ini <span class="${cls(eq-ds)}">${(eq/ds*100-100).toFixed(2)}%</span>`;
+ const L=B.limits||{},mode=B.killed?"MATI (−"+L.kill_dd_pct+"%)":B.halted?"STOP HARIAN":B.mode;
+ const stat=`<div class="card"><h2>Status bot</h2>${homeKpis([[esc(mode),"Mode"],[money(+B.available),"Tersedia"],[`<span class="${cls(+B.upnl)}">${money(+B.upnl)}</span>`,"Belum dikunci"],[(B.positions||[]).length+" / "+L.max_open,"Posisi"]])}
+  <p class="sub" style="margin:8px 0 0">Risiko ${L.risk_pct}% per trade · leverage maks ${L.max_lev}x isolated · stop harian −${L.daily_halt_pct}% · mati total −${L.kill_dd_pct}%. Diperbarui ${esc(B.updated)}.${B.kill_reason?" "+esc(B.kill_reason):""}</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="home-go" onclick="bgControl('ON')">ON</button><button type="button" class="home-go" onclick="bgControl('PAUSE')">PAUSE (tanpa entry baru)</button><button type="button" class="home-go" style="color:var(--dn);border-color:var(--dn)" onclick="bgControl('STOP')">STOP</button><button type="button" class="home-go" onclick="bgLock()">Kunci lagi</button></div>
+  <p class="sub" style="margin:8px 0 0">Tombol membuka GitHub dengan perintah bertanda tangan PIN; klik Submit. Bot menjalankannya di siklus berikutnya (tiap jam 06–23 WIB). Paling cepat: ketik STOP di chat.</p></div>`;
+ const rows=(B.positions||[]).map(p=>`<tr><td><b>${esc(p.sym.replace("USDT",""))}</b> ${esc(p.side.toUpperCase())}</td><td>${esc(p.size)}</td><td>${esc(p.entry&&(+p.entry).toPrecision(6))}</td><td>${esc(p.mark)}</td><td class="${cls(+p.upnl)}">${money(+p.upnl)}</td><td>${esc(p.sl||"—")}</td><td>${(p.tps||[]).map(t=>esc(t[0])+" ("+esc(t[1])+")").join("<br>")||"—"}</td><td>${esc(p.mode)} ${esc(p.lev)}x</td><td>${esc(p.liq&&(+p.liq).toPrecision(6))}</td><td class="sub">${p.mirror==="orphan"?"manual (aturan desk)":p.mirror==="untracked"?"tidak dilacak":"mirror desk"}${p.tp1_done?" · TP1 ✓":""}${p.tp2_done?" · TP2 ✓":""}</td></tr>`).join("");
+ const pos=`<div class="card"><h2>Posisi terbuka</h2>${rows?`<div class="tw"><table><thead><tr><th>Koin</th><th>Size</th><th>Entry</th><th>Mark</th><th>PnL</th><th>SL</th><th>TP (size)</th><th>Margin</th><th>Liq</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="sub">Tidak ada posisi.</p>`}</div>`;
+ const acts=(B.actions||[]).map(a=>`<div class="sub" style="margin-top:4px"><b>${esc(a.t)}</b> ${a.ok?"✓":"✗"} ${esc(a.a)}${a.err?" — "+esc(a.err):""}</div>`).join("")||`<p class="sub">Belum ada aksi.</p>`;
+ const sk=(B.skipped||[]).map(s=>`<div class="sub" style="margin-top:4px">${esc(s.k.split("|").slice(0,2).join(" "))}: ${esc(s.reason)}</div>`).join("");
+ sec.innerHTML=stat+pos+`<div class="card"><h2>Aksi terakhir bot</h2>${acts}${sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""}</div>`}
+setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
+/* BITGET-VIEW-END */
 function render(){if(!D)return;
+ if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));renderBitget();return}
+ $("bitgetsec")&&($("bitgetsec").hidden=true);$("v-bitget")&&$("v-bitget").classList.remove("on");
  const snap=snapUi();
  const home=VIEW==="home";
  const real=VIEW==="real";
@@ -1651,6 +1701,7 @@ $("v-dca").addEventListener("click",()=>{setView("dca");fetchDcaLive()});
 $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")closeLb()});
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
+$("v-bitget")&&$("v-bitget").addEventListener("click",()=>{setView("bitget");if(bgKeyHex())bgFetch()});
 load();
 setInterval(load,120000);
 setInterval(fetchMarks,5000);
