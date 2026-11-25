@@ -393,51 +393,41 @@ h1{text-transform:none;letter-spacing:0}
 .twx-legs{font-size:12px}
 .twx-notes{margin:8px 0 0;padding:0;list-style:none}
 .twx-notes li{font-size:12px;color:var(--mu);padding:2px 0;line-height:1.45}
-.own-card{margin:0 0 12px;border-color:#1e3a5f}
-.own-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;align-items:center}
-.own-k{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 4px}
-.own-vs{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
-.own-vs.ok{border-color:#14532d;color:#86efac}.own-vs.no{border-color:#5a4410;color:#fcd34d}
-.own-dec{font-size:13px;line-height:1.5;margin:2px 0 8px}
 
-.sk-dash{margin:0 0 12px;background:#d5d5d5;color:#1a1a1a;border:1px solid #b5b5b5;border-radius:12px;padding:12px 10px 10px;box-shadow:inset 0 1px 0 #efefef}
-.sk-dash,.sk-dash *{box-sizing:border-box}
-.sk-title{text-align:center;font-weight:800;letter-spacing:.12em;font-size:15px;margin:2px 0 2px;color:#111;text-transform:uppercase}
-.sk-sub{text-align:center;font-size:11px;color:#444;margin:0 0 8px}
-.sk-gauges{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 8px;scrollbar-width:thin}
-.sk-gauges::-webkit-scrollbar{height:6px}
-.sk-gauge{flex:0 0 148px;width:148px;text-align:center}
-.sk-roc{font-size:11px;font-weight:700;height:16px;line-height:16px}
-.sk-lab{margin:4px 10px 0;padding:3px 4px;border-radius:3px;color:#fff;font-size:11px;font-weight:700;letter-spacing:.02em;line-height:1.2}
-.sk-name{font-weight:800;font-size:13px;margin:5px 0 2px;color:#111;letter-spacing:.02em}
-.sk-coins{display:flex;justify-content:center;gap:4px;height:22px;align-items:center;margin-bottom:2px}
-.sk-coins svg{display:block}
-.sk-dial{width:132px;height:118px;margin:0 auto;display:block}
-.sk-val{font-weight:800;font-size:17px;margin:0 0 4px;color:#111}
-.sk-lower{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-around;padding:10px 0 8px;align-items:flex-start;border-top:1px solid #c0c0c0}
-.sk-col{flex:1 1 156px;min-width:148px;max-width:210px;text-align:center}
-.sk-col h3{font-size:11px;font-weight:800;letter-spacing:.06em;margin:0 0 6px;color:#111;text-transform:uppercase}
-.sk-vbar{width:150px;height:210px;margin:0 auto;display:block}
-.sk-donut{width:150px;height:150px;margin:0 auto;display:block}
-.sk-leg{font-size:11px;font-weight:600;margin-top:4px;color:#222}
-.sk-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 8px;vertical-align:middle}
-.sk-leg i:first-child{margin-left:0}
-.sk-strip{display:flex;flex-wrap:wrap;gap:10px 16px;background:#c8c8c8;border-radius:8px;padding:8px 10px;margin:4px 0}
-.sk-cell{min-width:120px}
-.sk-cell .k{font-size:10px;font-weight:800;letter-spacing:.06em;color:#333;margin:0 0 4px;text-transform:uppercase}
-.sk-pill{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:800;color:#fff;margin:0 3px 3px 0;letter-spacing:.02em}
-.sk-sum{background:#ececec;border:1px solid #c0c0c0;border-radius:8px;padding:8px 10px;margin:6px 0 4px}
-.sk-sum h3{font-size:11px;font-weight:800;letter-spacing:.06em;margin:0 0 6px;color:#111;text-transform:uppercase}
-.sk-sum ul{margin:0;padding:0 0 0 16px}
-.sk-sum li{font-size:12px;color:#222;padding:1px 0;line-height:1.45}
-.sk-rsps-wrap{margin:8px 0 0;border:1px solid #b5b5b5;border-radius:8px;background:#cecece;padding:2px 10px 8px}
-.sk-rsps-wrap>summary{cursor:pointer;font-weight:800;letter-spacing:.1em;padding:8px 0;list-style:none;font-size:13px;color:#111;text-transform:uppercase;text-align:center}
+.sk-dash{margin:0 0 12px}
+.sk-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 6px}
+.sk-head h2{margin:0}
+.sk-when{font-size:11px;color:var(--mu);white-space:nowrap}
+.sk-verdict{font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin:2px 0 2px}
+.sk-verdict-sub{color:var(--mu);font-size:13px;margin:0 0 14px}
+.sk-gauges{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 12px}
+@media(min-width:720px){.sk-gauges{grid-template-columns:repeat(4,1fr);gap:10px}}
+.sk-gauge{text-align:center;background:#0b0e14;border:1px solid var(--line);border-radius:12px;padding:8px 6px 10px}
+.sk-name{font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.04em;text-transform:uppercase;margin:0 0 2px}
+.sk-dial{width:100%;max-width:168px;height:auto;margin:0 auto;display:block}
+.sk-val{font-weight:700;font-size:20px;letter-spacing:-.02em;margin:2px 0 0;line-height:1.1}
+.sk-st{font-size:12px;color:var(--mu);margin-top:1px}
+.sk-roc{font-size:11px;font-weight:600;height:14px;line-height:14px}
+.sk-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.sk-chip{display:inline-flex;align-items:baseline;gap:5px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px;background:#0b0e14}
+.sk-chip .l{color:var(--mu);font-size:11px}
+.sk-chip b{font-weight:700}
+.sk-vs{font-size:12px;color:var(--mu);margin:0 0 8px;line-height:1.4}
+.sk-rsps-wrap{margin:4px 0 0;border:1px solid var(--line);border-radius:12px;background:#0b0e14;padding:2px 12px 10px}
+.sk-rsps-wrap>summary{cursor:pointer;font-weight:600;padding:10px 0;list-style:none;font-size:14px;color:var(--tx)}
 .sk-rsps-wrap>summary::-webkit-details-marker{display:none}
-.sk-rsps-wrap>summary::after{content:" ▾";font-size:11px;color:#555}
+.sk-rsps-wrap>summary::after{content:" ▾";color:#5a6478;font-size:11px}
 .sk-rsps-wrap[open]>summary::after{content:" ▴"}
-.sk-rsps-wrap .sk-gauges{flex-wrap:wrap;overflow:visible;justify-content:center;padding-bottom:4px}
-.sk-na .sk-lab{background:#9e9e9e}
-.sk-na .sk-val{color:#666}
+.sk-rsps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:720px){.sk-rsps{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){.sk-rsps{grid-template-columns:repeat(4,1fr)}}
+.sk-pair{border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:var(--card)}
+.sk-ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;font-weight:600}
+.sk-ph b{font-size:13px}
+.sk-track{position:relative;height:6px;border-radius:99px;margin:7px 0 5px;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 50%,#22c55e 100%);opacity:.9}
+.sk-track i{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#e6e9ef;border:2px solid #0b0e14;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #1f2633}
+.sk-track.na{background:#1f2633;opacity:1}
+.sk-ps{font-size:11px;color:var(--mu)}
 .twx-snap{margin:0 0 12px}
 .twx-pairs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .twx-pair{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
@@ -583,20 +573,44 @@ function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
   const xc=levelCrossClass(o,r);
   return `<div class="lr${tot?" tot":""}${xc}"><span>${esc(r.k)}${tag}${xc?` <span class="tag">${xc.includes("sl")?"crossed":"crossed"}</span>`:""}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
  return more("lv-"+esc(o.a),`Detail ${tip("SL",TIPS.sl)} / ${tip("TP",TIPS.tp)}`,`<div class="lt"><div class="lh"><span>Level</span><span>Harga</span><span>${tip("P/L $",TIPS.pnl)}</span><span>${tip("P/L %",TIPS.pnl)}</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">${tip("P/L",TIPS.pnl)} % dari modal posisi ini (${(fine?moneyR:money)(L.m)}). Tanda melewati harga hanya tampilan.</div>`)}
-const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al"><summary>Riwayat</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
+const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al" data-ui="al:${esc(o.desk||'')}:${esc(o.a)}:${o.ts||o.e||''}"><summary>Riwayat</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analisis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analisis" width="96" height="67" loading="lazy"><span>Analisis</span></a>`};
 function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analisis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
 function closeLb(){const lb=$("lb");if(!lb)return;lb.classList.remove("on");$("lbi").removeAttribute("src");document.body.style.overflow=""}
-const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
+const why=x=>{const short=esc(x.r||""),full=esc(x.rf||"");if(!short&&!full)return"";if(full&&full!==short)return `<details class="rd" data-ui="rd:${esc(x.desk||x.name||'')}:${esc(x.a||'')}:${x.cy||x.ts||''}:${esc(x.k||'')}"><summary title="${full}">${short}</summary><div class="rf">${full}</div></details>`;return `<div class="r">${short||full}</div>`};
 function upnl(o,p){if(p==null||isNaN(p))return o.u||0;const q=posQty(o);if(q!=null&&o.e!=null){const sg=o.side==="short"?-1:1;return sg*q*(p-o.e)-(o.f||0)}return o.qty?o.qty*p-(o.z||0):(o.u||0)}
 function chart(pts,start){start=start==null?START:start;if(!pts||pts.length<2)return'<svg class="ch" viewBox="0 0 300 90"><text x="150" y="50" fill="#8a93a6" font-size="11" text-anchor="middle">Grafik muncul setelah beberapa siklus</text></svg>';
  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]).concat([start]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),W=300,H=90,pd=4;
  const X=x=>pd+(x-x0)/((x1-x0)||1)*(W-2*pd),Y=y=>H-pd-(y-y0)/((y1-y0)||1)*(H-2*pd);
  const d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" "),last=pts[pts.length-1][1],c=last>=start?"#22c55e":"#ef4444";
  return`<svg class="ch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(start)}" y2="${Y(start)}" stroke="#2a3242" stroke-dasharray="3 3"/><path d="${d} L${X(x1)} ${H} L${X(x0)} ${H} Z" fill="${c}" opacity=".08"/><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`}
-function setView(v){if(!SHOW_HL_WALLETS&&(v==="steven"||v==="russel"))v="home";VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render()}
-function snapUi(){return{y:window.scrollY,open:[...document.querySelectorAll("details[open]")].map(d=>{const card=d.closest("[data-a]");return{a:card&&card.dataset.a,cls:d.className,sum:(d.querySelector("summary")||{}).textContent||"",id:d.id||""}})}}
-function restoreUi(s){if(!s)return;document.querySelectorAll(".oc[data-a],#wallet [data-a]").forEach(card=>{s.open.forEach(o=>{if(!o.a||card.dataset.a!==o.a)return;card.querySelectorAll("details").forEach(d=>{if(d.className===o.cls||((d.querySelector("summary")||{}).textContent||"")===o.sum)d.open=true})})});(s.open||[]).forEach(o=>{if(o.id){const d=document.getElementById(o.id);if(d&&d.tagName==="DETAILS")d.open=true}});if(s.y!=null)window.scrollTo(0,s.y)}
+function setView(v){if(!SHOW_HL_WALLETS&&(v==="steven"||v==="russel"))v="home";if(D)snapUi();VIEW=v;try{localStorage.setItem("deskView",v)}catch(e){}render({skipSnap:true})}
+function uiKey(d){if(!d||d.tagName!=="DETAILS")return"";
+ if(d.id)return"#"+d.id;
+ if(d.getAttribute("data-ui"))return"ui:"+d.getAttribute("data-ui");
+ const card=d.closest("[data-a]"),sum=((d.querySelector("summary")||{}).textContent||"").replace(/\s+/g," ").trim();
+ if(card&&card.dataset.a)return"a:"+card.dataset.a+"|"+(d.className||"").trim()+"|"+sum;
+ return"g:"+(d.className||"").trim()+"|"+sum}
+const UI_SCROLL={};
+function snapUi(){const openNow=[...document.querySelectorAll("details[open]")].map(uiKey).filter(Boolean);
+ const inDom=new Set([...document.querySelectorAll("details")].map(uiKey).filter(Boolean));
+ let prev=[];try{prev=(JSON.parse(sessionStorage.getItem("deskUi")||"{}")||{}).open||[]}catch(e){}
+ const open=[...new Set([...prev.filter(k=>!inDom.has(k)),...openNow])];
+ if(typeof VIEW!=="undefined")UI_SCROLL[VIEW]=window.scrollY;
+ const st={y:window.scrollY,view:typeof VIEW!=="undefined"?VIEW:"",open,scroll:{...UI_SCROLL}};
+ try{sessionStorage.setItem("deskUi",JSON.stringify({open:st.open,view:st.view,scroll:st.scroll}))}catch(e){}
+ return st}
+function restoreUi(st){if(!st||!st.open){try{const saved=JSON.parse(sessionStorage.getItem("deskUi")||"null");if(saved)st=Object.assign({y:st&&st.y},saved)}catch(e){}}
+ if(!st)return;
+ if(st.scroll)Object.assign(UI_SCROLL,st.scroll);
+ const keys=new Set(st.open||[]);
+ document.querySelectorAll("details").forEach(d=>{if(keys.has(uiKey(d)))d.open=true});
+ const y=(st.view&&typeof VIEW!=="undefined"&&st.view!==VIEW)?(UI_SCROLL[VIEW]||0):(st.y!=null?st.y:null);
+ if(y!=null){requestAnimationFrame(()=>window.scrollTo(0,y))}}
+document.addEventListener("toggle",e=>{const d=e.target;if(!d||d.tagName!=="DETAILS"||!d.isConnected)return;
+ let cur=[];try{cur=(JSON.parse(sessionStorage.getItem("deskUi")||"{}")||{}).open||[]}catch(ex){}
+ const k=uiKey(d),set=new Set(cur);if(d.open)set.add(k);else set.delete(k);
+ try{sessionStorage.setItem("deskUi",JSON.stringify({open:[...set],view:typeof VIEW!=="undefined"?VIEW:"",scroll:UI_SCROLL}))}catch(ex){}},true);
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
   const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
@@ -1479,7 +1493,7 @@ function twxSnapshot(S){if(!S)return"";const T=S.twx||{},R=S.rsps||{};
   ${rspsPairs?`<div class="twx-k">Pair RSPS</div><div class="twx-pairs">${rspsPairs}</div>`:""}</div>`}
 function twxHomeSection(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
  const latest=U[0],older=U.slice(1);
- const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(u=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(u.date))}</div>${twxUpdateBody(u,true)}</div>`).join("")}</details>`:"";
+ const hist=older.length?`<details class="more twx-hist" id="ui-twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(u=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(u.date))}</div>${twxUpdateBody(u,true)}</div>`).join("")}</details>`:"";
  return `<div class="card twx-box latest"><h2>Update Sistem TWX <span class="badge b-live">TERBARU</span></h2>${twxUpdateBody(latest,false)}</div>${twxSnapshot(TWX.snapshot)}${hist}`}
 function homeOpenSection(){const opens=(D.open||[]).slice();
  opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p)});
@@ -1505,164 +1519,95 @@ function twxHomeCompact(){const U=(TWX&&TWX.updates)||[];if(!U.length)return twx
  const u=U[0],older=U.slice(1),mt=u.mtpi||{},lt=u.ltpi||{},rg=u.btc_regime||{};
  let portS="N/A";const port=u.rsps_portfolio;if(Array.isArray(port)&&port.length)portS=port.map(p=>`${p.pct}% ${p.asset}`).join(" · ");
  const chips=[twxChip("MTPI",twxState(mt.state),mt.change,twxTone(mt.state)),twxChip("LTPI",twxState(lt.state),lt.change,twxTone(lt.state)),twxChip("Rezim BTC",twxState(rg.state),rg.change,twxTone(rg.state)),twxChip("Fokus",u.rsps_dominant_major||"N/A",""," "),twxChip("Portofolio",portS,"","")].join("");
- const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}</details>`:"";
+ const hist=older.length?`<details class="more twx-hist" id="ui-twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}</details>`:"";
  return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2><div class="twx-chips">${chips}</div>${hist}</div>`}
-function ownF(v){return v==null||isNaN(Number(v))?"N/A":(Number(v)>0?"+":"")+Number(v).toFixed(2).replace(".",",")}
-function ownTone(v){return v==null?"":v>0.15?"up":v<-0.15?"dn":"wa"}
-const SK_COL={BTC:"#f7931a",ETH:"#627eea",SOL:"#9945ff",SUI:"#4da6ff",DOGE:"#c2a633",XRP:"#23292f",HYPE:"#0ed3a3",USD:"#16a34a",USDT:"#16a34a",GOLD:"#d4af37",EUR:"#003399"};
-function skState(v){if(v==null||isNaN(Number(v)))return{t:"N/A",bar:"N/A",col:"#9e9e9e",fg:"#666"};
- v=Number(v);if(v>=0.5)return{t:"Bullish",bar:"Bullish State",col:"#1b7a2f",fg:"#1b7a2f"};
- if(v>0.15)return{t:"Slight Bull",bar:"Slight Bull State",col:"#5aaa4a",fg:"#2e7d32"};
- if(v>=-0.15)return{t:"Neutral",bar:"Neutral State",col:"#757575",fg:"#444"};
- if(v>-0.5)return{t:"Slight Bear",bar:"Slight Bear State",col:"#d45b5b",fg:"#b71c1c"};
- return{t:"Bearish",bar:"Bearish State",col:"#b71c1c",fg:"#b71c1c"}}
-function skRoc(v,p){if(v==null||p==null||Number(v)===Number(p))return{t:"No Change",c:"#333"};
- return Number(v)>Number(p)?{t:"Slight +ROC",c:"#1b7a2f"}:{t:"Slight -ROC",c:"#b71c1c"}}
-function skCoin(sym,r){r=r||10;const c=SK_COL[sym]||"#888",fg=(sym==="XRP"||sym==="EUR"||sym==="USD")?"#fff":"#111",t=sym==="USDT"||sym==="USD"?"$":sym.slice(0,1);
- return `<svg width="${r*2}" height="${r*2}" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="${c}" stroke="#fff" stroke-width="1.2"/><text x="10" y="13.6" text-anchor="middle" font-size="8.5" font-weight="800" fill="${fg}" font-family="system-ui,sans-serif">${t}</text></svg>`}
-function skPairMap(O){const m={};((O&&O.rsps&&O.rsps.pairs)||[]).forEach(p=>m[p.pair]=p);return m}
-function skPrevPair(O,pair){return O&&O.prev&&O.prev.pairs?O.prev.pairs[pair]:null}
-function skWinner(a,b,v){if(v==null||Math.abs(v)<=0.15)return null;return v>0?a:b}
-function skGauge(opt){const v=opt.v,na=v==null||isNaN(Number(v)),n=na?null:Math.max(-1,Math.min(1,Number(v)));
- const st=skState(n),roc=skRoc(n,opt.prev);
- let lab=opt.lab, labc=opt.labc||st.col;
- if(!lab){const w=opt.a&&opt.b?skWinner(opt.a,opt.b,n):opt.asset;lab=w?(w+" Bias"):st.bar;if(w)labc=SK_COL[w]||labc}
- const W=140,H=118,cx=70,cy=72,R=52;
+function ownF(v,d){d=d==null?2:d;return v==null||isNaN(Number(v))?"N/A":(Number(v)>0?"+":"")+Number(v).toFixed(d).replace(".",",")}
+function skState(v){if(v==null||isNaN(Number(v)))return{t:"N/A",fg:"var(--mu)"};
+ v=Number(v);if(v>=0.5)return{t:"Bullish",fg:"var(--up)"};if(v>0.15)return{t:"Slight bull",fg:"var(--up)"};
+ if(v>=-0.15)return{t:"Netral",fg:"var(--mu)"};if(v>-0.5)return{t:"Slight bear",fg:"var(--dn)"};return{t:"Bearish",fg:"var(--dn)"}}
+function skRoc(v,p){if(v==null||p==null||Number(v)===Number(p))return"";
+ return Number(v)>Number(p)?'<div class="sk-roc" style="color:var(--up)">Slight +ROC</div>':'<div class="sk-roc" style="color:var(--dn)">Slight −ROC</div>'}
+function skGauge(opt){const v=opt.v,na=v==null||isNaN(Number(v)),lo=opt.lo!=null?opt.lo:-1,hi=opt.hi!=null?opt.hi:1;
+ const n=na?null:Math.max(lo,Math.min(hi,Number(v)));
+ const st=opt.state||skState(n);
+ const W=200,H=128,cx=100,cy=102,R=78;
  const track=`M ${cx-R} ${cy} A ${R} ${R} 0 0 1 ${cx+R} ${cy}`;
  let needle="";
- if(n!=null){const a=Math.PI-((n+1)/2)*Math.PI,x2=cx+Math.cos(a)*(R-4),y2=cy-Math.sin(a)*(R-4),x3=cx+Math.cos(a)*8,y3=cy-Math.sin(a)*8;
-  const nx=Math.cos(a+Math.PI/2)*3.2,ny=-Math.sin(a+Math.PI/2)*3.2;
-  needle=`<polygon points="${x2},${y2} ${cx+nx},${cy+ny} ${cx-nx},${cy-ny}" fill="#222"/>
-   <circle cx="${cx}" cy="${cy}" r="5.2" fill="#222" stroke="#f4f4f4" stroke-width="1.6"/>`;}
- const ticks=[-1,-0.5,0,0.5,1].map(t=>{const a=Math.PI-((t+1)/2)*Math.PI,x1=cx+Math.cos(a)*(R-1),y1=cy-Math.sin(a)*(R-1),x0=cx+Math.cos(a)*(R-6),y0=cy-Math.sin(a)*(R-6);
-  return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#555" stroke-width="${t%1===0?1.6:1}"/>`}).join("");
- const gid="skg"+(opt.id||opt.name||"").replace(/[^A-Za-z0-9]/g,"");
+ if(n!=null){const t=(n-lo)/(hi-lo),a=Math.PI-t*Math.PI,x2=cx+Math.cos(a)*(R-20),y2=cy-Math.sin(a)*(R-20);
+  const nx=Math.cos(a+Math.PI/2)*4,ny=-Math.sin(a+Math.PI/2)*4;
+  needle=`<polygon points="${x2},${y2} ${cx+nx},${cy+ny} ${cx-nx},${cy-ny}" fill="#e6e9ef"/>
+   <circle cx="${cx}" cy="${cy}" r="5.5" fill="#e6e9ef" stroke="#0b0e14" stroke-width="2"/>`}
+ const gid="skg"+(opt.id||"x");
+ const grad=opt.grad||'<stop offset="0%" stop-color="#ef4444"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#22c55e"/>';
  const face=`<svg class="sk-dial" viewBox="0 0 ${W} ${H}" aria-hidden="true">
-  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c62828"/><stop offset="50%" stop-color="#f3c010"/><stop offset="100%" stop-color="#1b7a2f"/></linearGradient></defs>
-  <circle cx="${cx}" cy="${cy}" r="58" fill="#f7f7f7" stroke="#cfcfcf" stroke-width="1"/>
-  <path d="${track}" fill="none" stroke="#e0e0e0" stroke-width="12" stroke-linecap="butt"/>
-  ${na?"":`<path d="${track}" fill="none" stroke="url(#${gid})" stroke-width="11" stroke-linecap="butt"/>`}
-  ${ticks}${needle}
-  <text x="${cx}" y="${cy+28}" text-anchor="middle" font-size="12" font-weight="800" fill="${st.fg}" font-family="system-ui,sans-serif">${st.t}</text>
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0">${grad}</linearGradient></defs>
+  <path d="${track}" fill="none" stroke="#1f2633" stroke-width="14" stroke-linecap="round"/>
+  ${na?"":`<path d="${track}" fill="none" stroke="url(#${gid})" stroke-width="12" stroke-linecap="round"/>`}
+  ${needle}
  </svg>`;
- const coins=(opt.a&&opt.b)?`<div class="sk-coins">${skCoin(opt.a,11)}${skCoin(opt.b,11)}</div>`:`<div class="sk-coins" style="height:22px"></div>`;
- const val=na?"N/A":ownF(n);
- return `<div class="sk-gauge${na?" sk-na":""}" title="${esc(opt.tip||opt.name||"")}">
-  <div class="sk-roc" style="color:${roc.c}">${esc(roc.t)}</div>
-  <div class="sk-lab" style="background:${labc}">${esc(lab)}</div>
+ return `<div class="sk-gauge" title="${esc(opt.tip||opt.name||"")}">
   <div class="sk-name">${esc(opt.name)}</div>
-  ${coins}${face}<div class="sk-val" style="color:${st.fg}">${val}</div></div>`}
-function skVBar(opt){const lo=opt.lo,hi=opt.hi,na=opt.v==null||isNaN(Number(opt.v));
- const raw=na?null:Math.max(lo,Math.min(hi,Number(opt.v)));
- const x=40,y=22,w=36,h=160,W=150,H=210;
- const yOf=val=>y+((hi-val)/(hi-lo))*h;
- const mid=yOf(0), ticks=[];
- const step=opt.step||((hi-lo)<=2?0.5:1);
- for(let t=hi;t>=lo-1e-9;t-=step){const yy=yOf(t),lab=t>0?"+"+t.toFixed(t%1?1:0):String(t.toFixed(t%1?1:0));
-  ticks.push(`<line x1="${x-5}" y1="${yy}" x2="${x+w+5}" y2="${yy}" stroke="${t===0?"#333":"#bbb"}" stroke-width="${t===0?1.2:0.6}"/>
-   <text x="${x-8}" y="${yy+3}" text-anchor="end" font-size="9" fill="#333" font-family="system-ui,sans-serif">${lab}</text>`)}
- let mark="";
- if(raw!=null){const yy=yOf(raw),col=opt.color||(raw>0.15?"#1b7a2f":raw<-0.15?"#b71c1c":"#555");
-  mark=`<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="#111" stroke-width="1.4"/>
-   <polygon points="${x+w+6},${yy} ${x+w+16},${yy-7} ${x+w+26},${yy} ${x+w+16},${yy+7}" fill="${col}" stroke="#111" stroke-width="0.8"/>
-   <text x="${x+w+30}" y="${yy+4}" font-size="11" font-weight="800" fill="#111" font-family="system-ui,sans-serif">${ownF(opt.show==null?raw:opt.show)}</text>`}
- const gid="skb"+(opt.id||"k");
- return `<div class="sk-col"><h3>${esc(opt.title)}</h3>
- <svg class="sk-vbar" viewBox="0 0 ${W} ${H}" aria-hidden="true">
-  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">${opt.grad}</linearGradient></defs>
-  <text x="${W/2}" y="12" text-anchor="middle" font-size="9" font-weight="800" fill="${opt.topc||"#1b7a2f"}" font-family="system-ui,sans-serif">${esc(opt.topLab)}</text>
-  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="url(#${gid})" stroke="#9a9a9a" stroke-width="0.8"/>
-  ${ticks}${mark}
-  <text x="${W/2}" y="${H-6}" text-anchor="middle" font-size="9" font-weight="800" fill="${opt.botc||"#b71c1c"}" font-family="system-ui,sans-serif">${esc(opt.botLab)}</text>
- </svg></div>`}
-function skDonut(opt){const legs=opt.legs||[], tot=legs.reduce((s,l)=>s+(+l.pct||0),0), na=!tot;
- const cx=75,cy=72,R=48,sw=18,C=2*Math.PI*R;
- let ang=-Math.PI/2, arcs="";
- if(!na){legs.forEach(l=>{const frac=Math.max(0,Math.min(1,(+l.pct)/tot)),len=C*frac,dash=`${len} ${C-len}`,rot=ang*180/Math.PI;
-  arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${l.color}" stroke-width="${sw}" stroke-dasharray="${dash}" stroke-dashoffset="${C*0.25}" transform="rotate(${(ang*180/Math.PI)+90} ${cx} ${cy})" transform-origin="${cx} ${cy}"/>`;
-  /* simpler: use path or cumulative offset */
-  ang+=frac*2*Math.PI})}
- /* rebuild with dashoffset cumulative for correct order */
- if(!na){arcs="";let off=0;legs.forEach(l=>{const frac=Math.max(0,Math.min(1,(+l.pct)/tot)),len=C*frac;
-  arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${l.color}" stroke-width="${sw}" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${C*0.25-off}" stroke-linecap="butt"/>`;
-  off+=len})}
- const mid=na?"N/A":(legs.length===1||(legs[0]&&legs[0].pct>=99.5)?`${Math.round(legs[0].pct)}%`:(legs.map(l=>Math.round(l.pct)).join(" / ")));
- const mid2=na?"":esc(opt.center||"");
- const leg=na?`<div class="sk-leg">N/A</div>`:`<div class="sk-leg">${legs.map(l=>`<i style="background:${l.color}"></i>${esc(l.name)} ${Math.round(l.pct)}%`).join(" ")}</div>`;
- return `<div class="sk-col"><h3>${esc(opt.title)}</h3>
-  <svg class="sk-donut" viewBox="0 0 150 150" aria-hidden="true">
-   <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e6e6e6" stroke-width="${sw}"/>
-   ${arcs}
-   <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="16" font-weight="800" fill="#111" font-family="system-ui,sans-serif">${mid}</text>
-   ${mid2?`<text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#444" font-family="system-ui,sans-serif">${mid2}</text>`:""}
-  </svg>${leg}</div>`}
-function skPill(txt,on,ok){const bg=!on?"#9e9e9e":ok?"#1b7a2f":"#b71c1c";
- return `<span class="sk-pill" style="background:${bg}">${esc(txt)}</span>`}
+  ${skRoc(n,opt.prev)}${face}
+  <div class="sk-val" style="color:${st.fg}">${na?"N/A":ownF(opt.show!=null?opt.show:n)}</div>
+  <div class="sk-st">${esc(st.t)}</div></div>`}
+function skPairRow(opt){const v=opt.v,na=v==null||isNaN(Number(v)),n=na?null:Math.max(-1,Math.min(1,Number(v)));
+ const st=skState(n),pct=n==null?null:((n+1)/2)*100;
+ const mark=pct==null?"":`<i style="left:${pct}%"></i>`;
+ const name=opt.a&&opt.b?opt.a+" / "+opt.b:opt.name;
+ return `<div class="sk-pair${na?" sk-na":""}">
+  <div class="sk-ph"><span>${esc(name)}</span><b style="color:${st.fg}">${na?"N/A":ownF(n)}</b></div>
+  <div class="sk-track${na?" na":""}">${mark}</div>
+  <div class="sk-ps">${esc(st.t)}</div></div>`}
+function skChip(l,v,tone){const c=tone==="up"?"up":tone==="dn"?"dn":"";
+ return `<span class="sk-chip"><span class="l">${esc(l)}</span><b class="${c}">${v}</b></span>`}
 function ownHomeCard(){const O=OWN;if(!O||!(O.mtpi||O.ltpi))return"";
- const P=O.portfolio||{},rs=O.rsps||{},pm=skPairMap(O),pv=k=>pm[k]?pm[k].value:null;
- const pairG=(pair,a,b)=>skGauge({id:pair,name:pair+" TPI",v:pv(pair),prev:skPrevPair(O,pair),a,b,tip:a+" vs "+b});
- const row=[skGauge({id:"LTPI",name:"L-TPI",v:O.ltpi&&O.ltpi.value,prev:O.prev&&O.prev.ltpi,asset:"BTC",lab:"BTC Bias",labc:SK_COL.BTC,tip:"Tren BTC mingguan"}),
-  skGauge({id:"MTPI",name:"M-TPI",v:O.mtpi&&O.mtpi.value,prev:O.prev&&O.prev.mtpi,asset:"BTC",lab:"BTC Bias",labc:SK_COL.BTC,tip:"Tren BTC harian"}),
-  skGauge({id:"TRASH",name:"TRASH TPI",v:O.trash_tpi&&O.trash_tpi.value,prev:O.prev&&O.prev.trash_tpi,tip:"Keranjang 10 altcoin"}),
-  pairG("ETHBTC","ETH","BTC"),pairG("SOLETH","SOL","ETH"),pairG("SOLBTC","SOL","BTC")].join("");
- const rg=O.regime,sd=O.sdca,mc=O.macro;
- const bars=skVBar({id:"reg",title:"BTC Market State",topLab:"TRENDING",botLab:"MEAN REVERTING",v:rg&&rg.value,lo:-1,hi:1,step:0.5,
-    grad:'<stop offset="0%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#c62828"/>',topc:"#1b7a2f",botc:"#b71c1c"})
-  +skVBar({id:"val",title:"Cycle Valuation",topLab:"OVERBOUGHT",botLab:"OVERSOLD",v:sd&&sd.value!=null?-sd.value:null,show:sd&&sd.value,lo:-2,hi:2,step:1,
-    grad:'<stop offset="0%" stop-color="#c62828"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#1565c0"/>',topc:"#b71c1c",botc:"#1565c0",color:"#1565c0"})
-  +skVBar({id:"mac",title:"Macro Environment",topLab:"POSITIVE",botLab:"NEGATIVE",v:mc&&mc.value,lo:-1,hi:1,step:0.5,
-    grad:'<stop offset="0%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#eeeeee"/><stop offset="100%" stop-color="#c62828"/>',topc:"#1b7a2f",botc:"#b71c1c"});
- const cash=P.cash_pct,asset=P.asset||"BTC",ap=P.asset_pct||0;
- const legs=[];if(ap>0)legs.push({name:asset,pct:ap,color:SK_COL[asset]||"#f7931a"});if(cash>0)legs.push({name:"USD",pct:cash,color:SK_COL.USD});
- const dons=skDonut({title:"Current Portfolio",legs,center:P.exposure||""})
-  +skDonut({title:"Conservative Portfolio",legs:[],center:""});
- const mtS=O.mtpi&&O.mtpi.value>0,ltS=O.ltpi&&O.ltpi.value>0,mtU=!(O.mtpi&&O.mtpi.value!=null),ltU=!(O.ltpi&&O.ltpi.value!=null);
- const trend=rg&&rg.state==="TRENDING",levOk=P.leverage==="permissible",riskOn=P.exposure==="RISK ON";
- const strip=`<div class="sk-strip">
-  <div class="sk-cell"><div class="k">TPI Conditions</div>${skPill("M-TPI "+(mtU?"N/A":mtS?"Long":"Short"),!mtU,mtS)}${skPill("L-TPI "+(ltU?"N/A":ltS?"Long":"Short"),!ltU,ltS)}</div>
-  <div class="sk-cell"><div class="k">Regime</div>${skPill(rg? (trend?"TREND":"MR"):"N/A",!!rg,trend)}</div>
-  <div class="sk-cell"><div class="k">Exposure Type</div>${skPill(P.exposure||"N/A",!!P.exposure,riskOn)}</div>
-  <div class="sk-cell"><div class="k">Available Leverage</div>${skPill(P.leverage?String(P.leverage).toUpperCase():"N/A",!!P.leverage,levOk)}</div>
- </div>`;
+ const P=O.portfolio||{},rs=O.rsps||{},pm={};((rs.pairs)||[]).forEach(p=>pm[p.pair]=p);
+ const pv=k=>pm[k]?pm[k].value:null;
+ const expo=P.exposure||"N/A";
+ const port=P.cash_pct>=100?"100% cash":(P.asset?`${P.asset_pct}% ${P.asset} · ${P.cash_pct}% cash`:"N/A");
+ const lev=P.leverage==="permissible"?"leverage boleh":"tanpa leverage";
+ const expoFg=expo==="RISK ON"?"var(--up)":expo==="RISK OFF"?"var(--dn)":"var(--wa)";
+ const when=(function(){const g=String(O.generated||""),m=g.match(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2} WIB)/);return m?twxDate(m[1])+", "+m[2]:(O.date_wib?twxDate(O.date_wib):g)})();
+ const sd=O.sdca,rg=O.regime,mc=O.macro;
+ const sdState=sd&&sd.value!=null?{t:sd.bias||"",fg:sd.value>=0.5?"var(--up)":sd.value<=-0.5?"var(--dn)":"var(--mu)"}:{t:"N/A",fg:"var(--mu)"};
+ const rgState=rg&&rg.state?{t:rg.state==="TRENDING"?"Trending":"Mean-reverting",fg:rg.state==="TRENDING"?"var(--ac)":"var(--wa)"}:{t:"N/A",fg:"var(--mu)"};
+ const gauges=skGauge({id:"MTPI",name:"M-TPI",v:O.mtpi&&O.mtpi.value,prev:O.prev&&O.prev.mtpi,tip:"Tren BTC harian"})
+  +skGauge({id:"LTPI",name:"L-TPI",v:O.ltpi&&O.ltpi.value,prev:O.prev&&O.prev.ltpi,tip:"Tren BTC mingguan"})
+  +skGauge({id:"VAL",name:"Valuasi",v:sd&&sd.value,prev:O.prev&&O.prev.sdca,lo:-2,hi:2,state:sdState,tip:"Murah atau mahal. +1,5 ke atas = saatnya akumulasi."})
+  +skGauge({id:"REG",name:"Rezim",v:rg&&rg.value,prev:O.prev&&O.prev.regime,state:rgState,tip:"Trending atau bolak-balik (mean-reverting).",
+    grad:'<stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#60a5fa"/>'});
+ const macTone=mc&&mc.value>0.15?"up":mc&&mc.value<-0.15?"dn":"";
+ const chips=skChip("Likuiditas",mc?ownF(mc.value):"N/A",macTone)
+  +skChip("Mayor",rs.dominant_major||"N/A")
+  +skChip("Denominator",rs.denominator||"N/A")
+  +(P.dca_known?skChip("DCA spot",P.dca?"akumulasi":"belum",P.dca?"up":""):"");
  const U=(TWX&&TWX.updates)||[],u=U[0];
- const same=(a,b)=>a&&b&&String(a).toUpperCase().replace(/\s/g,"")===String(b).toUpperCase().replace(/\s/g,"");
- let vs=[];
- if(u){const st=o=>o&&o.state; vs.push(same(st(O.mtpi),st(u.mtpi))?"MTPI sama":"MTPI beda");
-  vs.push(same(st(O.ltpi),st(u.ltpi))?"LTPI sama":"LTPI beda");
-  vs.push(same(rs.dominant_major,u.rsps_dominant_major)?"mayor "+(rs.dominant_major||"?")+" sama":"mayor beda");
-  vs.push(same(rs.denominator,u.denominator)?"denominator sama":"denominator beda");
-  const rgs=rg&&rg.state, twr=u.btc_regime&&u.btc_regime.state;
-  vs.push(same(rgs,twr)?"rezim sama":("rezim beda (kita "+(rgs||"N/A")+", TWX "+(twr||"N/A")+")"));
-  const sp=(((TWX.snapshot||{}).twx||{}).pairs||[]).concat(((TWX.snapshot||{}).rsps||{}).pairs||[]);
-  if(sp.length){let n=0,ok=0;sp.forEach(x=>{const v=pv(x.pair);if(v!=null&&x.value!=null){n++;if(Math.sign(v)===Math.sign(x.value)||(Math.abs(v)<=0.15&&Math.abs(x.value)<=0.2))ok++}});if(n)vs.push("arah pair sama "+ok+" dari "+n)}
- }
- const bullets=[];
- bullets.push("Hitungan sendiri dari data gratis, bukan rumus TWX.");
- if(vs.length)bullets.push("vs TWX "+(u?twxDate(u.date):"")+": "+vs.join("; ")+".");
- if(sd)bullets.push("Nilai BTC "+ownF(sd.value)+" ("+(sd.bias||"")+") — akumulasi spot hanya jika ≥ +1,50."+(sd.inputs?` MVRV ${sd.inputs.MVRV}, Mayer 200W ${sd.inputs.Mayer200W}.`:"" )+(sd.as_of?" Data "+sd.as_of+".":""));
- if(mc)bullets.push("Likuiditas "+ownF(mc.value)+" ("+(mc.bias||"")+")."+(mc.inputs&&mc.inputs.net_liquidity_$T!=null?` Net liquidity $${mc.inputs.net_liquidity_$T}T, 4 minggu ${mc.inputs["perubahan_4mgg_%"]}%.`:"")+(mc.as_of?" Data FRED "+mc.as_of+".":""));
- else bullets.push("Likuiditas: N/A.");
- if(P.dca_known)bullets.push(P.dca?"Sinyal DCA spot: ya, saatnya akumulasi.":"Sinyal DCA spot: belum.");
- if(rs.dominant_major)bullets.push("Mayor RSPS: "+rs.dominant_major+" · Higher beta: "+(rs.higher_beta_active?rs.higher_beta:(rs.higher_beta_candidate?rs.higher_beta_candidate+" (belum aktif)":"tidak ada"))+" · Denominator: "+(rs.denominator||"N/A")+".");
- if(O.sources)bullets.push("Sumber: "+Object.values(O.sources).join(" · ")+".");
- if(O.na&&O.na.length)bullets.push("N/A: "+O.na.join(", ")+".");
- const sum=`<div class="sk-sum"><h3>Associated Data and Summary</h3><ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>`;
- const RSPS_ORDER=[["SUIBTC","SUI","BTC"],["SUIETH","SUI","ETH"],["SUISOL","SUI","SOL"],
+ let vs="";
+ if(u){const same=(a,b)=>a&&b&&String(a).toUpperCase().replace(/\s/g,"")===String(b).toUpperCase().replace(/\s/g,"");
+  const bits=[];
+  bits.push(same(O.mtpi&&O.mtpi.state,u.mtpi&&u.mtpi.state)?"MTPI sama":"MTPI beda");
+  bits.push(same(O.ltpi&&O.ltpi.state,u.ltpi&&u.ltpi.state)?"LTPI sama":"LTPI beda");
+  const rgs=rg&&rg.state,twr=u.btc_regime&&u.btc_regime.state;
+  bits.push(same(rgs,twr)?"rezim sama":"rezim beda");
+  vs=`<div class="sk-vs">vs TWX ${esc(twxDate(u.date))}: ${esc(bits.join(" · "))}.</div>`}
+ const ORDER=[["ETHBTC","ETH","BTC"],["SOLETH","SOL","ETH"],["SOLBTC","SOL","BTC"],
+  ["SUIBTC","SUI","BTC"],["SUIETH","SUI","ETH"],["SUISOL","SUI","SOL"],
   ["DOGEBTC","DOGE","BTC"],["DOGEETH","DOGE","ETH"],["DOGESOL","DOGE","SOL"],["DOGESUI","DOGE","SUI"],
   ["XRPBTC","XRP","BTC"],["XRPETH","XRP","ETH"],["XRPSOL","XRP","SOL"],["XRPSUI","XRP","SUI"],["XRPDOGE","XRP","DOGE"],
   ["HYPEBTC","HYPE","BTC"],["HYPEETH","HYPE","ETH"],["HYPESOL","HYPE","SOL"],["HYPESUI","HYPE","SUI"],["HYPEDOGE","HYPE","DOGE"],["HYPEXRP","HYPE","XRP"],
   ["GOLDUSD","GOLD","USD"],["EURGOLD","EUR","GOLD"],["EURUSD","EUR","USD"]];
- const rspsG=RSPS_ORDER.map(([p,a,b])=>skGauge({id:"r"+p,name:p+" TPI",v:pv(p),prev:skPrevPair(O,p),a,b,tip:a+" vs "+b})).join("");
- const rsps=`<details class="sk-rsps-wrap"><summary>-RSPS Dashboard-</summary><div class="sk-gauges">${rspsG}</div></details>`;
- return `<div class="sk-dash"><div class="sk-title">-Sistem Kita Dashboard-</div>
-  <div class="sk-sub">${esc((function(){const g=String(O.generated||""),m=g.match(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2} WIB)/);return m?twxDate(m[1])+", "+m[2]:(O.date_wib?twxDate(O.date_wib):g)})())}</div>
-  <div class="sk-gauges">${row}</div>
-  <div class="sk-lower">${bars}${dons}</div>
-  ${strip}${sum}${rsps}</div>`}
+ const rows=ORDER.map(([pair,a,b])=>skPairRow({name:pair,a,b,v:pv(pair)})).join("");
+ const rsps=`<details class="sk-rsps-wrap" id="ui-rsps"><summary>Kekuatan antar koin (RSPS)</summary><div class="sk-rsps">${rows}</div></details>`;
+ return `<div class="card sk-dash"><div class="sk-head"><h2>Sistem Kita</h2><div class="sk-when">${esc(when)}</div></div>
+  <div class="sk-verdict" style="color:${expoFg}">${esc(expo)}</div>
+  <div class="sk-verdict-sub">${esc(port)} · ${esc(lev)}</div>
+  <div class="sk-gauges">${gauges}</div>
+  <div class="sk-chips">${chips}</div>
+  ${vs}${rsps}</div>`}
 function twxHistoryDetails(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
- return`<details class="more twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`}
+ return`<details class="more twx-hist" id="ui-twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`}
 function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPaused=(D.paused_desks||[]).some(d=>/copy/i.test(d.name||""));
- return`<details class="more home-more"><summary>Lainnya</summary><div class="home-more-links">
+ return`<details class="more home-more" id="ui-home-more"><summary>Lainnya</summary><div class="home-more-links">
   <button type="button" class="home-go" onclick="setView('meme')">Memecoin${memeLive?"":" (menunggu)"}</button>
   <button type="button" class="home-go" onclick="setView('real')">Target $37${copyPaused?" (dijeda)":""}</button>
   <button type="button" class="home-go" onclick="setView('signals')">Semua sinyal</button>
@@ -1679,7 +1624,7 @@ function renderHome(){const d=(D.desks||[]).find(x=>x.name==="Majors")||{},opens
  $("tot").innerHTML=`${money(eq)} <span class="${cls(pl)}" style="font-size:16px">${pct(pl)}</span>`;
  $("totsub").textContent=`Paper Majors · modal $10K · ${opens.length} posisi · menang ${win}`;
  $("banner").hidden=true;$("banner").innerHTML="";
- if(typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&!BG_DATA&&typeof bgFetch==="function"&&!BG_BUSY){bgFetch().then(()=>{if(VIEW==="home")renderHome()})}
+ if(typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&!BG_DATA&&typeof bgFetch==="function"&&!BG_BUSY){bgFetch().then(()=>{if(VIEW==="home")render()})}
  $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${OWN&&OWN.mtpi?ownHomeCard()+twxHistoryDetails():twxHomeCompact()}${homeMoreLinks()}</div>`;
  $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini."}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
@@ -1775,7 +1720,7 @@ function renderDca(){const A=D.dca||{};
   const fee=o.fee==null?"—":`${Number(o.fee).toLocaleString("id-ID",{maximumFractionDigits:8})}${o.fee_asset?" "+esc(o.fee_asset):""}`;
   const idrAmt=o.idr!=null?o.idr:o.amount_idr;
   return `<tr><td class="mu when">${esc(t)}</td><td>${coinPair(o.pair||"")}</td><td>${esc(o.side||"BELI")}${o.type?" · "+esc(o.type):""}</td><td>${esc(qtyS)}</td><td>${px(o.price)}</td><td class="mu">${fee}</td><td>${idrAmt!=null?idr(idrAmt):"—"}</td></tr>`}).join("")+`</table></div>`:'<div class="empty">Belum ada pembelian yang dicatat.</div>';
- const detail=`<details class="dca-detail"><summary>Detail</summary>
+ const detail=`<details class="dca-detail" id="ui-dca-detail"><summary>Detail</summary>
   <div class="card" style="margin-top:8px"><p style="margin:0 0 8px;font-size:13px">${esc(A.explain||A.advice||"")}</p>${why}
    <p class="sub" style="margin:10px 0 0">Harga ${px(A.price)} USDT · MA50 ${px(A.ma50)} · MA200 ${px(A.ma200)} · MA200W ${A.ma200w!=null?px(A.ma200w):"N/A"} · puncak ${px(A.ath)}${A.ath_date?" ("+esc(A.ath_date)+")":""}. ${esc(A.src||"")}${A.stale?" · data cache":""}.</p></div>
   <div class="card"><h2>Grafik harian ~1 tahun</h2>${dcaChart(A.chart)}</div>
@@ -1871,10 +1816,10 @@ function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
  if($("dec"))$("dec").innerHTML=more("det-bg-act","Detail aksi terakhir",acts+(sk?`<h2 style="margin-top:12px">Sinyal desk yang dilewati</h2>${sk}`:""))}
 setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
 /* BITGET-VIEW-END */
-function render(){if(!D)return;
- if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));if(typeof syncTabVisibility==="function")syncTabVisibility();renderBitget();return}
+function render(opt){if(!D)return;
+ const snap=(opt&&opt.skipSnap)?(function(){let saved;try{saved=JSON.parse(sessionStorage.getItem("deskUi")||"null")}catch(e){saved=null}return{open:(saved&&saved.open)||[],y:UI_SCROLL[VIEW]||0,view:VIEW,scroll:Object.assign({},UI_SCROLL,saved&&saved.scroll)}}()):snapUi();
+ if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));$("v-bitget")&&$("v-bitget").classList.add("on");if(typeof syncTabVisibility==="function")syncTabVisibility();renderBitget();restoreUi(snap);return}
  $("bitgetsec")&&($("bitgetsec").hidden=true);$("v-bitget")&&$("v-bitget").classList.remove("on");
- const snap=snapUi();
  const home=VIEW==="home";
  const real=VIEW==="real";
  const signals=VIEW==="signals";
