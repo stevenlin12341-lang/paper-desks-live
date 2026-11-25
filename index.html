@@ -393,6 +393,12 @@ h1{text-transform:none;letter-spacing:0}
 .twx-legs{font-size:12px}
 .twx-notes{margin:8px 0 0;padding:0;list-style:none}
 .twx-notes li{font-size:12px;color:var(--mu);padding:2px 0;line-height:1.45}
+.own-card{margin:0 0 12px;border-color:#1e3a5f}
+.own-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;align-items:center}
+.own-k{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 4px}
+.own-vs{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
+.own-vs.ok{border-color:#14532d;color:#86efac}.own-vs.no{border-color:#5a4410;color:#fcd34d}
+.own-dec{font-size:13px;line-height:1.5;margin:2px 0 8px}
 .twx-snap{margin:0 0 12px}
 .twx-pairs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .twx-pair{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:#0b0e14}
@@ -462,7 +468,7 @@ const SHOW_HL_WALLETS=false; // reversible; Steven/Russel Hyperliquid tracking o
 const HL="https://api.hyperliquid.xyz/info",BN="https://fapi.binance.com/fapi/v1/premiumIndex";
 const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b",url:"https://app.hyperliquid.xyz/explorer/address/0x74e44d14C66F407278d4B1E5e8453c8aeDAEF25b"},{name:"Russel",address:"0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB",url:"https://app.hyperliquid.xyz/explorer/address/0x8A7a58402BCb2d87d02bd07C3673AdB4f4B201fB"}];
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
-let D=null,TWX=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
+let D=null,TWX=null,OWN=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
 let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca","bitget"];
   const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
@@ -1462,6 +1468,49 @@ function twxHomeCompact(){const U=(TWX&&TWX.updates)||[];if(!U.length)return twx
  const chips=[twxChip("MTPI",twxState(mt.state),mt.change,twxTone(mt.state)),twxChip("LTPI",twxState(lt.state),lt.change,twxTone(lt.state)),twxChip("Rezim BTC",twxState(rg.state),rg.change,twxTone(rg.state)),twxChip("Fokus",u.rsps_dominant_major||"N/A",""," "),twxChip("Portofolio",portS,"","")].join("");
  const hist=older.length?`<details class="more twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}</details>`:"";
  return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2><div class="twx-chips">${chips}</div>${hist}</div>`}
+function ownF(v){return v==null||isNaN(Number(v))?"N/A":(Number(v)>0?"+":"")+Number(v).toFixed(2).replace(".",",")}
+function ownTone(v){return v==null?"":v>0.15?"up":v<-0.15?"dn":"wa"}
+function ownChip(l,v,sub,tip,tone){return`<span class="twx-chip ${tone??ownTone(v)}" title="${esc(tip||"")}"><span class="l">${esc(l)}</span><b>${ownF(v)}</b>${sub?`<span class="sub"> · ${esc(sub)}</span>`:""}</span>`}
+function ownVs(){const U=(TWX&&TWX.updates)||[],u=U[0],O=OWN;if(!u||!O)return"";
+ const rs=O.rsps||{},up=x=>String(x||"").toUpperCase().replace(/\s|\$/g,""),rows=[];
+ const st=(o)=>o&&o.state?String(o.state).toUpperCase():null;
+ const cmp=(l,a,b)=>{if(a==null||b==null)return;rows.push(`<span class="own-vs ${up(a)===up(b)?"ok":"no"}">${esc(l)}: ${up(a)===up(b)?"✓ "+esc(a):"≠ kita "+esc(a)+" · TWX "+esc(b)}</span>`)};
+ cmp("MTPI",st(O.mtpi),st(u.mtpi));cmp("LTPI",st(O.ltpi),st(u.ltpi));
+ cmp("Mayor",rs.dominant_major,u.rsps_dominant_major);
+ cmp("Higher beta",rs.higher_beta_active?rs.higher_beta:"tidak ada",u.optional_higher_beta||"tidak ada");
+ cmp("Denominator",rs.denominator,u.denominator);
+ cmp("Rezim",O.regime&&O.regime.state,u.btc_regime&&u.btc_regime.state);
+ let pr="";const sp=(((TWX.snapshot||{}).twx||{}).pairs||[]).concat(((TWX.snapshot||{}).rsps||{}).pairs||[]);
+ if(sp.length&&(rs.pairs||[]).length){const m={};rs.pairs.forEach(p=>m[p.pair]=p.value);let n=0,ok=0;
+  sp.forEach(x=>{if(m[x.pair]!=null&&x.value!=null){n++;if(Math.sign(m[x.pair])===Math.sign(x.value)||(Math.abs(m[x.pair])<=0.15&&Math.abs(x.value)<=0.2))ok++}});
+  if(n)pr=`<span class="own-vs ${ok/n>=0.7?"ok":"no"}">Pair arah sama: ${ok} dari ${n} <span class="sub">(snapshot TWX ${esc(twxDate(TWX.snapshot.as_of))})</span></span>`}
+ return`<div class="own-k">vs TWX ${esc(twxDate(u.date))}</div><div class="own-row">${rows.join("")}${pr}</div>`}
+function ownHomeCard(){const O=OWN;if(!O||!O.mtpi)return"";
+ const rs=O.rsps||{},P=O.portfolio||{},sd=O.sdca,mc=O.macro,rg=O.regime;
+ const chips=ownChip("MTPI (harian)",O.mtpi&&O.mtpi.value,O.mtpi&&O.mtpi.state,"Rata-rata 9 indikator tren BTC harian. +1 naik, -1 turun.")
+  +ownChip("LTPI (mingguan)",O.ltpi&&O.ltpi.value,O.ltpi&&O.ltpi.state,"Sama, tapi pakai candle mingguan. Tren besar.")
+  +(O.trash_tpi?ownChip("Altcoin",O.trash_tpi.value,O.trash_tpi.state,"Tren keranjang 10 altcoin (bobot sama)."):"")
+  +(rg?ownChip("Rezim BTC",rg.value,rg.state==="TRENDING"?"trending":"mean-reverting","+ = pasar trending, - = bolak-balik (mean-reverting). Dari ADX, Choppiness, Hurst.","wa"):"")
+  +(sd?ownChip("Nilai BTC",sd.value,sd.bias,"Skor murah/mahal dari MVRV, MA 200 minggu, power-law. +1,5 ke atas = waktunya akumulasi.",sd.value>=1.5?"up":sd.value<=-1.5?"dn":"wa"):`<span class="twx-chip"><span class="l">Nilai BTC</span><b>N/A</b></span>`)
+  +(mc?ownChip("Likuiditas",mc.value,mc.bias,"Net liquidity The Fed (neraca - TGA - RRP), perubahan 4 minggu."):`<span class="twx-chip"><span class="l">Likuiditas</span><b>N/A</b></span>`);
+ const pf=P.exposure?(P.cash_pct>=100?"100% cash":`${P.asset_pct}% ${esc(P.asset||"")} · ${P.cash_pct}% cash`):"N/A";
+ const lev=P.leverage==="permissible"?"boleh (hati-hati)":P.leverage?"dilarang":"N/A";
+ const dca=!P.dca_known?"N/A":P.dca?"ya, saatnya akumulasi":"belum";
+ const hb=rs.higher_beta_candidate?(rs.higher_beta_active?rs.higher_beta:`${rs.higher_beta_candidate} (belum aktif)`):"—";
+ const dec=`<div class="own-dec"><b>${esc(P.exposure||"N/A")}</b> · Portofolio: <b>${pf}</b> · Leverage: <b>${lev}</b> · DCA spot: <b>${dca}</b><br><span class="mu">Mayor ${esc(rs.dominant_major||"N/A")} · Higher beta ${esc(hb)} · Denominator ${esc(rs.denominator||"N/A")}</span></div>`;
+ const comp=(o,t)=>o&&o.components?`<div class="own-k">${t}</div><div class="own-row">${Object.entries(o.components).map(([k,v])=>`<span class="twx-pair ${v>0?"up":v<0?"dn":"wa"}"><span>${esc(k)}</span><span class="pv">${v>0?"+1":v<0?"−1":"0"}</span></span>`).join("")}</div>`:"";
+ const sc=rs.scores?`<div class="own-k">Peringkat kekuatan (RSPS)</div><div class="own-row">${Object.entries(rs.scores).map(([k,v])=>`<span class="twx-pair ${ownTone(v/3)}"><span>${esc(k)}</span><span class="pv">${ownF(v)}</span></span>`).join("")}</div>`:"";
+ const pairs=(rs.pairs||[]).length?`<div class="own-k">Pair RSPS (harian)</div><div class="twx-pairs">${rs.pairs.map(twxPairChip).join("")}</div>`:"";
+ const na=(O.na&&O.na.length)?`<div class="sub">N/A: ${esc(O.na.join(", "))}</div>`:"";
+ const M=O.method||{},S=O.sources||{};
+ const det=`<details class="more"><summary>Detail &amp; cara hitung</summary>${sc}${pairs}${comp(O.mtpi,"Indikator MTPI")}${comp(O.ltpi,"Indikator LTPI")}
+  <ul class="twx-notes"><li>${esc(M.tpi||"")}</li><li>${esc(M.sdca||"")}${sd&&sd.inputs?` (MVRV ${sd.inputs.MVRV}, Mayer 200W ${sd.inputs.Mayer200W}, z ${sd.inputs.z_MVRV}/${sd.inputs.z_MA200W}/${sd.inputs.z_PowerLaw})`:""}</li><li>${esc(M.makro||"")}</li><li>${esc(M.rezim||"")}${rg&&rg.inputs?` (ADX ${rg.inputs.ADX14}, CI ${rg.inputs.Choppiness14}, Hurst ${rg.inputs.Hurst250})`:""}</li>
+  <li>Sumber: ${esc(Object.values(S).join(" · "))}. Hitungan sendiri, bukan rumus TWX.</li></ul>${na}</details>`;
+ return`<div class="card own-card"><h2>Sistem Kita <span class="badge b-live">${esc(twxDate(O.date_wib))}</span></h2>
+  <div class="sub" style="margin:-4px 0 8px">Hitungan sendiri dari data gratis. Arahkan kursor ke kotak untuk penjelasan.</div>
+  <div class="twx-chips">${chips}</div>${dec}${ownVs()}${det}</div>`}
+function twxHistoryDetails(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
+ return`<details class="more twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`}
 function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPaused=(D.paused_desks||[]).some(d=>/copy/i.test(d.name||""));
  return`<details class="more home-more"><summary>Lainnya</summary><div class="home-more-links">
   <button type="button" class="home-go" onclick="setView('meme')">Memecoin${memeLive?"":" (menunggu)"}</button>
@@ -1481,7 +1530,7 @@ function renderHome(){const d=(D.desks||[]).find(x=>x.name==="Majors")||{},opens
  $("totsub").textContent=`Paper Majors · modal $10K · ${opens.length} posisi · menang ${win}`;
  $("banner").hidden=true;$("banner").innerHTML="";
  if(typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&!BG_DATA&&typeof bgFetch==="function"&&!BG_BUSY){bgFetch().then(()=>{if(VIEW==="home")renderHome()})}
- $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${twxHomeCompact()}${homeMoreLinks()}</div>`;
+ $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${OWN&&OWN.mtpi?ownHomeCard()+twxHistoryDetails():twxHomeCompact()}${homeMoreLinks()}</div>`;
  $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini."}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
@@ -1782,7 +1831,7 @@ async function fetchWallet(){if(!SHOW_HL_WALLETS||!D||walletBusy)return;walletBu
   walletAt=Date.now();if(wantsWallet())render();else paintLive()}
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
-async function load(){try{const [r,t]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("data/twx_updates.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);D=await r.json();if(t&&t.ok){try{TWX=await t.json()}catch(e){}}render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
+async function load(){try{const [r,t]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("data/twx_updates.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);D=await r.json();if(t&&t.ok){try{TWX=await t.json()}catch(e){}}try{const o=await fetch("data/own_system.json?t="+Date.now(),{cache:"no-store"});if(o.ok)OWN=await o.json()}catch(e){}render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-meme").addEventListener("click",()=>setView("meme"));
