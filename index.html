@@ -452,6 +452,20 @@ h1{text-transform:none;letter-spacing:0}
   .big{font-size:28px}
   header{padding:6px 0 10px}
 }
+
+.cd-strip{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mu)}
+.cd-strip .cd-item{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.cd-strip b{color:var(--tx);font-variant-numeric:tabular-nums;font-weight:700}
+.cd-strip .hint{width:100%;font-size:11px;margin:0;color:var(--mu)}
+.cd-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.cd-row:last-child{border-bottom:0}
+.cd-row .nm{font-weight:600}
+.cd-row .tm{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;line-height:1.35}
+.cd-row.on .tm{color:var(--up)}
+.cd-note{font-size:11px;color:var(--mu);margin:6px 0 0;line-height:1.4;border-bottom:0;padding:0}
+.cd-block{margin:0 0 8px}
+.sk-dash>.cd-row{margin:0 0 10px;padding-top:0}
+.cd-sess h2{margin-bottom:2px}
 </style></head><body><div class="wrap">
 <nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">Paper Desks</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
 
@@ -473,6 +487,7 @@ h1{text-transform:none;letter-spacing:0}
   <div class="big" id="tot">—</div><div class="sub" id="totsub">memuat…</div></div>
  <div class="sub" style="text-align:right"><div id="upd"></div><div id="livest"></div></div>
 </header>
+<div id="cdstrip" class="cd-strip" hidden></div>
 <section id="banner" class="note" hidden></section>
 <section id="ot"><div class="oth"><h3 id="ottitle">Posisi terbuka <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
@@ -1440,6 +1455,98 @@ function sentimenCard(){const S=(D&&D.sentimen)||{},P=S.public||{},K=S.desk||{};
     <p class="sent-why">${esc(K.reason||"Data desk belum ada.")}</p></div>
   </div></div>`}
 
+
+function wibParts(ms){const d=new Date(ms+7*3600000);return{y:d.getUTCFullYear(),mo:d.getUTCMonth(),d:d.getUTCDate(),h:d.getUTCHours(),mi:d.getUTCMinutes(),s:d.getUTCSeconds(),dow:d.getUTCDay()}}
+function wibMs(y,mo,d,h,mi,s){return Date.UTC(y,mo,d,h,mi||0,s||0)-7*3600000}
+function wibYmd(p){return p.y+"-"+String(p.mo+1).padStart(2,"0")+"-"+String(p.d).padStart(2,"0")}
+function wibNextDay(p){return wibParts(wibMs(p.y,p.mo,p.d,12,0,0)+86400000)}
+function wibAt(p,h,mi){return wibMs(p.y,p.mo,p.d,h,mi||0,0)}
+function wibClock(ms){const p=wibParts(ms);return String(p.h).padStart(2,"0")+":"+String(p.mi).padStart(2,"0")}
+function cdFmt(ms){if(ms<=0)return"sekarang";const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60,p=n=>String(n).padStart(2,"0");return d>0?d+"hr "+h+"j "+p(m)+"m":h>0?h+"j "+p(m)+"m "+p(sec)+"d":m+"m "+p(sec)+"d"}
+function tzParts(ms,tz){const f=new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",weekday:"short"});const o={};for(const x of f.formatToParts(new Date(ms)))o[x.type]=x.value;return{y:+o.year,mo:+o.month-1,d:+o.day,h:+o.hour,mi:+o.minute,s:+o.second,wd:o.weekday}}
+function tzOffsetMs(ms,tz){const p=tzParts(ms,tz);return Date.UTC(p.y,p.mo,p.d,p.h,p.mi,p.s)-ms}
+function zonedMs(tz,y,mo,d,h,mi,s){const utc=Date.UTC(y,mo,d,h,mi,s||0);return utc-tzOffsetMs(utc-tzOffsetMs(utc,tz),tz)}
+function parseWibStamp(s){const m=String(s||"").match(/(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);return m?wibMs(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0),0):null}
+function nextWibHourOnOrAfter(now,hour){const p=wibParts(now);let t=wibAt(p,hour,0);if(now>=t){const n=wibNextDay(p);t=wibAt(n,hour,0)}return t}
+function cdNextDaily0700(now){const p=wibParts(now),t=wibAt(p,7,0);return now<t?t:wibAt(wibNextDay(p),7,0)}
+function cdNextCycle(now){const p=wibParts(now),gen=(D&&D.gen_ts)?D.gen_ts*1000:0,grace=15*60*1000;
+  if(p.h>=6&&p.h<=23){const slot=wibAt(p,p.h,0);
+    if(now-slot<=grace&&(!gen||gen<slot-60*1000))return{at:slot,due:now>=slot,night:false,label:"Siklus "+wibClock(slot)+" WIB"};
+    if(p.h<23){const nx=wibAt(p,p.h+1,0);return{at:nx,due:false,night:false,label:"Siklus berikutnya "+wibClock(nx)+" WIB"}}}
+  const n=(p.h>=23)?wibNextDay(p):p,at=wibAt(n,6,0);
+  return{at,due:false,night:true,label:"Siklus berikutnya 06:00 WIB"}}
+function cdNextNight(now){const p=wibParts(now);
+  const inWin=p.h===23||p.h<5||(p.h===5&&p.mi===0&&p.s===0);
+  if(inWin){const slot=wibAt(p,p.h,0);if(p.mi===0&&p.s===0)return{at:slot,inWin:true,label:"Jaga malam "+wibClock(slot)+" WIB"};
+    const nh=p.h===23?0:p.h+1;const n=p.h===23?wibNextDay(p):p;const at=wibAt(n,nh,0);
+    return{at,inWin:true,label:"Jaga malam berikutnya "+wibClock(at)+" WIB"}}
+  const at=p.h<23?wibAt(p,23,0):wibAt(wibNextDay(p),23,0);
+  return{at,inWin:false,label:"Jaga malam berikutnya 23:00 WIB"}}
+function cdOwnNext(now){const p=wibParts(now),today7=wibAt(p,7,0),ymd=wibYmd(p);
+  const gen=parseWibStamp(OWN&&OWN.generated),dw=OWN&&OWN.date_wib;
+  if(dw===ymd&&gen&&gen>=today7-5*60*1000)return{at:wibAt(wibNextDay(p),7,0),due:false,label:"Hitung berikutnya"};
+  if(now<today7)return{at:today7,due:false,label:"Hitung berikutnya"};
+  return{at:today7,due:true,label:"Hitung hari ini"}}
+function cdTwxNext(now){const last=(((TWX&&TWX.updates)||[])[0]||{}).date||(TWX&&TWX.updated)||"";
+  const p=wibParts(now),ymd=wibYmd(p),today7=wibAt(p,7,0);
+  if(last===ymd)return{at:wibAt(wibNextDay(p),7,0),due:false,open:false,label:"Update TWX berikutnya"};
+  if(now<today7)return{at:today7,due:false,open:false,label:"Sesi TWX baru"};
+  return{at:null,due:false,open:true,label:"Sesi TWX hari ini sudah buka"}}
+function cdNextSession(tz,openH,openM,closeH,closeM,now,weekendsOff){
+  const cur=tzParts(now,tz);let skipped=false;
+  for(let i=0;i<10;i++){
+    const dt=new Date(Date.UTC(cur.y,cur.mo,cur.d+i));
+    const y=dt.getUTCFullYear(),mo=dt.getUTCMonth(),d=dt.getUTCDate();
+    const open=zonedMs(tz,y,mo,d,openH,openM,0),close=zonedMs(tz,y,mo,d,closeH,closeM,0);
+    const wd=tzParts(open,tz).wd,we=weekendsOff&&(wd==="Sat"||wd==="Sun");
+    if(we){skipped=true;continue}
+    if(i===0&&now>=open&&now<close)return{active:true,at:close,phrase:"aktif · tutup dalam"};
+    if(now<open)return{active:false,at:open,phrase:(skipped&&wd==="Mon")?"libur · buka Senin dalam":"buka dalam"};
+    if(i===0)skipped=skipped||(weekendsOff&&wd==="Fri");
+  }
+  return{active:false,at:now,phrase:"buka dalam"}
+}
+function cdSessionText(s,now){if(!s||s.at==null)return"—";return s.phrase+" "+cdFmt(s.at-now)}
+function cdTwxHtml(){return`<div class="cd-block twx-cd"><div class="cd-row"><span class="nm">Sesi / update TWX</span><span class="tm" data-cd="twx">—</span></div><div class="cd-note">Sesi harian baru setelah tutup lilin 00:00 UTC (07:00 WIB). Update TWX dari Discord, bukan hitungan kita.</div></div>`}
+function marketSessionsCard(){return`<div class="card cd-sess"><h2>Sesi pasar</h2>
+  <div class="cd-row" data-cd-row="asia"><span class="nm">Asia (Tokyo)</span><span class="tm" data-cd="asia">—</span></div>
+  <div class="cd-row" data-cd-row="london"><span class="nm">London</span><span class="tm" data-cd="london">—</span></div>
+  <div class="cd-row" data-cd-row="ny"><span class="nm">New York</span><span class="tm" data-cd="ny">—</span></div>
+  <div class="cd-row" data-cd-row="uscrypto"><span class="nm">Crypto AS</span><span class="tm" data-cd="uscrypto">—</span></div>
+  <div class="cd-note">Jam bursa saham; akhir pekan libur. Crypto tetap 24/7 — Crypto AS adalah jendela likuiditas AS (08:00–17:00 waktu New York).</div></div>`}
+function paintCountdowns(){
+  const now=Date.now(),show=VIEW==="home"||VIEW==="paper"||VIEW==="bitget",el=$("cdstrip");
+  if(el){
+    el.hidden=!show;
+    if(show){
+      const want=VIEW==="bitget"?"bitget":"cycle";
+      if(el.dataset.mode!==want){
+        el.innerHTML=VIEW==="bitget"
+          ?`<div class="cd-item"><span data-cd-lab="cycle">Siklus berikutnya</span> <b data-cd="cycle">—</b></div><div class="cd-item"><span data-cd-lab="night">Jaga malam</span> <b data-cd="night">—</b></div><div class="hint" data-cd="cycle-hint"></div>`
+          :`<div class="cd-item"><span data-cd-lab="cycle">Siklus berikutnya</span> <b data-cd="cycle">—</b></div><div class="hint" data-cd="cycle-hint"></div>`;
+        el.dataset.mode=want;
+      }
+      const cy=cdNextCycle(now),lab=el.querySelector('[data-cd-lab="cycle"]'),val=el.querySelector('[data-cd="cycle"]'),hint=el.querySelector('[data-cd="cycle-hint"]');
+      if(lab)lab.textContent=cy.label;
+      if(val)val.textContent=cy.due?"seharusnya segera":cdFmt(cy.at-now);
+      if(hint)hint.textContent=cy.night?"Desk Majors diam 23:00–06:00. Jaga malam Bitget tetap cek tiap jam 23:00–05:00. Siklus bisa geser ±15 mnt.":"Biasanya di awal jam, bisa geser ±15 mnt."+(VIEW==="bitget"?" Mirror Bitget jalan tepat setelah siklus.":"");
+      if(VIEW==="bitget"){const nw=cdNextNight(now),nl=el.querySelector('[data-cd-lab="night"]'),nv=el.querySelector('[data-cd="night"]');
+        if(nl)nl.textContent=nw.label;if(nv)nv.textContent=cdFmt(nw.at-now)}
+    }
+  }
+  const set=(id,text,on)=>{const n=document.querySelector('[data-cd="'+id+'"]');if(!n)return;n.textContent=text;const row=n.closest(".cd-row");if(row)row.classList.toggle("on",!!on)};
+  const tw=cdTwxNext(now);set("twx",tw.open?"menunggu update Discord":((tw.due?"sekarang":cdFmt(tw.at-now))+" · 07:00 WIB"));
+  const ow=cdOwnNext(now);set("own",(ow.due?"seharusnya segera":cdFmt(ow.at-now))+" · 07:00 WIB");
+  const asia=cdNextSession("Asia/Tokyo",9,0,15,0,now,true);
+  const lon=cdNextSession("Europe/London",8,0,16,30,now,true);
+  const ny=cdNextSession("America/New_York",9,30,16,0,now,true);
+  const us=cdNextSession("America/New_York",8,0,17,0,now,false);
+  set("asia",cdSessionText(asia,now),asia.active);
+  set("london",cdSessionText(lon,now),lon.active);
+  set("ny",cdSessionText(ny,now),ny.active);
+  set("uscrypto",cdSessionText(us,now),us.active);
+}
+
 function twxDate(iso){const p=String(iso||"").split("-"),mo=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
  return p.length===3?`${Number(p[2])} ${mo[Number(p[1])-1]||p[1]} ${p[0]}`:(iso||"—")}
 function twxTone(s){s=String(s||"").toLowerCase();
@@ -1497,7 +1604,7 @@ function twxSnapshot(S){if(!S)return"";const T=S.twx||{},R=S.rsps||{};
 function twxHomeSection(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
  const latest=U[0],older=U.slice(1);
  const hist=older.length?`<details class="more twx-hist" id="ui-twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(u=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(u.date))}</div>${twxUpdateBody(u,true)}</div>`).join("")}</details>`:"";
- return `<div class="card twx-box latest"><h2>Update Sistem TWX <span class="badge b-live">TERBARU</span></h2>${twxUpdateBody(latest,false)}</div>${twxSnapshot(TWX.snapshot)}${hist}`}
+ return `<div class="card twx-box latest"><h2>Update Sistem TWX <span class="badge b-live">TERBARU</span></h2>${cdTwxHtml()}${twxUpdateBody(latest,false)}</div>${twxSnapshot(TWX.snapshot)}${hist}`}
 function homeOpenSection(){const opens=(D.open||[]).slice();
  opens.forEach(o=>{const p=livePx(o);o._p=p??o.p;o._u=upnl(o,o._p)});
  if(!opens.length)return`<div class="card"><h2>Posisi terbuka</h2><p class="sub" style="margin:0">Tidak ada posisi paper sekarang.</p></div>`;
@@ -1523,7 +1630,7 @@ function twxHomeCompact(){const U=(TWX&&TWX.updates)||[];if(!U.length)return twx
  let portS="N/A";const port=u.rsps_portfolio;if(Array.isArray(port)&&port.length)portS=port.map(p=>`${p.pct}% ${p.asset}`).join(" · ");
  const chips=[twxChip("MTPI",twxState(mt.state),mt.change,twxTone(mt.state)),twxChip("LTPI",twxState(lt.state),lt.change,twxTone(lt.state)),twxChip("Rezim BTC",twxState(rg.state),rg.change,twxTone(rg.state)),twxChip("Fokus",u.rsps_dominant_major||"N/A",""," "),twxChip("Portofolio",portS,"","")].join("");
  const hist=older.length?`<details class="more twx-hist" id="ui-twx-hist"><summary>Update sebelumnya (${older.length})</summary>${older.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}</details>`:"";
- return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2><div class="twx-chips">${chips}</div>${hist}</div>`}
+ return`<div class="card twx-box latest"><h2>TWX <span class="badge">${esc(twxDate(u.date))}</span></h2>${cdTwxHtml()}<div class="twx-chips">${chips}</div>${hist}</div>`}
 function ownF(v,d){d=d==null?2:d;return v==null||isNaN(Number(v))?"N/A":(Number(v)>0?"+":"")+Number(v).toFixed(d).replace(".",",")}
 function skState(v){if(v==null||isNaN(Number(v)))return{t:"N/A",fg:"var(--mu)"};
  v=Number(v);if(v>=0.5)return{t:"Bullish",fg:"var(--up)"};if(v>0.15)return{t:"Slight bull",fg:"var(--up)"};
@@ -1602,13 +1709,15 @@ function ownHomeCard(){const O=OWN;if(!O||!(O.mtpi||O.ltpi))return"";
  const rows=ORDER.map(([pair,a,b])=>skPairRow({name:pair,a,b,v:pv(pair)})).join("");
  const rsps=`<details class="sk-rsps-wrap" id="ui-rsps"><summary>Kekuatan antar koin (RSPS)</summary><div class="sk-rsps">${rows}</div></details>`;
  return `<div class="card sk-dash"><div class="sk-head"><h2>Sistem Kita</h2><div class="sk-when">${esc(when)}</div></div>
+  <div class="cd-row"><span class="nm">Hitung berikutnya</span><span class="tm" data-cd="own">—</span></div>
   <div class="sk-verdict" style="color:${expoFg}">${esc(expo)}</div>
   <div class="sk-verdict-sub">${esc(port)} · ${esc(lev)}</div>
   <div class="sk-gauges">${gauges}</div>
   <div class="sk-chips">${chips}</div>
   ${vs}${rsps}</div>`}
-function twxHistoryDetails(){const U=(TWX&&TWX.updates)||[];if(!U.length)return"";
- return`<details class="more twx-hist" id="ui-twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`}
+function twxHistoryDetails(){const U=(TWX&&TWX.updates)||[];
+ const body=U.length?`<details class="more twx-hist" id="ui-twx-hist"><summary>Update TWX asli (${U.length})</summary>${U.map(x=>`<div class="twx-old"><div class="twx-date">${esc(twxDate(x.date))}</div>${twxUpdateBody(x,true)}</div>`).join("")}${twxSnapshot(TWX.snapshot)}</details>`:`<p class="sub">Belum ada update TWX.</p>`;
+ return`<div class="card twx-box latest"><div class="sk-head"><h2>TWX</h2><div class="sk-when">${U.length?esc(twxDate(U[0].date)):""}</div></div>${cdTwxHtml()}${body}</div>`}
 function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPaused=(D.paused_desks||[]).some(d=>/copy/i.test(d.name||""));
  return`<details class="more home-more" id="ui-home-more"><summary>Lainnya</summary><div class="home-more-links">
   <button type="button" class="home-go" onclick="setView('meme')">Memecoin${memeLive?"":" (menunggu)"}</button>
@@ -1628,7 +1737,7 @@ function renderHome(){const d=(D.desks||[]).find(x=>x.name==="Majors")||{},opens
  $("totsub").textContent=`Paper Majors · modal $10K · ${opens.length} posisi · menang ${win}`;
  $("banner").hidden=true;$("banner").innerHTML="";
  if(typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&!BG_DATA&&typeof bgFetch==="function"&&!BG_BUSY){bgFetch().then(()=>{if(VIEW==="home")render()})}
- $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${OWN&&OWN.mtpi?ownHomeCard()+twxHistoryDetails():twxHomeCompact()}${homeMoreLinks()}</div>`;
+ $("homesec").innerHTML=`<div class="home-stack">${homeOpenSection()}${homeBitgetCard()}${OWN&&OWN.mtpi?ownHomeCard()+twxHistoryDetails():twxHomeCompact()}${marketSessionsCard()}${homeMoreLinks()}</div>`;
  $("foot").innerHTML="Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini."}
 function dcaAvgEntryCard(){const P=(D.dca||{}).portfolio||{},btc=P.btc||{};
  const avgU=btc.avg_price_usdt!=null?Number(btc.avg_price_usdt):null;
@@ -1916,6 +2025,7 @@ function render(opt){if(!D)return;
   paintLive();
  }
  restoreUi(snap);
+ paintCountdowns();
 }
 function paintLive(){const el=$("livest");if(!el)return;
  const t=marksAt||walletAt;
@@ -2007,5 +2117,6 @@ setInterval(load,120000);
 setInterval(fetchMarks,5000);
 setInterval(()=>{if(wantsWallet())fetchWallet()},10000);
 setInterval(paintLive,1000);
+setInterval(paintCountdowns,1000);
 setInterval(()=>{if(VIEW==="dca"&&dcaUnlocked())fetchDcaLive()},10000);
 </script></body></html>
