@@ -2053,6 +2053,80 @@ function instShadowLine(S){
   }
   return`<div class="note" style="margin-top:10px"><b>Filter institusi (bayangan).</b> ${esc(body)} Tidak mengubah trade live sampai evaluasi 5 Des. Long diblok kalau institusi BEARISH, short diblok kalau BULLISH.</div>`;
 }
+function instMoney(n,signed){if(instNA(n))return"N/A";const a=Math.abs(n),s=n<0?"−":(signed&&n>0?"+":"");
+ if(a>=1e9)return s+"$"+(a/1e9).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" miliar";
+ if(a>=1e6)return s+"$"+(a/1e6).toLocaleString("en-US",{minimumFractionDigits:a>=1e8?0:1,maximumFractionDigits:a>=1e8?0:1})+" juta";
+ if(a>=1e3)return s+"$"+a.toLocaleString("en-US",{maximumFractionDigits:0});
+ return s+"$"+a.toLocaleString("en-US",{maximumFractionDigits:0})}
+function instInt(n,signed){if(instNA(n))return"N/A";const s=n<0?"−":(signed&&n>0?"+":"");return s+Math.abs(n).toLocaleString("en-US",{maximumFractionDigits:0})}
+function instChg(n){return instInt(n,true)}
+function instCotCard(C){
+  if(!C||!C.ok){
+    const err=C&&(C.stale_error||C.error);
+    return`<div class="card" style="padding:10px 12px"><b>Hedge fund (COT CFTC)</b><p class="sub" style="margin:6px 0 0">N/A${err?" · sumber gagal":""}. Laporan posisi hedge fund di futures CME, rilis tiap minggu.</p></div>`;
+  }
+  const row=(x,label)=>{
+    if(!x||!x.ok)return`<div style="margin-top:8px"><b>${esc(label)}</b> <span class="mu">N/A</span></div>`;
+    const chg=instNA(x.net_chg)?"":` <span class="${instCls(x.net_chg)}">(${instChg(x.net_chg)} vs minggu lalu)</span>`;
+    return`<div style="margin-top:8px">
+      <div><b>${esc(label)}</b> net ${instInt(x.net,true)} kontrak${chg}</div>
+      ${x.read?`<div class="sub">${esc(x.read)}</div>`:""}
+     </div>`;
+  };
+  const btc=C.btc||{},eth=C.eth||{},mic=C.btc_micro||{};
+  const am=[];
+  if(btc.ok&&!instNA(btc.am_net))am.push("BTC net "+instInt(btc.am_net,true));
+  if(eth.ok&&!instNA(eth.am_net))am.push("ETH net "+instInt(eth.am_net,true));
+  const micro=mic.ok?`<div class="sub" style="margin-top:4px">Micro BTC: net ${instInt(mic.net,true)} kontrak${instNA(mic.net_chg)?"":" ("+instChg(mic.net_chg)+")"}</div>`:"";
+  const dt=C.report_date||btc.date||eth.date||"N/A";
+  return`<div class="card" style="padding:10px 12px">
+    <b>Hedge fund (COT CFTC)</b>
+    <div class="sub">Laporan ${esc(dt)} · TFF, futures only · sumber <a href="${esc(C.source_url||"https://publicreporting.cftc.gov/resource/gpe5-46if")}" target="_blank" rel="noopener">CFTC</a>${C.cached&&C.stale?" · data cache":""}</div>
+    ${row(btc,"BTC")}${row(eth,"ETH")}
+    ${am.length?`<div class="sub" style="margin-top:8px">Asset manager: ${esc(am.join(" · "))}</div>`:""}
+    ${micro}
+    <p class="note" style="margin:8px 0 0">${esc(C.caveat||"Short hedge fund sering dipakai buat hedge ETF (basis trade), jadi bukan sinyal jual murni.")}</p>
+   </div>`;
+}
+function inst13fCard(F){
+  const title="Hedge fund 13F (telat ~45 hari)";
+  if(!F||!F.ok){
+    return`<details class="more" style="margin-top:14px"><summary>${title}</summary><p class="sub">N/A. Laporan kuartalan ke SEC, biasanya telat sekitar 45 hari. Tidak masuk putusan institusi.</p></details>`;
+  }
+  const fundRow=f=>{
+    if(!f)return"";
+    if(!f.ok)return`<div class="it"><div class="h"><b>${esc(f.name||"N/A")}</b></div><div class="r mu">N/A</div></div>`;
+    const bit=(sum,chgU,chgP,chgS,lab)=>{
+      const empty=!sum||((!sum.shares||sum.shares===0)&&instNA(sum.value_usd));
+      if(empty)return`<span class="mu">${lab} tidak pegang</span>`;
+      const val=instNA(sum.value_usd)?(instInt(sum.shares,false)+" saham"):instMoney(sum.value_usd,false);
+      let chg="";
+      if(!instNA(chgP)&&Math.abs(chgP)<400)chg=` <span class="${instCls(chgP)}">${instPct(chgP,0)}</span>`;
+      else if(!instNA(chgU))chg=` <span class="${instCls(chgU)}">${instMoney(chgU,true)}</span>`;
+      else if(!instNA(chgS))chg=` <span class="${instCls(chgS)}">${instChg(chgS)} saham</span>`;
+      const ticks=(sum.tickers||[]).join(", ");
+      return`<span>${lab} ${val}${chg}${ticks?` <span class="mu">(${esc(ticks)})</span>`:""}</span>`;
+    };
+    const when=f.period_label||f.period||"";
+    return`<div class="it"><div class="h"><b>${esc(f.name)}</b>${when?` <span class="mu">per ${esc(when)}</span>`:""}</div>
+      <div class="r">${bit(f.btc,f.btc_chg_usd,f.btc_chg_pct,f.btc_chg_shares,"BTC ETF")} · ${bit(f.eth,f.eth_chg_usd,f.eth_chg_pct,f.eth_chg_shares,"ETH ETF")}</div></div>`;
+  };
+  const funds=(F.funds||[]).map(fundRow).join("");
+  const S=F.strategy||{};
+  let strat="";
+  if(!S||S.ok===false){
+    strat=`<p class="sub" style="margin-top:8px"><b>Strategy</b> (bukan 13F): N/A</p>`;
+  }else if(S.ok){
+    const chg=instNA(S.chg_90d)?"":` <span class="${instCls(S.chg_90d)}">(${instChg(S.chg_90d)} BTC dalam 90 hari)</span>`;
+    strat=`<p class="sub" style="margin-top:8px"><b>Strategy</b> (bukan 13F): ${instInt(S.btc,false)} BTC${chg}. Sumber <a href="${esc(S.source_url||"https://www.strategy.com/ledger")}" target="_blank" rel="noopener">laporan perusahaan</a> lewat CoinGecko.</p>`;
+  }
+  const per=F.period_label||F.period||"";
+  return`<details class="more" style="margin-top:14px"><summary>${title}</summary>
+    <p class="sub">${esc(F.note||"Laporan kuartalan, biasanya telat sekitar 45 hari. Bukan data real-time, tidak masuk putusan institusi.")}${per?" Posisi per "+esc(per)+".":""}</p>
+    <div class="feed">${funds||'<p class="sub">N/A</p>'}</div>
+    ${strat}
+   </details>`;
+}
 function renderInstitusi(){const sec=$("institusisec");if(!sec)return;
  ["banner","wallet","shadowsec","trendsec","learnsec","homesec","dcasec","memesec","bitgetsec","ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
  if($("cdstrip"))$("cdstrip").hidden=true;
@@ -2112,8 +2186,10 @@ function renderInstitusi(){const sec=$("institusisec");if(!sec)return;
   </details>`;
 
  sec.innerHTML=`<div class="card">${kpis}</div>
+  ${instCotCard(I.cot)}
   ${instShadowLine(I.shadow)}
   ${hiHtml}${restHtml}
+  ${inst13fCard(I.filings_13f)}
   ${details}
   <p class="note" style="margin-top:12px">${esc(I.disclaimer||"Data publik, bisa telat, bukan info orang dalam, dan bukan saran.")}</p>`;
 }
