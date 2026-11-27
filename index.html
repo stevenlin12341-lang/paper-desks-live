@@ -2004,17 +2004,61 @@ function instPct(n,d){if(instNA(n))return"N/A";const x=Number(n),s=x<0?"−":(x>
 function instUsd(n){if(instNA(n))return"N/A";if(Math.abs(n)>=1e6)return instJt(n/1e6,false);return"$"+Math.abs(n).toLocaleString("en-US",{maximumFractionDigits:0})}
 function instNum(n,d){if(instNA(n))return"N/A";return Number(n).toLocaleString("en-US",{maximumFractionDigits:d==null?2:d})}
 function instFlow(n){if(instNA(n))return"N/A";const a=Math.abs(n),s=n<0?"−":(n>0?"+":"");
- const d=a>=100?0:(a>=10?1:1);return s+a.toLocaleString("en-US",{minimumFractionDigits:a>=100?0:1,maximumFractionDigits:d})}
+ return s+a.toLocaleString("en-US",{minimumFractionDigits:a>=100?0:1,maximumFractionDigits:a>=100?0:1})}
 function instWhen(t){if(!t)return"N/A";return String(t).replace(/ WIB$/,"").replace(/ \d{4}, /,", ")}
 function instCls(n){return instNA(n)||n===0?"mu":(n>0?"up":"dn")}
-function instRead(text){return text?`<p class="sub" style="margin:8px 0 0;line-height:1.45">${esc(text)}</p>`:""}
-function instStale(s){return s&&s.stale?` <span class="badge">data lama</span>`:""}
+function instVClass(v){return v==="BULLISH"?"b-bull":v==="BEARISH"?"b-bear":"b-neut"}
+function instVColor(v){return v==="BULLISH"?"var(--up)":v==="BEARISH"?"var(--dn)":"var(--wa)"}
+function instBadge(v){const lab=v||"N/A";return`<span class="badge ${instVClass(v)}">${esc(lab)}</span>`}
+function instFlag(c){
+  if(c.flag==="open")return`terbuka ${(c.side||"").toLowerCase()}${c.desk?" · "+c.desk:""}`;
+  if(c.flag==="recent")return`baru ${(c.side||"").toLowerCase()}${c.desk?" · "+c.desk:""}${c.when?" · "+c.when:""}`;
+  return"";
+}
+function instBits(c){
+  const bits=[];
+  if(!instNA(c.etf_total))bits.push("ETF "+instJt(c.etf_total,true));
+  if(!instNA(c.premium))bits.push("prem "+instPct(c.premium,2));
+  if(!instNA(c.pc_oi))bits.push("P/C "+instNum(c.pc_oi,2));
+  return bits.length?bits.join(" · "):"N/A";
+}
+function instCoinCard(c,hi){
+  const flag=instFlag(c);
+  return`<div class="card" style="padding:10px 12px;${hi?"border-left:3px solid var(--ac);":""}">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <b style="font-size:15px">${esc(c.ticker)}</b>${instBadge(c.verdict)}
+      ${flag?`<span class="sub">${esc(flag)}</span>`:""}
+    </div>
+    <div class="sub" style="margin-top:4px">${esc(instBits(c))}</div>
+   </div>`}
+function instEtfTable(E,cols){
+  if(!E||!E.ok||!(E.days||[]).length)return"";
+  const use=cols.filter(f=>(E.funds||[]).indexOf(f)>=0);
+  const head=`<tr><th>Tanggal</th>${use.map(f=>`<th>${esc(f)}</th>`).join("")}<th>Total</th></tr>`;
+  const rows=(E.days||[]).map(d=>{
+    const cells=use.map(f=>{const v=d.funds&&d.funds[f];return`<td class="${instCls(v)}">${instFlow(v)}</td>`}).join("");
+    return`<tr><td>${esc(d.date||"N/A")}</td>${cells}<td class="${instCls(d.total)}"><b>${instFlow(d.total)}</b></td></tr>`}).join("");
+  return`<div class="tw" style="margin-top:8px"><table>${head}${rows}</table></div>`}
+function instShadowLine(S){
+  const sh=S||{};
+  const n=sh.n_blocked||0,cl=sh.closed||0;
+  let body;
+  if(!n){
+    body="Baru jalan, belum ada trade yang diblok.";
+  }else if(!cl){
+    body=`${n} diblok, masih terbuka semua — belum ada hasil menang/kalah.`;
+  }else{
+    const sum=instNA(sh.sum_R)?"N/A":((sh.sum_R>0?"+":"")+Number(sh.sum_R).toFixed(2)+"R");
+    body=`${n} diblok · yang sudah selesai: ${sh.win||0} menang / ${sh.loss||0} kalah · sum R ${sum}.`;
+  }
+  return`<div class="note" style="margin-top:10px"><b>Filter institusi (bayangan).</b> ${esc(body)} Tidak mengubah trade live sampai evaluasi 5 Des. Long diblok kalau institusi BEARISH, short diblok kalau BULLISH.</div>`;
+}
 function renderInstitusi(){const sec=$("institusisec");if(!sec)return;
  ["banner","wallet","shadowsec","trendsec","learnsec","homesec","dcasec","memesec","bitgetsec","ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
  if($("cdstrip"))$("cdstrip").hidden=true;
  sec.hidden=false;
  $("htitle").innerHTML=`Jejak institusi <span class="badge">Data publik</span>`;
- $("foot").innerHTML="Data publik, bisa telat, bukan info orang dalam real-time, dan bukan saran. Halaman ini tidak menyimpan kunci API dan tidak bisa mengirim order.";
+ $("foot").innerHTML="Data publik, bisa telat, bukan info orang dalam real-time, dan bukan saran. Filter institusi hanya bayangan. Halaman ini tidak menyimpan kunci API dan tidak bisa mengirim order.";
  const I=INST,right=$("upd")&&$("upd").parentElement;if(right)right.hidden=false;
  if(!I){
   $("tot").hidden=false;$("totsub").hidden=false;
@@ -2024,65 +2068,55 @@ function renderInstitusi(){const sec=$("institusisec");if(!sec)return;
   sec.innerHTML=`<div class="card"><p class="sub">${esc(INST_ERR||"Memuat data institusi…")}</p></div>`;
   if(!INST_BUSY)fetchInstitusi();
   return}
- const E=I.etf||{},P=I.premium||{},D=I.deribit||{};
+ const V=I.verdict||"N/A",reason=I.verdict_reason||"Data belum cukup.";
  $("tot").hidden=false;$("totsub").hidden=false;
- $("tot").innerHTML=E.ok?`<span class="${instCls(E.latest_total)}">${instJt(E.latest_total,true)}</span>`:"N/A";
- $("totsub").textContent=E.ok?`Arus ETF BTC · data terbaru ${E.latest_date||"N/A"} (sesi bursa AS)`:"Arus ETF BTC · N/A";
+ $("tot").innerHTML=`<span style="color:${instVColor(I.verdict)}">${esc(V)}</span>`;
+ $("totsub").textContent=reason;
  if($("upd"))$("upd").textContent=I.updated?"Diperbarui "+I.updated:"";
  if($("livest"))$("livest").innerHTML="";
 
- const focus=["IBIT","FBTC","ARKB","GBTC"];
- const latest=(E.days&&E.days[0])||null;
- const chips=latest?focus.map(f=>{const v=latest.funds&&latest.funds[f];return`<div class="kpi"><div class="v ${instCls(v)}">${instJt(v,true)}</div><div class="l">${f}</div></div>`}).join(""):"";
- const fundCols=(E.funds&&E.funds.length?E.funds:focus);
- const mainCols=focus.filter(f=>fundCols.indexOf(f)>=0);
- function etfTable(cols){
-  const head=`<tr><th>Tanggal</th>${cols.map(f=>`<th>${esc(f)}</th>`).join("")}<th>Total</th></tr>`;
-  const rows=(E.days||[]).map(d=>{
-   const cells=cols.map(f=>{const v=d.funds&&d.funds[f];return`<td class="${instCls(v)}">${instFlow(v)}</td>`}).join("");
-   return`<tr><td>${esc(d.date||"N/A")}</td>${cells}<td class="${instCls(d.total)}"><b>${instFlow(d.total)}</b></td></tr>`}).join("");
-  return`<div class="tw" style="margin-top:10px"><table>${head}${rows}</table></div>`}
- const allTbl=(fundCols.length>mainCols.length)?`<details class="more" style="margin-top:8px"><summary>Semua dana (${fundCols.length} ETF)</summary>${etfTable(fundCols)}</details>`:"";
- const etfCard=`<div class="card"><h2>Arus ETF BTC harian <span class="sub" style="font-weight:400">US$ juta${instStale(E)}</span></h2>
-  ${E.ok?`<div class="eq ${instCls(E.latest_total)}">${instJt(E.latest_total,true)}</div>
-  <div class="sub" style="margin:-4px 0 10px">Total ${esc(E.latest_date||"")} · sumber <a href="${esc(E.source_url||"https://farside.co.uk/btc/")}" target="_blank" rel="noopener">Farside Investors</a></div>
-  <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(90px,1fr));max-width:560px">${chips}</div>
-  ${instRead(E.how)}
-  ${(E.days||[]).length?etfTable(mainCols)+allTbl:'<div class="empty">Belum ada data harian.</div>'}`
-  :`<div class="eq mu">N/A</div><p class="sub">Data ETF sedang tidak tersedia. Sumber: <a href="https://farside.co.uk/btc/" target="_blank" rel="noopener">Farside Investors</a>.</p>${instRead(E.how)}`}</div>`;
+ const etfs=I.etfs||(I.etf?{BTC:I.etf}:{}),prems=I.premiums||{},opts=I.options||I.deribit&&{BTC:I.deribit}||{};
+ const btcE=etfs.BTC||{},btcP=prems.BTC||I.premium||{},btcO=opts.BTC||{};
+ const etfLab=(btcE.latest_date||"").replace(/ \d{4}$/,"");
+ const kpis=`<div class="kpis" style="grid-template-columns:repeat(3,1fr);gap:8px">
+   <div class="kpi"><div class="v ${instCls(btcE.latest_total)}">${btcE.ok?instJt(btcE.latest_total,true):"N/A"}</div><div class="l">ETF BTC${etfLab?" · "+etfLab:""}</div></div>
+   <div class="kpi"><div class="v ${instCls(btcP.pct)}">${btcP.ok||!instNA(btcP.pct)?instPct(btcP.pct,2):"N/A"}</div><div class="l">Coinbase premium</div></div>
+   <div class="kpi"><div class="v">${btcO.ok&&!instNA(btcO.pc_oi)?instNum(btcO.pc_oi,2):"N/A"}</div><div class="l">Put/call BTC (OI)</div></div>
+  </div>`;
 
- const premTone=P.ok?instCls(P.pct):"mu";
- const premCard=`<div class="card"><h2>Coinbase premium${instStale(P)}</h2>
-  ${P.ok?`<div class="eq ${premTone}">${instPct(P.pct,3)}</div>
-  <div class="sub">Coinbase $${instNum(P.coinbase,0)} vs Binance $${instNum(P.binance,0)}</div>`
-  :`<div class="eq mu">N/A</div><p class="sub">Harga Coinbase atau Binance sedang tidak tersedia.</p>`}
-  ${instRead(P.how)}</div>`;
+ const coins=I.coins||[];
+ const hi=coins.filter(c=>c.flag==="open"||c.flag==="recent");
+ const rest=coins.filter(c=>c.flag!=="open"&&c.flag!=="recent");
+ const hiHtml=hi.length?`<h3 style="margin:16px 0 4px;font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em">Koin yang baru kita trade</h3>${hi.map(c=>instCoinCard(c,true)).join("")}`:"";
+ const pinned=new Set(["BTC","ETH","SOL"]);
+ const loud=rest.filter(c=>pinned.has(c.ticker)||(c.verdict&&c.verdict!=="NETRAL"));
+ const quiet=rest.filter(c=>loud.indexOf(c)<0);
+ const restHtml=(loud.length||quiet.length)?`<h3 style="margin:16px 0 4px;font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em">Koin desk lain</h3>${loud.map(c=>instCoinCard(c,false)).join("")}${quiet.length?`<details class="more" style="margin-top:10px"><summary>Yang datanya tipis / netral (${quiet.length})</summary>${quiet.map(c=>instCoinCard(c,false)).join("")}</details>`:""}`:'<p class="sub">Tidak ada data institusi untuk koin desk lain.</p>';
 
- const mp=D.max_pain||null;
- const mpTxt=mp&&!instNA(mp.strike)?`$${instNum(mp.strike,0)}`:"N/A";
- const mpSub=mp?`Jatuh tempo ${esc(mp.expiry_label||mp.expiry||"")} · harga sekarang ${instNA(mp.spot)?"N/A":"$"+instNum(mp.spot,0)}`:"";
- const eth=D.eth&&D.eth.ok?`<div class="sub" style="margin-top:6px">ETH: rasio put/call OI ${instNA(D.eth.pc_oi)?"N/A":instNum(D.eth.pc_oi,2)} · volume 24 jam ${instNA(D.eth.pc_vol)?"N/A":instNum(D.eth.pc_vol,2)}</div>`:"";
+ const etfDetails=["BTC","ETH","SOL"].map(a=>{
+   const E=etfs[a];if(!E||!E.ok)return"";
+   const cols=a==="BTC"?["IBIT","FBTC","ARKB","GBTC"]:((E.funds||[]).slice(0,4));
+   return`<div style="margin-top:10px"><b>${esc(a)}</b> <span class="sub">total ${instJt(E.latest_total,true)} · ${esc(E.latest_date||"")} · sumber <a href="${esc(E.source_url||"#")}" target="_blank" rel="noopener">Farside</a></span>${instEtfTable(E,cols)}</div>`;
+ }).join("");
  const sideLab=s=>s==="buy"?"beli":s==="sell"?"jual":"N/A";
  const typLab=t=>t==="call"?"call (naik)":t==="put"?"put (turun)":"N/A";
- const blkRows=(D.blocks||[]).map(b=>{
-  const sideCls=b.side==="buy"?"up":b.side==="sell"?"dn":"mu";
-  const sz=instNA(b.size_btc)?"N/A":(instNum(b.size_btc,1)+" BTC")+(instNA(b.notional_usd)?"":" · "+instUsd(b.notional_usd));
-  return`<div class="it"><div class="h"><b class="${sideCls}">${esc(sideLab(b.side))}</b> <span>${esc(typLab(b.type))}</span> <span>strike ${instNA(b.strike)?"N/A":"$"+instNum(b.strike,0)}</span> <span class="mu">${esc(b.expiry_label||b.expiry||"N/A")}</span></div><div class="r">${sz} · ${esc(instWhen(b.t))}</div></div>`}).join("");
- const derCard=`<div class="card"><h2>Opsi BTC di Deribit${instStale(D)}</h2>
-  ${D.ok?`<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));max-width:640px">
-    <div class="kpi"><div class="v">${instNA(D.pc_oi)?"N/A":instNum(D.pc_oi,2)}</div><div class="l">Rasio put/call (OI)</div></div>
-    <div class="kpi"><div class="v">${instNA(D.pc_vol)?"N/A":instNum(D.pc_vol,2)}</div><div class="l">Rasio put/call (volume 24 jam)</div></div>
-    <div class="kpi"><div class="v">${mpTxt}</div><div class="l">Max pain</div></div>
-  </div>
-  <div class="sub" style="margin-top:6px">${mpSub?esc(mpSub):""}${(!instNA(D.call_oi_btc)&&!instNA(D.put_oi_btc))?` · OI call ${instNum(D.call_oi_btc,0)} BTC / put ${instNum(D.put_oi_btc,0)} BTC`:""}</div>
-  ${eth}
-  ${instRead(D.how)}
-  <h2 style="margin-top:14px">Blok / transaksi gede terbaru <span class="sub" style="font-weight:400">≥ ${D.block_min_btc||25} BTC</span></h2>
-  ${blkRows?`<div class="feed" style="margin-top:8px">${blkRows}</div>`:'<div class="empty">Tidak ada transaksi ≥ '+(D.block_min_btc||25)+' BTC di data publik terbaru.</div>'}`
-  :`<div class="eq mu">N/A</div><p class="sub">Data opsi Deribit sedang tidak tersedia.</p>${instRead(D.how)}`}</div>`;
+ const blks=(btcO.blocks||[]).map(b=>{
+   const sideCls=b.side==="buy"?"up":b.side==="sell"?"dn":"mu";
+   const sz=instNA(b.size_btc)?"N/A":(instNum(b.size_btc,1)+" BTC")+(instNA(b.notional_usd)?"":" · "+instUsd(b.notional_usd));
+   return`<div class="it"><div class="h"><b class="${sideCls}">${esc(sideLab(b.side))}</b> <span>${esc(typLab(b.type))}</span> <span>strike ${instNA(b.strike)?"N/A":"$"+instNum(b.strike,0)}</span> <span class="mu">${esc(b.expiry_label||b.expiry||"N/A")}</span></div><div class="r">${sz} · ${esc(instWhen(b.t))}</div></div>`}).join("");
+ const how=`<p class="sub" style="margin:8px 0 0;line-height:1.45">Cara baca: ETF plus = uang institusi masuk (fund beli koin itu). Premium plus = harga Coinbase lebih mahal, biasanya tekanan beli AS. Rasio put/call di atas 1 = lebih banyak put (jaga kalau turun); di bawah 1 = lebih banyak call. Kalau datanya tipis, koin ditandai NETRAL atau dilewati.</p>`;
+ const details=`<details class="more" style="margin-top:14px"><summary>Detail angka</summary>
+   ${etfDetails||'<p class="sub">Data ETF tidak tersedia.</p>'}
+   ${blks?`<h3 style="margin:14px 0 6px;font-size:13px">Blok opsi BTC (≥ ${btcO.block_min_btc||25} BTC)</h3><div class="feed">${blks}</div>`:""}
+   ${how}
+  </details>`;
 
- const note=`<p class="note" style="margin-top:12px">${esc(I.disclaimer||"Data publik, bisa telat, bukan info orang dalam, dan bukan saran.")}</p>`;
- sec.innerHTML=etfCard+premCard+derCard+note}
+ sec.innerHTML=`<div class="card">${kpis}</div>
+  ${instShadowLine(I.shadow)}
+  ${hiHtml}${restHtml}
+  ${details}
+  <p class="note" style="margin-top:12px">${esc(I.disclaimer||"Data publik, bisa telat, bukan info orang dalam, dan bukan saran.")}</p>`;
+}
 /* INST-VIEW-END */
 function render(opt){if(!D)return;
  const snap=(opt&&opt.skipSnap)?(function(){let saved;try{saved=JSON.parse(sessionStorage.getItem("deskUi")||"null")}catch(e){saved=null}return{open:(saved&&saved.open)||[],y:UI_SCROLL[VIEW]||0,view:VIEW,scroll:Object.assign({},UI_SCROLL,saved&&saved.scroll)}}()):snapUi();
