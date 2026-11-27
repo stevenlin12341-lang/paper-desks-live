@@ -474,6 +474,7 @@ h1{text-transform:none;letter-spacing:0}
  <button type="button" id="v-paper">Paper</button>
  <button type="button" id="v-dca">Cicilan BTC</button>
  <button type="button" id="v-bitget">🔐 Bitget</button>
+ <button type="button" id="v-institusi">Institusi</button>
  <button type="button" id="v-meme" hidden>Memecoin</button>
  <button type="button" id="v-real" hidden>Target $37</button>
  <button type="button" id="v-signals" hidden>Semua sinyal</button>
@@ -503,6 +504,7 @@ h1{text-transform:none;letter-spacing:0}
 <section id="dcasec" hidden></section>
 <section id="memesec" hidden></section>
 <section id="bitgetsec" hidden></section>
+<section id="institusisec" hidden></section>
 <footer id="foot">Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini.</footer>
 </div>
 <div id="lb" class="lb"><a class="lbopen" id="lbnew" href="#" target="_blank" rel="noopener">Buka ↗</a><button type="button" class="lbx" id="lbx" aria-label="Close">×</button><img class="lbimg" id="lbi" alt="Analisis"></div>
@@ -514,7 +516,7 @@ const WALLETS_FALLBACK=[{name:"Steven",address:"0x74e44d14C66F407278d4B1E5e8453c
 const WALLET_FALLBACK=WALLETS_FALLBACK[0].address;
 let D=null,TWX=null,OWN=null,LIVE={},HLMIDS={},WALLET_LIVE=null,WALLETS_LIVE={},dfilter="all";
 let marksAt=0,walletAt=0,marksSrc="",marksN=0,liveFail=false,marksBusy=false,walletBusy=false;
-let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca","bitget"];
+let VIEW=(()=>{try{const ok=["home","paper","meme","real","signals","trend","steven","russel","dca","bitget","institusi"];
   const q=(new URLSearchParams(location.search).get("tab")||"").toLowerCase();if(ok.indexOf(q)>=0){localStorage.setItem("deskHomeV1","1");localStorage.setItem("deskView",q);return q}
   if(!localStorage.getItem("deskHomeV1")){localStorage.setItem("deskHomeV1","1");return"home"}
   const v=localStorage.getItem("deskView");return ok.indexOf(v)>=0?v:"home"}catch(e){return"home"}})();
@@ -1724,6 +1726,7 @@ function homeMoreLinks(){const M=D.meme||{},memeLive=M.status==="live",copyPause
   <button type="button" class="home-go" onclick="setView('real')">Target $37${copyPaused?" (dijeda)":""}</button>
   <button type="button" class="home-go" onclick="setView('signals')">Semua sinyal</button>
   <button type="button" class="home-go" onclick="setView('trend')">Tes tren</button>
+  <button type="button" class="home-go" onclick="setView('institusi')">Institusi</button>
  </div></details>`}
 function syncTabVisibility(){const memeLive=!!(D&&D.meme&&D.meme.status==="live");
  const show={"v-meme":memeLive||VIEW==="meme","v-real":VIEW==="real","v-signals":VIEW==="signals","v-trend":VIEW==="trend","v-steven":!!(SHOW_HL_WALLETS&&VIEW==="steven"),"v-russel":!!(SHOW_HL_WALLETS&&VIEW==="russel")};
@@ -1986,10 +1989,107 @@ function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
  bgLiveStart();paintBgLive()}
 setInterval(()=>{if(VIEW==="bitget"&&bgKeyHex())bgFetch()},60000);
 /* BITGET-VIEW-END */
+/* INST-VIEW-START (Grok Bot). Public institutional indicators only. No API keys, no orders from this page. */
+let INST=null,INST_ERR="",INST_BUSY=false;
+async function fetchInstitusi(){if(INST_BUSY)return INST;INST_BUSY=true;
+ try{const r=await fetch("data/institusi.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("http "+r.status);INST=await r.json();INST_ERR=""}
+ catch(e){INST_ERR="Gagal memuat data institusi.";if(!INST)INST={ok:false}}
+ finally{INST_BUSY=false;if(VIEW==="institusi")render()}
+ return INST}
+function instNA(v){return v==null||v===""||(typeof v==="number"&&!isFinite(v))}
+function instJt(n,signed){if(instNA(n))return"N/A";const a=Math.abs(n),s=n<0?"−":(signed&&n>0?"+":"");
+ const body=a>=100?a.toLocaleString("en-US",{maximumFractionDigits:0}):a.toLocaleString("en-US",{minimumFractionDigits:a<10?1:0,maximumFractionDigits:1});
+ return s+"$"+body+" juta"}
+function instPct(n,d){if(instNA(n))return"N/A";const x=Number(n),s=x<0?"−":(x>0?"+":"");return s+Math.abs(x).toFixed(d==null?2:d)+"%"}
+function instUsd(n){if(instNA(n))return"N/A";if(Math.abs(n)>=1e6)return instJt(n/1e6,false);return"$"+Math.abs(n).toLocaleString("en-US",{maximumFractionDigits:0})}
+function instNum(n,d){if(instNA(n))return"N/A";return Number(n).toLocaleString("en-US",{maximumFractionDigits:d==null?2:d})}
+function instFlow(n){if(instNA(n))return"N/A";const a=Math.abs(n),s=n<0?"−":(n>0?"+":"");
+ const d=a>=100?0:(a>=10?1:1);return s+a.toLocaleString("en-US",{minimumFractionDigits:a>=100?0:1,maximumFractionDigits:d})}
+function instWhen(t){if(!t)return"N/A";return String(t).replace(/ WIB$/,"").replace(/ \d{4}, /,", ")}
+function instCls(n){return instNA(n)||n===0?"mu":(n>0?"up":"dn")}
+function instRead(text){return text?`<p class="sub" style="margin:8px 0 0;line-height:1.45">${esc(text)}</p>`:""}
+function instStale(s){return s&&s.stale?` <span class="badge">data lama</span>`:""}
+function renderInstitusi(){const sec=$("institusisec");if(!sec)return;
+ ["banner","wallet","shadowsec","trendsec","learnsec","homesec","dcasec","memesec","bitgetsec","ot","desksec","twosec"].forEach(id=>{const e=$(id);if(e)e.hidden=true});
+ if($("cdstrip"))$("cdstrip").hidden=true;
+ sec.hidden=false;
+ $("htitle").innerHTML=`Jejak institusi <span class="badge">Data publik</span>`;
+ $("foot").innerHTML="Data publik, bisa telat, bukan info orang dalam real-time, dan bukan saran. Halaman ini tidak menyimpan kunci API dan tidak bisa mengirim order.";
+ const I=INST,right=$("upd")&&$("upd").parentElement;if(right)right.hidden=false;
+ if(!I){
+  $("tot").hidden=false;$("totsub").hidden=false;
+  $("tot").textContent=INST_ERR?"N/A":"memuat…";
+  $("totsub").textContent=INST_ERR||"Mengambil data publik…";
+  $("upd")&&($("upd").textContent="");
+  sec.innerHTML=`<div class="card"><p class="sub">${esc(INST_ERR||"Memuat data institusi…")}</p></div>`;
+  if(!INST_BUSY)fetchInstitusi();
+  return}
+ const E=I.etf||{},P=I.premium||{},D=I.deribit||{};
+ $("tot").hidden=false;$("totsub").hidden=false;
+ $("tot").innerHTML=E.ok?`<span class="${instCls(E.latest_total)}">${instJt(E.latest_total,true)}</span>`:"N/A";
+ $("totsub").textContent=E.ok?`Arus ETF BTC · data terbaru ${E.latest_date||"N/A"} (sesi bursa AS)`:"Arus ETF BTC · N/A";
+ if($("upd"))$("upd").textContent=I.updated?"Diperbarui "+I.updated:"";
+ if($("livest"))$("livest").innerHTML="";
+
+ const focus=["IBIT","FBTC","ARKB","GBTC"];
+ const latest=(E.days&&E.days[0])||null;
+ const chips=latest?focus.map(f=>{const v=latest.funds&&latest.funds[f];return`<div class="kpi"><div class="v ${instCls(v)}">${instJt(v,true)}</div><div class="l">${f}</div></div>`}).join(""):"";
+ const fundCols=(E.funds&&E.funds.length?E.funds:focus);
+ const mainCols=focus.filter(f=>fundCols.indexOf(f)>=0);
+ function etfTable(cols){
+  const head=`<tr><th>Tanggal</th>${cols.map(f=>`<th>${esc(f)}</th>`).join("")}<th>Total</th></tr>`;
+  const rows=(E.days||[]).map(d=>{
+   const cells=cols.map(f=>{const v=d.funds&&d.funds[f];return`<td class="${instCls(v)}">${instFlow(v)}</td>`}).join("");
+   return`<tr><td>${esc(d.date||"N/A")}</td>${cells}<td class="${instCls(d.total)}"><b>${instFlow(d.total)}</b></td></tr>`}).join("");
+  return`<div class="tw" style="margin-top:10px"><table>${head}${rows}</table></div>`}
+ const allTbl=(fundCols.length>mainCols.length)?`<details class="more" style="margin-top:8px"><summary>Semua dana (${fundCols.length} ETF)</summary>${etfTable(fundCols)}</details>`:"";
+ const etfCard=`<div class="card"><h2>Arus ETF BTC harian <span class="sub" style="font-weight:400">US$ juta${instStale(E)}</span></h2>
+  ${E.ok?`<div class="eq ${instCls(E.latest_total)}">${instJt(E.latest_total,true)}</div>
+  <div class="sub" style="margin:-4px 0 10px">Total ${esc(E.latest_date||"")} · sumber <a href="${esc(E.source_url||"https://farside.co.uk/btc/")}" target="_blank" rel="noopener">Farside Investors</a></div>
+  <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(90px,1fr));max-width:560px">${chips}</div>
+  ${instRead(E.how)}
+  ${(E.days||[]).length?etfTable(mainCols)+allTbl:'<div class="empty">Belum ada data harian.</div>'}`
+  :`<div class="eq mu">N/A</div><p class="sub">Data ETF sedang tidak tersedia. Sumber: <a href="https://farside.co.uk/btc/" target="_blank" rel="noopener">Farside Investors</a>.</p>${instRead(E.how)}`}</div>`;
+
+ const premTone=P.ok?instCls(P.pct):"mu";
+ const premCard=`<div class="card"><h2>Coinbase premium${instStale(P)}</h2>
+  ${P.ok?`<div class="eq ${premTone}">${instPct(P.pct,3)}</div>
+  <div class="sub">Coinbase $${instNum(P.coinbase,0)} vs Binance $${instNum(P.binance,0)}</div>`
+  :`<div class="eq mu">N/A</div><p class="sub">Harga Coinbase atau Binance sedang tidak tersedia.</p>`}
+  ${instRead(P.how)}</div>`;
+
+ const mp=D.max_pain||null;
+ const mpTxt=mp&&!instNA(mp.strike)?`$${instNum(mp.strike,0)}`:"N/A";
+ const mpSub=mp?`Jatuh tempo ${esc(mp.expiry_label||mp.expiry||"")} · harga sekarang ${instNA(mp.spot)?"N/A":"$"+instNum(mp.spot,0)}`:"";
+ const eth=D.eth&&D.eth.ok?`<div class="sub" style="margin-top:6px">ETH: rasio put/call OI ${instNA(D.eth.pc_oi)?"N/A":instNum(D.eth.pc_oi,2)} · volume 24 jam ${instNA(D.eth.pc_vol)?"N/A":instNum(D.eth.pc_vol,2)}</div>`:"";
+ const sideLab=s=>s==="buy"?"beli":s==="sell"?"jual":"N/A";
+ const typLab=t=>t==="call"?"call (naik)":t==="put"?"put (turun)":"N/A";
+ const blkRows=(D.blocks||[]).map(b=>{
+  const sideCls=b.side==="buy"?"up":b.side==="sell"?"dn":"mu";
+  const sz=instNA(b.size_btc)?"N/A":(instNum(b.size_btc,1)+" BTC")+(instNA(b.notional_usd)?"":" · "+instUsd(b.notional_usd));
+  return`<div class="it"><div class="h"><b class="${sideCls}">${esc(sideLab(b.side))}</b> <span>${esc(typLab(b.type))}</span> <span>strike ${instNA(b.strike)?"N/A":"$"+instNum(b.strike,0)}</span> <span class="mu">${esc(b.expiry_label||b.expiry||"N/A")}</span></div><div class="r">${sz} · ${esc(instWhen(b.t))}</div></div>`}).join("");
+ const derCard=`<div class="card"><h2>Opsi BTC di Deribit${instStale(D)}</h2>
+  ${D.ok?`<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));max-width:640px">
+    <div class="kpi"><div class="v">${instNA(D.pc_oi)?"N/A":instNum(D.pc_oi,2)}</div><div class="l">Rasio put/call (OI)</div></div>
+    <div class="kpi"><div class="v">${instNA(D.pc_vol)?"N/A":instNum(D.pc_vol,2)}</div><div class="l">Rasio put/call (volume 24 jam)</div></div>
+    <div class="kpi"><div class="v">${mpTxt}</div><div class="l">Max pain</div></div>
+  </div>
+  <div class="sub" style="margin-top:6px">${mpSub?esc(mpSub):""}${(!instNA(D.call_oi_btc)&&!instNA(D.put_oi_btc))?` · OI call ${instNum(D.call_oi_btc,0)} BTC / put ${instNum(D.put_oi_btc,0)} BTC`:""}</div>
+  ${eth}
+  ${instRead(D.how)}
+  <h2 style="margin-top:14px">Blok / transaksi gede terbaru <span class="sub" style="font-weight:400">≥ ${D.block_min_btc||25} BTC</span></h2>
+  ${blkRows?`<div class="feed" style="margin-top:8px">${blkRows}</div>`:'<div class="empty">Tidak ada transaksi ≥ '+(D.block_min_btc||25)+' BTC di data publik terbaru.</div>'}`
+  :`<div class="eq mu">N/A</div><p class="sub">Data opsi Deribit sedang tidak tersedia.</p>${instRead(D.how)}`}</div>`;
+
+ const note=`<p class="note" style="margin-top:12px">${esc(I.disclaimer||"Data publik, bisa telat, bukan info orang dalam, dan bukan saran.")}</p>`;
+ sec.innerHTML=etfCard+premCard+derCard+note}
+/* INST-VIEW-END */
 function render(opt){if(!D)return;
  const snap=(opt&&opt.skipSnap)?(function(){let saved;try{saved=JSON.parse(sessionStorage.getItem("deskUi")||"null")}catch(e){saved=null}return{open:(saved&&saved.open)||[],y:UI_SCROLL[VIEW]||0,view:VIEW,scroll:Object.assign({},UI_SCROLL,saved&&saved.scroll)}}()):snapUi();
+ if(VIEW==="institusi"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-institusi"));$("v-institusi")&&$("v-institusi").classList.add("on");if(typeof syncTabVisibility==="function")syncTabVisibility();renderInstitusi();if(typeof restoreUi==="function")restoreUi(typeof snap!=="undefined"?snap:null);return}
  if(VIEW==="bitget"){document.querySelectorAll("#views button").forEach(b=>b.classList.toggle("on",b.id==="v-bitget"));$("v-bitget")&&$("v-bitget").classList.add("on");if(typeof syncTabVisibility==="function")syncTabVisibility();renderBitget();restoreUi(snap);return}
  $("bitgetsec")&&($("bitgetsec").hidden=true);$("v-bitget")&&$("v-bitget").classList.remove("on");
+ $("institusisec")&&($("institusisec").hidden=true);$("v-institusi")&&$("v-institusi").classList.remove("on");
  const home=VIEW==="home";
  const real=VIEW==="real";
  const signals=VIEW==="signals";
@@ -2027,7 +2127,7 @@ function render(opt){if(!D)return;
  restoreUi(snap);
  paintCountdowns();
 }
-function paintLive(){const el=$("livest");if(!el)return;
+function paintLive(){const el=$("livest");if(!el)return;if(VIEW==="institusi"){el.innerHTML="";return}
  const t=marksAt||walletAt;
  if(t&&!liveFail){const bits=["Live"];if(marksSrc)bits.push(marksSrc+(marksN?` ${marksN} harga`:"" ));if(wantsWallet()&&walletAt)bits.push(isWalletView()?"dompet":"dompet");
   el.innerHTML=`<span class="dot"></span><span class="ok">${esc(bits.join(" · "))} · diperbarui ${secAgo(t)}</span>`}
@@ -2098,7 +2198,7 @@ async function fetchWallet(){if(!SHOW_HL_WALLETS||!D||walletBusy)return;walletBu
   walletAt=Date.now();if(wantsWallet())render();else paintLive()}
  catch(e){/* keep last snapshot / data.json wallets */}
  finally{walletBusy=false}}
-async function load(){try{const [r,t]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("data/twx_updates.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);D=await r.json();if(t&&t.ok){try{TWX=await t.json()}catch(e){}}try{const o=await fetch("data/own_system.json?t="+Date.now(),{cache:"no-store"});if(o.ok)OWN=await o.json()}catch(e){}render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
+async function load(){try{const [r,t]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("data/twx_updates.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);D=await r.json();if(t&&t.ok){try{TWX=await t.json()}catch(e){}}try{const o=await fetch("data/own_system.json?t="+Date.now(),{cache:"no-store"});if(o.ok)OWN=await o.json()}catch(e){}try{const i=await fetch("data/institusi.json?t="+Date.now(),{cache:"no-store"});if(i.ok)INST=await i.json()}catch(e){}render();fetchMarks();if(wantsWallet())fetchWallet()}catch(e){$("totsub").textContent="Gagal memuat data.json"}}
 $("v-home").addEventListener("click",()=>{setView("home");fetchWallet()});
 $("v-paper").addEventListener("click",()=>setView("paper"));
 $("v-meme").addEventListener("click",()=>setView("meme"));
@@ -2112,6 +2212,7 @@ $("lb").addEventListener("click",e=>{if(e.target.id==="lb"||e.target.id==="lbx")
 $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
 $("v-bitget")&&$("v-bitget").addEventListener("click",()=>{setView("bitget");if(bgKeyHex())bgFetch()});
+$("v-institusi")&&$("v-institusi").addEventListener("click",()=>{setView("institusi");fetchInstitusi()});
 load();
 setInterval(load,120000);
 setInterval(fetchMarks,5000);

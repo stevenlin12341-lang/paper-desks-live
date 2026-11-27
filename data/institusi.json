@@ -1,0 +1,366 @@
+{
+ "ok": true,
+ "updated": "27 Nov 2026, 17:25 WIB",
+ "disclaimer": "Semua angka di tab ini data publik, bisa telat, dan bukan info orang dalam secara real-time. Bukan saran investasi. Halaman ini tidak menyimpan kunci API dan tidak bisa mengirim order.",
+ "etf": {
+  "ok": true,
+  "source": "Farside Investors",
+  "source_url": "https://farside.co.uk/btc/",
+  "unit": "US$ juta",
+  "latest_date": "25 Nov 2026",
+  "latest_date_iso": "2026-11-25",
+  "latest_total": -453.0,
+  "funds": [
+   "IBIT",
+   "FBTC",
+   "BITB",
+   "ARKB",
+   "BTCO",
+   "EZBC",
+   "BRRR",
+   "HODL",
+   "BTCW",
+   "MSBT",
+   "GBTC",
+   "BTC"
+  ],
+  "days": [
+   {
+    "date": "25 Nov 2026",
+    "date_iso": "2026-11-25",
+    "total": -453.0,
+    "funds": {
+     "IBIT": -329.7,
+     "FBTC": -6.5,
+     "BITB": -18.2,
+     "ARKB": -14.9,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": -9.7,
+     "BTCW": 0.0,
+     "MSBT": 0.0,
+     "GBTC": -13.9,
+     "BTC": -60.1
+    }
+   },
+   {
+    "date": "24 Nov 2026",
+    "date_iso": "2026-11-24",
+    "total": -231.4,
+    "funds": {
+     "IBIT": -175.3,
+     "FBTC": -44.0,
+     "BITB": -10.3,
+     "ARKB": -15.8,
+     "BTCO": 0.0,
+     "EZBC": 6.9,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": 3.1,
+     "GBTC": 0.0,
+     "BTC": 4.0
+    }
+   },
+   {
+    "date": "23 Nov 2026",
+    "date_iso": "2026-11-23",
+    "total": -569.7,
+    "funds": {
+     "IBIT": -509.3,
+     "FBTC": 13.3,
+     "BITB": -12.6,
+     "ARKB": 0.0,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": 0.0,
+     "GBTC": 0.0,
+     "BTC": -61.1
+    }
+   },
+   {
+    "date": "20 Nov 2026",
+    "date_iso": "2026-11-20",
+    "total": -669.2,
+    "funds": {
+     "IBIT": -544.7,
+     "FBTC": -72.4,
+     "BITB": -7.0,
+     "ARKB": 0.0,
+     "BTCO": 0.0,
+     "EZBC": -1.7,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": 2.3,
+     "GBTC": -32.8,
+     "BTC": -12.9
+    }
+   },
+   {
+    "date": "19 Nov 2026",
+    "date_iso": "2026-11-19",
+    "total": -582.3,
+    "funds": {
+     "IBIT": -541.1,
+     "FBTC": -45.9,
+     "BITB": 0.0,
+     "ARKB": -31.3,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.3,
+     "MSBT": 49.6,
+     "GBTC": -13.9,
+     "BTC": 0.0
+    }
+   },
+   {
+    "date": "18 Nov 2026",
+    "date_iso": "2026-11-18",
+    "total": -306.5,
+    "funds": {
+     "IBIT": -148.7,
+     "FBTC": -69.3,
+     "BITB": -36.6,
+     "ARKB": -19.3,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": -1.8,
+     "BTCW": 0.0,
+     "MSBT": 0.0,
+     "GBTC": -20.3,
+     "BTC": -10.5
+    }
+   },
+   {
+    "date": "17 Nov 2026",
+    "date_iso": "2026-11-17",
+    "total": -239.9,
+    "funds": {
+     "IBIT": -209.5,
+     "FBTC": 0.0,
+     "BITB": 0.0,
+     "ARKB": -13.1,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": -3.6,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": 2.9,
+     "GBTC": -17.7,
+     "BTC": 1.1
+    }
+   },
+   {
+    "date": "16 Nov 2026",
+    "date_iso": "2026-11-16",
+    "total": 7.9,
+    "funds": {
+     "IBIT": 76.5,
+     "FBTC": -11.3,
+     "BITB": 0.0,
+     "ARKB": -4.3,
+     "BTCO": -6.5,
+     "EZBC": -3.8,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": -1.5,
+     "GBTC": -34.6,
+     "BTC": -6.6
+    }
+   },
+   {
+    "date": "13 Nov 2026",
+    "date_iso": "2026-11-13",
+    "total": -185.4,
+    "funds": {
+     "IBIT": -143.5,
+     "FBTC": -41.9,
+     "BITB": 0.0,
+     "ARKB": 0.0,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": 0.0,
+     "BTCW": 0.0,
+     "MSBT": 0.0,
+     "GBTC": 0.0,
+     "BTC": 0.0
+    }
+   },
+   {
+    "date": "12 Nov 2026",
+    "date_iso": "2026-11-12",
+    "total": -284.1,
+    "funds": {
+     "IBIT": -203.8,
+     "FBTC": -32.6,
+     "BITB": -26.4,
+     "ARKB": -18.5,
+     "BTCO": 0.0,
+     "EZBC": 0.0,
+     "BRRR": 0.0,
+     "HODL": -6.1,
+     "BTCW": 0.0,
+     "MSBT": 3.3,
+     "GBTC": 0.0,
+     "BTC": 0.0
+    }
+   }
+  ],
+  "cached": true,
+  "how": "Angka plus = uang masuk ke ETF spot BTC (fund beli bitcoin). Angka minus = uang keluar (fund jual bitcoin). Data harian dari sesi bursa AS, biasanya baru tampil malam hari waktu AS, jadi bisa telat 1 hari kerja."
+ },
+ "premium": {
+  "ok": true,
+  "coinbase": 61612.32,
+  "binance": 61688.0,
+  "pct": -0.1227,
+  "how": "Angka plus berarti harga BTC di Coinbase (banyak pembeli institusi AS) lebih mahal dari Binance. Itu biasanya tanda ada tekanan beli dari AS. Angka minus = sebaliknya, permintaan di luar AS lebih kuat. Selisihnya biasanya kecil, di bawah 1%."
+ },
+ "deribit": {
+  "ok": true,
+  "pc_oi": 0.8,
+  "pc_vol": 1.223,
+  "call_oi_btc": 188410.2,
+  "put_oi_btc": 150712.1,
+  "call_vol_btc": 7300.6,
+  "put_vol_btc": 8925.7,
+  "spot": 61621.6,
+  "max_pain": {
+   "expiry": "25DEC26",
+   "expiry_label": "25 Des 2026",
+   "strike": 70000,
+   "spot": 61621.6
+  },
+  "block_min_btc": 25,
+  "blocks": [
+   {
+    "t": "27 Nov 2026, 15:18 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 50000,
+    "expiry": "25DEC26",
+    "expiry_label": "25 Des 2026",
+    "size_btc": 250.0,
+    "notional_usd": 15514660.0,
+    "instrument": "BTC-25DEC26-50000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:14 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 50000,
+    "expiry": "25DEC26",
+    "expiry_label": "25 Des 2026",
+    "size_btc": 250.0,
+    "notional_usd": 15437638.0,
+    "instrument": "BTC-25DEC26-50000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:50 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 58000,
+    "expiry": "4DEC26",
+    "expiry_label": "4 Des 2026",
+    "size_btc": 125.0,
+    "notional_usd": 7710311.0,
+    "instrument": "BTC-4DEC26-58000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:50 WIB",
+    "side": "sell",
+    "type": "put",
+    "strike": 55000,
+    "expiry": "4DEC26",
+    "expiry_label": "4 Des 2026",
+    "size_btc": 125.0,
+    "notional_usd": 7710311.0,
+    "instrument": "BTC-4DEC26-55000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:33 WIB",
+    "side": "buy",
+    "type": "call",
+    "strike": 62000,
+    "expiry": "30NOV26",
+    "expiry_label": "30 Nov 2026",
+    "size_btc": 120.0,
+    "notional_usd": 7404029.0,
+    "instrument": "BTC-30NOV26-62000-C"
+   },
+   {
+    "t": "27 Nov 2026, 15:28 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 58000,
+    "expiry": "4DEC26",
+    "expiry_label": "4 Des 2026",
+    "size_btc": 100.0,
+    "notional_usd": 6181239.0,
+    "instrument": "BTC-4DEC26-58000-P"
+   },
+   {
+    "t": "27 Nov 2026, 17:09 WIB",
+    "side": "sell",
+    "type": "put",
+    "strike": 62000,
+    "expiry": "25DEC26",
+    "expiry_label": "25 Des 2026",
+    "size_btc": 50.0,
+    "notional_usd": 3079680.0,
+    "instrument": "BTC-25DEC26-62000-P"
+   },
+   {
+    "t": "27 Nov 2026, 17:09 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 50000,
+    "expiry": "25DEC26",
+    "expiry_label": "25 Des 2026",
+    "size_btc": 50.0,
+    "notional_usd": 3079680.0,
+    "instrument": "BTC-25DEC26-50000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:46 WIB",
+    "side": "buy",
+    "type": "put",
+    "strike": 62000,
+    "expiry": "4DEC26",
+    "expiry_label": "4 Des 2026",
+    "size_btc": 50.0,
+    "notional_usd": 3084717.0,
+    "instrument": "BTC-4DEC26-62000-P"
+   },
+   {
+    "t": "27 Nov 2026, 15:46 WIB",
+    "side": "buy",
+    "type": "call",
+    "strike": 62000,
+    "expiry": "4DEC26",
+    "expiry_label": "4 Des 2026",
+    "size_btc": 50.0,
+    "notional_usd": 3084717.0,
+    "instrument": "BTC-4DEC26-62000-C"
+   }
+  ],
+  "eth": {
+   "ok": true,
+   "pc_oi": 0.643,
+   "pc_vol": 3.947,
+   "call_oi": 984259.0,
+   "put_oi": 632538.0
+  },
+  "how": "Rasio put/call di atas 1 berarti lebih banyak put (sering dipakai buat jaga kalau harga turun). Di bawah 1 berarti lebih banyak call (taruhan harga naik). Max pain adalah harga yang bikin pembeli opsi paling merugi kalau kontrak jatuh tempo di situ; menjelang jatuh tempo harga kadang tertarik ke situ, tapi tidak selalu. Blok di bawah adalah transaksi opsi berukuran besar (≥25 BTC), dari sisi pengambil harga (taker). Kita tidak tahu siapa yang trade, dan ini bisa jadi hedging, bukan taruhan arah."
+ }
+}
