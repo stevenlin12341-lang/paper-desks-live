@@ -2039,19 +2039,21 @@ function instEtfTable(E,cols){
     const cells=use.map(f=>{const v=d.funds&&d.funds[f];return`<td class="${instCls(v)}">${instFlow(v)}</td>`}).join("");
     return`<tr><td>${esc(d.date||"N/A")}</td>${cells}<td class="${instCls(d.total)}"><b>${instFlow(d.total)}</b></td></tr>`}).join("");
   return`<div class="tw" style="margin-top:8px"><table>${head}${rows}</table></div>`}
+function instShadowBits(n,cl,win,loss,sumR,empty){
+  if(!n)return empty;
+  if(!cl)return `${n} diblok, masih terbuka semua — belum ada hasil menang/kalah.`;
+  const sum=instNA(sumR)?"N/A":((sumR>0?"+":"")+Number(sumR).toFixed(2)+"R");
+  return `${n} diblok · yang sudah selesai: ${win||0} menang / ${loss||0} kalah · sum R ${sum}.`;
+}
 function instShadowLine(S){
   const sh=S||{};
-  const n=sh.n_blocked||0,cl=sh.closed||0;
-  let body;
-  if(!n){
-    body="Baru jalan, belum ada trade yang diblok.";
-  }else if(!cl){
-    body=`${n} diblok, masih terbuka semua — belum ada hasil menang/kalah.`;
-  }else{
-    const sum=instNA(sh.sum_R)?"N/A":((sh.sum_R>0?"+":"")+Number(sh.sum_R).toFixed(2)+"R");
-    body=`${n} diblok · yang sudah selesai: ${sh.win||0} menang / ${sh.loss||0} kalah · sum R ${sum}.`;
-  }
-  return`<div class="note" style="margin-top:10px"><b>Filter institusi (bayangan).</b> ${esc(body)} Tidak mengubah trade live sampai evaluasi 5 Des. Long diblok kalau institusi BEARISH, short diblok kalau BULLISH.</div>`;
+  const body=instShadowBits(sh.n_blocked||0,sh.closed||0,sh.win,sh.loss,sh.sum_R,"Baru jalan, belum ada trade yang diblok.");
+  const cot=sh.cot||{}, st=cot.state||{};
+  const cotBody=instShadowBits(cot.n_blocked||0,cot.closed||0,cot.win,cot.loss,cot.sum_R,"Belum ada trade yang diblok aturan COT.");
+  const th=st.threshold||cot.threshold||400;
+  const now=st.read?` ${st.read}`:"";
+  const cotLine=`<div class="note" style="margin-top:6px"><b>Aturan COT (bayangan).</b> ${esc(cotBody)}${esc(now)} Long diblok kalau hedge fund nambah short ≥ ${th} kontrak vs minggu lalu dan putusan BEARISH; short diblok kalau hedge fund kurangi short ≥ ${th} dan putusan BULLISH. Tidak jalan dari COT sendirian. Hasilnya dicatat terpisah sampai evaluasi 5 Des.</div>`;
+  return`<div class="note" style="margin-top:10px"><b>Filter institusi (bayangan).</b> ${esc(body)} Tidak mengubah trade live sampai evaluasi 5 Des. Long diblok kalau institusi BEARISH, short diblok kalau BULLISH.</div>${cotLine}`;
 }
 function instMoney(n,signed){if(instNA(n))return"N/A";const a=Math.abs(n),s=n<0?"−":(signed&&n>0?"+":"");
  if(a>=1e9)return s+"$"+(a/1e9).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" miliar";
