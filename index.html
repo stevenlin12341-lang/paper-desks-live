@@ -490,6 +490,20 @@ h1{text-transform:none;letter-spacing:0}
 .metode details.mgroup[open]>summary::after{content:" ▴"}
 .metode details.mgroup[open]{padding-bottom:8px}
 @media(max-width:560px){.metode .hm{display:none}.metode table{white-space:normal}.metode td:first-child{min-width:110px}}
+
+.mcoins{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:4px 0 14px}
+.mcoins h4{margin:0 0 8px;font-size:13px;font-weight:700}
+.mcol{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.mcoin{padding:7px 0;border-bottom:1px solid var(--line)}
+.mcoin:last-child{border-bottom:0}
+.mc-h{display:flex;align-items:center;gap:8px;font-size:13px}
+.mc-h .coin{flex:0 0 auto}
+.mc-n{color:var(--mu);font-size:12px;margin-right:auto;min-width:0}
+.mpbar{height:6px;border-radius:99px;background:#1f2633;margin-top:5px;overflow:hidden}
+.mpbar i{display:block;height:100%;border-radius:99px}
+.mpbar.up i{background:#22c55e}
+.mpbar.dn i{background:#ef4444}
+@media(max-width:640px){.mcoins{grid-template-columns:1fr}.mc-h{flex-wrap:wrap}.mc-n{flex:1 1 100%;order:2;margin:0}.mc-h .n{margin-left:auto}}
 .views{position:sticky;top:0;z-index:20;background:var(--bg);padding:6px 0;margin-top:0}
 #banner{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 #banner.open{display:block;-webkit-line-clamp:unset}
@@ -893,6 +907,26 @@ function metodeBar(wins,losses,clsName){
   const wp=t? (w/t*100):0, lp=t?(l/t*100):0;
   return `<div class="mbar${clsName?" "+clsName:""}" role="img" aria-label="${w} menang, ${l} kalah"><i class="w" style="width:${wp.toFixed(1)}%"></i><i class="l" style="width:${lp.toFixed(1)}%"></i></div>`;
 }
+function metodeCoins(S,$m){
+  let profit=(S&&S.coins&&S.coins.profit)||[], loss=(S&&S.coins&&S.coins.loss)||[];
+  if(!profit.length&&!loss.length){
+    const rows=(((S&&S.groups)||[]).find(g=>g.title==="Koin")||{}).rows||[];
+    profit=rows.filter(r=>(r.pnl||0)>0).sort((a,b)=>(b.pnl||0)-(a.pnl||0));
+    loss=rows.filter(r=>(r.pnl||0)<0).sort((a,b)=>(a.pnl||0)-(b.pnl||0));
+  }
+  if(!profit.length&&!loss.length)return"";
+  const maxAbs=Math.max(0,...[...profit,...loss].map(r=>Math.abs(Number(r.pnl)||0)));
+  const row=(r,kind)=>{
+    const name=r.label||r.k||"";
+    const icon=typeof coinLabel==="function"?coinLabel(name):esc(name);
+    const wp=maxAbs?Math.min(100,Math.abs(Number(r.pnl)||0)/maxAbs*100):0;
+    return `<div class="mcoin">
+      <div class="mc-h">${icon}<span class="mc-n">${r.n??0} transaksi · ${r.wins??0} menang · ${r.losses??0} kalah</span><span class="n ${cls(r.pnl)}">${$m(r.pnl)}</span></div>
+      <div class="mpbar ${kind}" role="img" aria-label="${$m(r.pnl)}"><i style="width:${wp.toFixed(1)}%"></i></div>
+    </div>`};
+  const col=(title,kind,rows,empty)=>`<div class="mcol"><h4 class="${kind==="up"?"up":"dn"}">${esc(title)}</h4>${rows.length?rows.map(r=>row(r,kind)).join(""):`<p class="mnote">${esc(empty)}</p>`}</div>`;
+  return `<div class="mcoins">${col("Untung dari","up",profit,"Belum ada koin yang untung.")}${col("Rugi dari","dn",loss,"Belum ada koin yang rugi.")}</div>`;
+}
 /* METODE-BLOCK-START: one renderer for paper Majors, Bitget (real) and the $37 books. Collapsed by default. */
 function metodeBlock(S,o){
   o=o||{};const id=o.id||"det-metode",$m=o.fmt||moneyR,title=o.title||"Metode: hasil per cara main";
@@ -913,13 +947,13 @@ function metodeBlock(S,o){
       <td class="hm">${metodeBar(r.wins,r.losses)}</td>
     </tr>`).join("");
     return `<div class="tw"><table><tr><th>Metode</th><th class="n">Transaksi</th><th class="n hm">Menang</th><th class="n hm">Kalah</th><th class="n">${tip("% menang",TIPS.wr)}</th><th class="n">${tip("Total PnL",TIPS.pnl)}</th><th class="n hm">Rata-rata R</th><th class="hm">Bar</th></tr>${rows}</table></div>`};
-  const gs=S.groups||[];
+  const gs=(S.groups||[]).filter(g=>g.title!=="Koin");
   const groups=gs.map((g,i)=>{
     const t=esc(g.title||"");
     if(i<2)return `<div class="mgroup"><h4>${t}</h4>${tbl(g)}</div>`;
     return `<details class="mgroup mdet" id="${esc(id)}-g${i}"><summary>${t}</summary>${tbl(g)}</details>`;
   }).join("");
-  return `<details class="more metode" id="${esc(id)}"><summary>${esc(title)} <span class="sub">· ${ov.n} transaksi · ${ov.win==null?"—":ov.win+"%"} menang</span></summary><p class="mnote">${esc(S.note||"Ringkasan hasil per cara masuk dan cara keluar.")}</p>${head}${groups}</details>`;
+  return `<details class="more metode" id="${esc(id)}"><summary>${esc(title)} <span class="sub">· ${ov.n} transaksi · ${ov.win==null?"—":ov.win+"%"} menang</span></summary><p class="mnote">${esc(S.note||"Ringkasan hasil per cara masuk dan cara keluar.")}</p>${head}${metodeCoins(S,$m)}${groups}</details>`;
 }
 function metodeSection(M){return metodeBlock(M&&M.methods,{id:"det-metode-"+(typeof VIEW!=="undefined"?VIEW:"x"),fmt:moneyR,title:"Metode: hasil per cara main",empty:"Belum ada transaksi ditutup di buku ini, jadi belum ada ringkasan menang/kalah per metode."})}
 /* METODE-BLOCK-END */
