@@ -1,6 +1,6 @@
 {
  "ok": true,
- "updated": "28 Nov 2026, 12:04 WIB",
+ "updated": "28 Nov 2026, 13:11 WIB",
  "disclaimer": "Semua angka di tab ini data publik, bisa telat, dan bukan info orang dalam secara real-time. Bukan saran investasi. Filter institusi di tab ini hanya bayangan — tidak mengubah trade paper live sampai evaluasi 5 Des. Halaman ini tidak menyimpan kunci API dan tidak bisa mengirim order.",
  "verdict": "BEARISH",
  "verdict_reason": "ETF BTC −$61.8 juta (27 Nov 2026), 5 hari −$1,985 juta; SOL bullish. Hedge fund COT: hedge fund tetap net short BTC, hampir datar vs minggu lalu; hedge fund kurangi short ETH.",
@@ -601,125 +601,167 @@
   }
  },
  "premiums": {
-  "BNB": {
-   "ok": true,
-   "coinbase": 553.29,
-   "binance": 554.01,
-   "pct": -0.13
-  },
   "XRP": {
    "ok": true,
-   "coinbase": 0.9469,
-   "binance": 0.9477,
-   "pct": -0.0844
-  },
-  "BTC": {
-   "ok": true,
-   "coinbase": 59854.42,
-   "binance": 59924.78,
-   "pct": -0.1174
+   "coinbase": 0.9449,
+   "binance": 0.9458,
+   "pct": -0.0952
   },
   "HYPE": {
    "ok": true,
-   "coinbase": 63.85,
-   "binance": 63.95,
-   "pct": -0.1564
+   "coinbase": 62.93,
+   "binance": 63.02,
+   "pct": -0.1428
   },
-  "SOL": {
+  "BTC": {
    "ok": true,
-   "coinbase": 71.42,
-   "binance": 71.5,
-   "pct": -0.1119
+   "coinbase": 59653.42,
+   "binance": 59724.24,
+   "pct": -0.1186
   },
   "ETH": {
    "ok": true,
-   "coinbase": 1658.56,
-   "binance": 1660.21,
-   "pct": -0.0994
+   "coinbase": 1654.23,
+   "binance": 1655.99,
+   "pct": -0.1063
+  },
+  "BNB": {
+   "ok": true,
+   "coinbase": 551.14,
+   "binance": 551.71,
+   "pct": -0.1033
   },
   "ZEC": {
    "ok": true,
-   "coinbase": 745.61,
-   "binance": 746.15,
-   "pct": -0.0724
-  },
-  "LINK": {
-   "ok": true,
-   "coinbase": 9.196,
-   "binance": 9.203,
-   "pct": -0.0761
+   "coinbase": 735.84,
+   "binance": 736.89,
+   "pct": -0.1425
   },
   "AVAX": {
    "ok": true,
-   "coinbase": 6.572,
-   "binance": 6.577,
-   "pct": -0.076
+   "coinbase": 6.516,
+   "binance": 6.522,
+   "pct": -0.092
   },
   "XLM": {
    "ok": true,
-   "coinbase": 0.125193,
-   "binance": 0.1254,
-   "pct": -0.1651
-  },
-  "LTC": {
-   "ok": true,
-   "coinbase": 44.44,
-   "binance": 44.47,
-   "pct": -0.063
+   "coinbase": 0.12411,
+   "binance": 0.1242,
+   "pct": -0.0725
   },
   "DOGE": {
    "ok": true,
-   "coinbase": 0.05715,
-   "binance": 0.0572,
-   "pct": -0.0874
+   "coinbase": 0.05672,
+   "binance": 0.05678,
+   "pct": -0.1057
   },
-  "SUI": {
+  "LINK": {
    "ok": true,
-   "coinbase": 0.6667,
-   "binance": 0.6672,
-   "pct": -0.0749
-  },
-  "BCH": {
-   "ok": true,
-   "coinbase": 208.14,
-   "binance": 208.4,
-   "pct": -0.1248
-  },
-  "DOT": {
-   "ok": true,
-   "coinbase": 0.6575,
-   "binance": 0.658,
-   "pct": -0.076
-  },
-  "AAVE": {
-   "ok": true,
-   "coinbase": 93.6,
-   "binance": 93.7,
-   "pct": -0.1067
+   "coinbase": 9.134,
+   "binance": 9.144,
+   "pct": -0.1094
   },
   "ADA": {
    "ok": true,
-   "coinbase": 0.14689,
-   "binance": 0.147,
-   "pct": -0.0748
+   "coinbase": 0.14548,
+   "binance": 0.1456,
+   "pct": -0.0824
   },
-  "WIF": {
+  "BCH": {
    "ok": true,
-   "coinbase": 0.13891,
-   "binance": 0.1391,
-   "pct": -0.1366
+   "coinbase": 206.23,
+   "binance": 206.4,
+   "pct": -0.0824
   },
-  "UNI": {
+  "SOL": {
    "ok": true,
-   "coinbase": 4.6984,
-   "binance": 4.704,
-   "pct": -0.119
+   "coinbase": 71.21,
+   "binance": 71.28,
+   "pct": -0.0982
+  },
+  "NEAR": {
+   "ok": true,
+   "coinbase": 3.009,
+   "binance": 3.013,
+   "pct": -0.1328
   },
   "ARB": {
    "ok": true,
-   "coinbase": 0.1124,
-   "binance": 0.1126,
-   "pct": -0.1776
+   "coinbase": 0.11147,
+   "binance": 0.1116,
+   "pct": -0.1165
+  },
+  "SUI": {
+   "ok": true,
+   "coinbase": 0.6641,
+   "binance": 0.6648,
+   "pct": -0.1053
+  },
+  "LTC": {
+   "ok": true,
+   "coinbase": 44.17,
+   "binance": 44.21,
+   "pct": -0.0973
+  },
+  "APT": {
+   "ok": true,
+   "coinbase": 0.3775,
+   "binance": 0.378,
+   "pct": -0.1323
+  },
+  "OP": {
+   "ok": true,
+   "coinbase": 0.06874,
+   "binance": 0.0688,
+   "pct": -0.0872
+  },
+  "AAVE": {
+   "ok": true,
+   "coinbase": 92.9,
+   "binance": 92.97,
+   "pct": -0.0753
+  },
+  "ENA": {
+   "ok": true,
+   "coinbase": 0.1011,
+   "binance": 0.1012,
+   "pct": -0.0988
+  },
+  "DOT": {
+   "ok": true,
+   "coinbase": 0.6504,
+   "binance": 0.651,
+   "pct": -0.0922
+  },
+  "FIL": {
+   "ok": true,
+   "coinbase": 0.5124,
+   "binance": 0.5124,
+   "pct": 0.0
+  },
+  "ATOM": {
+   "ok": true,
+   "coinbase": 1.2,
+   "binance": 1.201,
+   "pct": -0.0833
+  },
+  "UNI": {
+   "ok": true,
+   "coinbase": 4.65,
+   "binance": 4.653,
+   "pct": -0.0645
+  },
+  "INJ": {
+   "ok": true,
+   "coinbase": 6.209,
+   "binance": 6.227,
+   "pct": -0.2891
+  },
+  "WLD": {
+   "ok": true,
+   "coinbase": 0.2394,
+   "binance": 0.2397,
+   "pct": -0.1252
   },
   "PEPE": {
    "ok": true,
@@ -727,94 +769,52 @@
    "binance": 3e-06,
    "pct": 0.0
   },
-  "ENA": {
+  "ONDO": {
    "ok": true,
-   "coinbase": 0.10234,
-   "binance": 0.1025,
-   "pct": -0.1561
-  },
-  "APT": {
-   "ok": true,
-   "coinbase": 0.3833,
-   "binance": 0.3837,
-   "pct": -0.1042
-  },
-  "OP": {
-   "ok": true,
-   "coinbase": 0.06974,
-   "binance": 0.0699,
-   "pct": -0.2289
-  },
-  "NEAR": {
-   "ok": true,
-   "coinbase": 3.0227,
-   "binance": 3.026,
-   "pct": -0.1091
+   "coinbase": 0.28181,
+   "binance": 0.282,
+   "pct": -0.0674
   },
   "TIA": {
    "ok": true,
-   "coinbase": 0.3378,
-   "binance": 0.3381,
-   "pct": -0.0887
-  },
-  "ONDO": {
-   "ok": true,
-   "coinbase": 0.28521,
-   "binance": 0.2852,
-   "pct": 0.0035
+   "coinbase": 0.3348,
+   "binance": 0.3351,
+   "pct": -0.0895
   },
   "ETC": {
    "ok": true,
-   "coinbase": 5.855,
-   "binance": 5.87,
-   "pct": -0.2555
+   "coinbase": 5.806,
+   "binance": 5.82,
+   "pct": -0.2405
+  },
+  "WIF": {
+   "ok": true,
+   "coinbase": 0.13795,
+   "binance": 0.1382,
+   "pct": -0.1809
   },
   "SEI": {
    "ok": true,
-   "coinbase": 0.03841,
-   "binance": 0.03845,
-   "pct": -0.104
-  },
-  "WLD": {
-   "ok": true,
-   "coinbase": 0.2429,
-   "binance": 0.2428,
-   "pct": 0.0412
-  },
-  "ATOM": {
-   "ok": true,
-   "coinbase": 1.2051,
-   "binance": 1.208,
-   "pct": -0.2401
-  },
-  "INJ": {
-   "ok": true,
-   "coinbase": 6.24,
-   "binance": 6.249,
-   "pct": -0.144
-  },
-  "FIL": {
-   "ok": true,
-   "coinbase": 0.5208,
-   "binance": 0.5216,
-   "pct": -0.1534
+   "coinbase": 0.03815,
+   "binance": 0.03823,
+   "pct": -0.2093
   }
  },
  "options": {
   "BTC": {
    "ok": true,
    "pc_oi": 0.81,
-   "pc_vol": 1.057,
-   "call_oi": 193074.5,
-   "put_oi": 156299.3,
-   "call_vol": 13185.1,
-   "put_vol": 13936.4,
-   "spot": 59863.44,
+   "pc_vol": 1.151,
+   "call_oi": 193078.2,
+   "put_oi": 156319.6,
+   "call_vol": 11867.0,
+   "put_vol": 13657.7,
+   "spot": 59656.88,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 70000,
-    "spot": 59863.44
+    "spot": 59656.88
    },
    "blocks": [
     {
@@ -838,17 +838,6 @@
      "size_btc": 70.0,
      "notional_usd": 4181649.0,
      "instrument": "BTC-25DEC26-75000-C"
-    },
-    {
-     "t": "28 Nov 2026, 03:09 WIB",
-     "side": "buy",
-     "type": "put",
-     "strike": 59000,
-     "expiry": "30NOV26",
-     "expiry_label": "30 Nov 2026",
-     "size_btc": 50.0,
-     "notional_usd": 2989356.0,
-     "instrument": "BTC-30NOV26-59000-P"
     },
     {
      "t": "28 Nov 2026, 11:02 WIB",
@@ -877,35 +866,35 @@
   },
   "ETH": {
    "ok": true,
-   "pc_oi": 0.65,
-   "pc_vol": 1.273,
-   "call_oi": 1009826.0,
-   "put_oi": 656793.0,
-   "call_vol": 67449.0,
-   "put_vol": 85859.0,
-   "spot": 1658.66,
+   "pc_oi": 0.651,
+   "pc_vol": 1.233,
+   "call_oi": 1010029.0,
+   "put_oi": 657321.0,
+   "call_vol": 68529.0,
+   "put_vol": 84500.0,
+   "spot": 1654.15,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 2200,
-    "spot": 1658.66
+    "spot": 1654.15
    },
    "blocks": []
   },
   "SOL": {
    "ok": true,
-   "pc_oi": 0.652,
-   "pc_vol": 1.086,
-   "call_oi": 617000.0,
+   "pc_oi": 0.651,
+   "pc_vol": 1.115,
+   "call_oi": 617550.0,
    "put_oi": 402040.0,
-   "call_vol": 62900.0,
-   "put_vol": 68310.0,
-   "spot": 71.42,
+   "call_vol": 61260.0,
+   "put_vol": 68290.0,
+   "spot": 71.22,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 90,
-    "spot": 71.42
+    "spot": 71.22
    },
    "blocks": [],
    "quoted": "USDC"
@@ -913,17 +902,17 @@
   "XRP": {
    "ok": true,
    "pc_oi": 0.484,
-   "pc_vol": 0.072,
+   "pc_vol": 0.046,
    "call_oi": 5755000.0,
    "put_oi": 2787000.0,
-   "call_vol": 1089000.0,
-   "put_vol": 78000.0,
-   "spot": 0.95,
+   "call_vol": 1121000.0,
+   "put_vol": 52000.0,
+   "spot": 0.94,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 1,
-    "spot": 0.95
+    "spot": 0.94
    },
    "blocks": [],
    "quoted": "USDC"
@@ -931,35 +920,35 @@
   "HYPE": {
    "ok": true,
    "pc_oi": 1.047,
-   "pc_vol": 1.312,
+   "pc_vol": 1.137,
    "call_oi": 278360.0,
-   "put_oi": 291570.0,
-   "call_vol": 28390.0,
-   "put_vol": 37260.0,
-   "spot": 63.88,
+   "put_oi": 291500.0,
+   "call_vol": 28780.0,
+   "put_vol": 32710.0,
+   "spot": 62.96,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 74,
-    "spot": 63.88
+    "spot": 62.96
    },
    "blocks": [],
    "quoted": "USDC"
   },
   "AVAX": {
    "ok": true,
-   "pc_oi": 0.927,
-   "pc_vol": 0.95,
-   "call_oi": 697300.0,
-   "put_oi": 646600.0,
-   "call_vol": 28000.0,
-   "put_vol": 26600.0,
-   "spot": 6.57,
+   "pc_oi": 0.93,
+   "pc_vol": 0.972,
+   "call_oi": 698600.0,
+   "put_oi": 649600.0,
+   "call_vol": 24800.0,
+   "put_vol": 24100.0,
+   "spot": 6.52,
    "max_pain": {
     "expiry": "25DEC26",
     "expiry_label": "25 Des 2026",
     "strike": 8,
-    "spot": 6.57
+    "spot": 6.52
    },
    "blocks": [],
    "quoted": "USDC"
@@ -1596,9 +1585,9 @@
    "etf_total": -61.8,
    "etf_date": "27 Nov 2026",
    "etf_sum5": -1985.1,
-   "premium": -0.1174,
+   "premium": -0.1186,
    "pc_oi": 0.81,
-   "pc_vol": 1.057
+   "pc_vol": 1.151
   },
   {
    "ticker": "ETH",
@@ -1612,14 +1601,14 @@
    "etf_total": -12.1,
    "etf_date": "27 Nov 2026",
    "etf_sum5": -326.9,
-   "premium": -0.0994,
-   "pc_oi": 0.65,
-   "pc_vol": 1.273
+   "premium": -0.1063,
+   "pc_oi": 0.651,
+   "pc_vol": 1.233
   },
   {
    "ticker": "BNB",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.13% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.10% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1628,14 +1617,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.13,
+   "premium": -0.1033,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "XRP",
    "verdict": "BULLISH",
-   "reason": "opsi: lebih banyak call (P/C 0.48), volume call unggul (0.07).",
+   "reason": "opsi: lebih banyak call (P/C 0.48), volume call unggul (0.05).",
    "has": {
     "etf": false,
     "premium": true,
@@ -1644,9 +1633,9 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0844,
+   "premium": -0.0952,
    "pc_oi": 0.484,
-   "pc_vol": 0.072
+   "pc_vol": 0.046
   },
   {
    "ticker": "SOL",
@@ -1660,14 +1649,14 @@
    "etf_total": -0.9,
    "etf_date": "27 Nov 2026",
    "etf_sum5": -9.9,
-   "premium": -0.1119,
-   "pc_oi": 0.652,
-   "pc_vol": 1.086
+   "premium": -0.0982,
+   "pc_oi": 0.651,
+   "pc_vol": 1.115
   },
   {
    "ticker": "HYPE",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.16% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.14% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1676,14 +1665,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1564,
+   "premium": -0.1428,
    "pc_oi": 1.047,
-   "pc_vol": 1.312
+   "pc_vol": 1.137
   },
   {
    "ticker": "ZEC",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.07% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.14% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1692,14 +1681,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0724,
+   "premium": -0.1425,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "DOGE",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.09% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.11% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1708,12 +1697,28 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0874,
+   "premium": -0.1057,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "LINK",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.11% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.1094,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "ADA",
    "verdict": "NETRAL",
    "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
    "has": {
@@ -1724,12 +1729,12 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0761,
+   "premium": -0.0824,
    "pc_oi": null,
    "pc_vol": null
   },
   {
-   "ticker": "ADA",
+   "ticker": "XLM",
    "verdict": "NETRAL",
    "reason": "premium Coinbase hampir datar (−0.07% (vs BTC −0.12%))",
    "has": {
@@ -1740,23 +1745,7 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0748,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "XLM",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.17% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.1651,
+   "premium": -0.0725,
    "pc_oi": null,
    "pc_vol": null,
    "flag": "recent",
@@ -1767,7 +1756,7 @@
   {
    "ticker": "AVAX",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.09% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1776,83 +1765,12 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.076,
-   "pc_oi": 0.927,
-   "pc_vol": 0.95
+   "premium": -0.092,
+   "pc_oi": 0.93,
+   "pc_vol": 0.972
   },
   {
    "ticker": "SUI",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.07% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.0749,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "LTC",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.06% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.063,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "BCH",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.12% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.1248,
-   "pc_oi": null,
-   "pc_vol": null,
-   "flag": "recent",
-   "desk": "bitget+paper",
-   "side": "short",
-   "when": "26 Nov, 06:05"
-  },
-  {
-   "ticker": "DOT",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.076,
-   "pc_oi": null,
-   "pc_vol": null,
-   "flag": "open",
-   "desk": "paper",
-   "side": "short"
-  },
-  {
-   "ticker": "NEAR",
    "verdict": "NETRAL",
    "reason": "premium Coinbase hampir datar (−0.11% (vs BTC −0.12%))",
    "has": {
@@ -1863,12 +1781,12 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1091,
+   "premium": -0.1053,
    "pc_oi": null,
    "pc_vol": null
   },
   {
-   "ticker": "APT",
+   "ticker": "LTC",
    "verdict": "NETRAL",
    "reason": "premium Coinbase hampir datar (−0.10% (vs BTC −0.12%))",
    "has": {
@@ -1879,44 +1797,83 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1042,
+   "premium": -0.0973,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "BCH",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.0824,
+   "pc_oi": null,
+   "pc_vol": null,
+   "flag": "recent",
+   "desk": "bitget+paper",
+   "side": "short",
+   "when": "26 Nov, 06:05"
+  },
+  {
+   "ticker": "DOT",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.09% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.0922,
+   "pc_oi": null,
+   "pc_vol": null,
+   "flag": "open",
+   "desk": "paper",
+   "side": "short"
+  },
+  {
+   "ticker": "NEAR",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.13% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.1328,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "APT",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.13% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.1323,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "ARB",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.18% (vs BTC −0.12%))",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.1776,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "OP",
-   "verdict": "NETRAL",
-   "reason": "Coinbase sedikit lebih murah −0.23% (vs BTC −0.12%) — belum cukup buat putusan.",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.2289,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "UNI",
    "verdict": "NETRAL",
    "reason": "premium Coinbase hampir datar (−0.12% (vs BTC −0.12%))",
    "has": {
@@ -1927,14 +1884,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.119,
+   "premium": -0.1165,
    "pc_oi": null,
    "pc_vol": null
   },
   {
-   "ticker": "AAVE",
+   "ticker": "OP",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.11% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.09% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1943,7 +1900,39 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1067,
+   "premium": -0.0872,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "UNI",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.06% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.0645,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "AAVE",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.0753,
    "pc_oi": null,
    "pc_vol": null,
    "flag": "open",
@@ -1969,7 +1958,7 @@
   {
    "ticker": "WIF",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.14% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.18% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1978,14 +1967,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1366,
+   "premium": -0.1809,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "ENA",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.16% (vs BTC −0.12%))",
+   "reason": "premium Coinbase hampir datar (−0.10% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -1994,14 +1983,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1561,
+   "premium": -0.0988,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "WLD",
-   "verdict": "BULLISH",
-   "reason": "Coinbase lebih mahal +0.04% (vs BTC −0.12%).",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.13% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -2010,14 +1999,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": 0.0412,
+   "premium": -0.1252,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "FIL",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.15% (vs BTC −0.12%))",
+   "reason": "Coinbase sedikit lebih mahal +0.00% (vs BTC −0.12%) — belum cukup buat putusan.",
    "has": {
     "etf": false,
     "premium": true,
@@ -2026,12 +2015,28 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.1534,
+   "premium": 0.0,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "ATOM",
+   "verdict": "NETRAL",
+   "reason": "premium Coinbase hampir datar (−0.08% (vs BTC −0.12%))",
+   "has": {
+    "etf": false,
+    "premium": true,
+    "options": false
+   },
+   "etf_total": null,
+   "etf_date": null,
+   "etf_sum5": null,
+   "premium": -0.0833,
+   "pc_oi": null,
+   "pc_vol": null
+  },
+  {
+   "ticker": "ETC",
    "verdict": "NETRAL",
    "reason": "Coinbase sedikit lebih murah −0.24% (vs BTC −0.12%) — belum cukup buat putusan.",
    "has": {
@@ -2042,30 +2047,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.2401,
-   "pc_oi": null,
-   "pc_vol": null
-  },
-  {
-   "ticker": "ETC",
-   "verdict": "NETRAL",
-   "reason": "Coinbase sedikit lebih murah −0.26% (vs BTC −0.12%) — belum cukup buat putusan.",
-   "has": {
-    "etf": false,
-    "premium": true,
-    "options": false
-   },
-   "etf_total": null,
-   "etf_date": null,
-   "etf_sum5": null,
-   "premium": -0.2555,
+   "premium": -0.2405,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "INJ",
-   "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.14% (vs BTC −0.12%))",
+   "verdict": "BEARISH",
+   "reason": "Coinbase lebih murah −0.29% (vs BTC −0.12%).",
    "has": {
     "etf": false,
     "premium": true,
@@ -2074,7 +2063,7 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.144,
+   "premium": -0.2891,
    "pc_oi": null,
    "pc_vol": null
   },
@@ -2090,14 +2079,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.0887,
+   "premium": -0.0895,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "SEI",
    "verdict": "NETRAL",
-   "reason": "premium Coinbase hampir datar (−0.10% (vs BTC −0.12%))",
+   "reason": "Coinbase sedikit lebih murah −0.21% (vs BTC −0.12%) — belum cukup buat putusan.",
    "has": {
     "etf": false,
     "premium": true,
@@ -2106,14 +2095,14 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": -0.104,
+   "premium": -0.2093,
    "pc_oi": null,
    "pc_vol": null
   },
   {
    "ticker": "ONDO",
    "verdict": "NETRAL",
-   "reason": "Coinbase sedikit lebih mahal +0.00% (vs BTC −0.12%) — belum cukup buat putusan.",
+   "reason": "premium Coinbase hampir datar (−0.07% (vs BTC −0.12%))",
    "has": {
     "etf": false,
     "premium": true,
@@ -2122,7 +2111,7 @@
    "etf_total": null,
    "etf_date": null,
    "etf_sum5": null,
-   "premium": 0.0035,
+   "premium": -0.0674,
    "pc_oi": null,
    "pc_vol": null
   }
@@ -2175,9 +2164,9 @@
   "loss": 0,
   "sum_R": 0.0,
   "avg_R": null,
-  "n_agree": 30,
-  "n_disagree": 0,
-  "n_neutral": 34,
+  "n_agree": 32,
+  "n_disagree": 1,
+  "n_neutral": 47,
   "started": "2026-11-27 18:09 WIB",
   "cot": {
    "open": 0,
@@ -2187,9 +2176,9 @@
    "loss": 0,
    "sum_R": 0.0,
    "avg_R": null,
-   "n_agree": 30,
-   "n_disagree": 0,
-   "n_neutral": 34,
+   "n_agree": 32,
+   "n_disagree": 1,
+   "n_neutral": 47,
    "started": "2026-11-27 22:55 WIB",
    "threshold": 400,
    "state": {
@@ -2469,24 +2458,24 @@
  },
  "premium": {
   "ok": true,
-  "coinbase": 59854.42,
-  "binance": 59924.78,
-  "pct": -0.1174
+  "coinbase": 59653.42,
+  "binance": 59724.24,
+  "pct": -0.1186
  },
  "deribit": {
   "ok": true,
   "pc_oi": 0.81,
-  "pc_vol": 1.057,
-  "call_oi": 193074.5,
-  "put_oi": 156299.3,
-  "call_vol": 13185.1,
-  "put_vol": 13936.4,
-  "spot": 59863.44,
+  "pc_vol": 1.151,
+  "call_oi": 193078.2,
+  "put_oi": 156319.6,
+  "call_vol": 11867.0,
+  "put_vol": 13657.7,
+  "spot": 59656.88,
   "max_pain": {
    "expiry": "25DEC26",
    "expiry_label": "25 Des 2026",
    "strike": 70000,
-   "spot": 59863.44
+   "spot": 59656.88
   },
   "blocks": [
    {
@@ -2510,17 +2499,6 @@
     "size_btc": 70.0,
     "notional_usd": 4181649.0,
     "instrument": "BTC-25DEC26-75000-C"
-   },
-   {
-    "t": "28 Nov 2026, 03:09 WIB",
-    "side": "buy",
-    "type": "put",
-    "strike": 59000,
-    "expiry": "30NOV26",
-    "expiry_label": "30 Nov 2026",
-    "size_btc": 50.0,
-    "notional_usd": 2989356.0,
-    "instrument": "BTC-30NOV26-59000-P"
    },
    {
     "t": "28 Nov 2026, 11:02 WIB",
