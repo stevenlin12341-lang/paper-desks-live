@@ -466,6 +466,35 @@ h1{text-transform:none;letter-spacing:0}
 .cd-block{margin:0 0 8px}
 .sk-dash>.cd-row{margin:0 0 10px;padding-top:0}
 .cd-sess h2{margin-bottom:2px}
+
+/* UI-V3 simple: key numbers first, folded details, mobile-first */
+.kpis.k4{grid-template-columns:repeat(4,1fr)}
+.kpis.k4 .kpi .v{font-size:18px}
+.kmini{margin-top:8px}
+@media(max-width:560px){.kpis.k4{grid-template-columns:repeat(2,1fr);gap:10px}.kpis.k4 .kpi .v{font-size:20px}}
+.ocn{margin:8px 0 2px;border:1px solid var(--line);border-radius:10px;background:#0b0e14;padding:0 10px}
+.ocn>summary{cursor:pointer;color:var(--mu);font-size:12px;font-weight:600;padding:8px 0;list-style:none;user-select:none}
+.ocn>summary::-webkit-details-marker{display:none}
+.ocn>summary::after{content:" ▾";color:#5a6478;font-size:10px}
+.ocn[open]>summary::after{content:" ▴"}
+.ocn[open]{padding-bottom:8px}
+.more.metode{margin-top:12px;background:#0b0e14}
+.more.metode>summary .sub{font-weight:400;font-size:12px}
+.metode .mover{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:6px 0 6px;font-size:13px}
+.metode .mover b{font-size:15px}
+.metode .mbar-lg{height:10px;margin:0 0 12px}
+.metode details.mgroup{margin:0 0 8px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:var(--card)}
+.metode details.mgroup>summary{cursor:pointer;color:var(--mu);font-size:13px;font-weight:600;padding:9px 0;list-style:none}
+.metode details.mgroup>summary::-webkit-details-marker{display:none}
+.metode details.mgroup>summary::after{content:" ▾";color:#5a6478;font-size:10px}
+.metode details.mgroup[open]>summary::after{content:" ▴"}
+.metode details.mgroup[open]{padding-bottom:8px}
+@media(max-width:560px){.metode .hm{display:none}.metode table{white-space:normal}.metode td:first-child{min-width:110px}}
+.views{position:sticky;top:0;z-index:20;background:var(--bg);padding:6px 0;margin-top:0}
+#banner{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+#banner.open{display:block;-webkit-line-clamp:unset}
+footer{font-size:11px}
+@media(max-width:560px){.wrap{padding:12px}.big{font-size:30px}.card{padding:12px}.oc .g{font-size:12.5px}}
 </style></head><body><div class="wrap">
 <nav class="brand-switch" aria-label="Dashboard copy"><span class="brand-label">Paper Desks</span><a href="./" aria-current="page">GROK BOT</a><a href="./codex.html">CODEX</a></nav>
 
@@ -490,12 +519,12 @@ h1{text-transform:none;letter-spacing:0}
 </header>
 <div id="cdstrip" class="cd-strip" hidden></div>
 <section id="banner" class="note" hidden></section>
-<section id="ot"><div class="oth"><h3 id="ottitle">Posisi terbuka <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="wallet" hidden></section>
+<section id="desksec"><h3 id="desktitle">Ringkasan</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
+<section id="ot"><div class="oth"><h3 id="ottitle">Posisi terbuka <span class="badge" id="otn">0</span></h3><div id="otsum" class="sub"></div></div><div class="ogrid" id="open"></div></section>
 <section id="shadowsec"><div id="shadow"></div></section>
 <section id="trendsec" hidden></section>
 <section id="learnsec"><h3>Belajar dari kerugian</h3><div id="learn"></div></section>
-<section id="desksec"><h3 id="desktitle">Ringkasan desk</h3><div class="grid" id="desks" style="margin-top:0"></div></section>
 <div class="two" id="twosec">
  <section><h3 id="cltitle">Transaksi yang sudah ditutup</h3><div class="tw" id="closed"></div></section>
  <section id="rightsec"><h3 id="righttitle">Keputusan terbaru</h3><div class="tabs" id="dtabs"></div><div class="feed" id="dec"></div></section>
@@ -648,7 +677,7 @@ function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort(
   <div><span>${tip("Modal",TIPS.margin)}</span>${$(sz)}</div>
   <div><span>Tesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
   <div><span>Sisa waktu</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>${tip("Skor",TIPS.score)}</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}</div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
+  <div><span>${tip("Skor",TIPS.score)}</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${(o.pat||o.news||analysisBtn(o))?`<details class="ocn" data-ui="ocn-${esc(o.a)}-${esc(o.side)}"><summary>Analisis &amp; berita</summary>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}</details>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
  return{html,tu,tm}}
 function closedTable(cl,fine){const $=fine?moneyR:money;
  return cl.length?more("det-closed","Detail transaksi ditutup",`<table><tr><th>Koin</th><th>Desk</th><th>${tip("Untung/Rugi",TIPS.pnl)}</th><th>Alasan keluar</th><th>Masuk / Keluar</th></tr>`+cl.map(c=>`<tr><td>${coinLabel(c.a,c.link)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>Masuk ${esc(c.entered)}</div>`:""}${c.exited?`<div>Keluar ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`):'<div class="empty">Belum ada transaksi yang ditutup.</div>'}
@@ -738,12 +767,12 @@ function renderPaper(){
   const full=((D.full||[]).find(f=>f.desk===d.name)||{}).pts||[];
   return`<div class="card"><h2>${esc(d.name)} ${d.paused?'<span class="badge b-paused">DIJEDA</span>':'<span class="badge b-live">BERJALAN</span>'}</h2>
   <div class="eq">${money(eq)} <span class="${cls(pl)}" style="font-size:14px">${pct(pl)}</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">${d.win==null?"—":d.win+"%"}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div>
-  <div class="kpi"><div class="v">${d.open}</div><div class="l">Terbuka</div></div><div class="kpi"><div class="v">${d.closed}</div><div class="l">Ditutup</div></div>
-  <div class="kpi"><div class="v ${cls(d.real)}">${money(d.real)}</div><div class="l">${tip("Sudah dikunci",TIPS.rpnl)}</div></div>
-  <div class="kpi"><div class="v ${cls(d.unreal+(liveU[d.name]||0))}">${money(d.unreal+(liveU[d.name]||0))}</div><div class="l">${tip("Belum dikunci",TIPS.upnl)}</div></div>
-  <div class="kpi"><div class="v">${d.paused?"—":"#"+(d.cycle??0)}</div><div class="l">${tip("Siklus",TIPS.cycle)}</div></div></div>
-  ${d.paused?'<div class="sub" style="margin-top:10px">Dijeda di sesi 2. Tidak ada transaksi.</div>':chart(full)}</div>`}).join("");
+  <div class="kpis k4"><div class="kpi"><div class="v ${cls(d.real)}">${money(d.real)}</div><div class="l">${tip("Untung terkunci",TIPS.rpnl)}</div></div>
+  <div class="kpi"><div class="v">${d.win==null?"—":d.win+"%"}</div><div class="l">${tip("Menang",TIPS.wr)}</div></div>
+  <div class="kpi"><div class="v">${d.open}</div><div class="l">Posisi terbuka</div></div>
+  <div class="kpi"><div class="v ${cls(d.unreal+(liveU[d.name]||0))}">${money(d.unreal+(liveU[d.name]||0))}</div><div class="l">${tip("Belum dikunci",TIPS.upnl)}</div></div></div>
+  <div class="sub kmini">${d.closed} transaksi selesai${d.paused?"":" · "+tip("siklus",TIPS.cycle)+" #"+(d.cycle??0)}</div>
+  ${d.paused?'<div class="sub" style="margin-top:10px">Dijeda di sesi 2. Tidak ada transaksi.</div>':chart(full)}${d.paused?"":metodeBlock(D.metode&&D.metode.paper,{id:"det-metode-paper",fmt:money,title:"Metode: hasil per cara main"})}</div>`}).join("");
  const base=START*act.length,tp=(tot/base-1)*100;$("tot").innerHTML=`${money(tot)} <span class="${cls(tp)}" style="font-size:16px">${pct(tp)}</span>`;
  $("htitle").innerHTML=`Desk Majors <span class="badge b-paper">${tip("Simulasi",TIPS.paper)}</span>`;
  $("totsub").textContent=`Paper Majors · modal $10K`;
@@ -759,7 +788,7 @@ function renderPaper(){
  $("shadow").innerHTML=shadowHtml(D.shadow);
  $("learn").innerHTML=more("det-learn","Detail belajar dari kerugian",learnHtml(D.learn));
  $("dec").innerHTML=ds.length?more("det-dec","Detail keputusan",ds.map(x=>`<div class="it"><div class="h"><b class="k-${x.k}">${x.k.toUpperCase()}</b>${coinLabel(x.a)}${x.side?sideBadge(x.side):""}${x.sc!=null?`<span class="badge">${tip("skor",TIPS.score)} ${x.sc}</span>`:""}<span class="sub">${esc(x.desk)} · ${tip("siklus",TIPS.cycle)} ${x.cy} · ${ago(x.ts)}</span></div>${why(x)}${x.pat?`<div class="pat">📐 ${esc(x.pat)}</div>`:""}</div>`).join("")):'<div class="it mu">Belum ada keputusan.</div>';
- $("desktitle").textContent="Ringkasan desk";
+ $("desktitle").textContent="Ringkasan";
  $("foot").innerHTML=`Simulasi, bukan uang sungguhan. Tidak ada kunci, tidak ada order dari halaman ini. ${esc(D.run?.archive||"Sesi 1 diarsipkan")}. ${esc(D.paused_note||"Desk memecoin dan copy sedang dijeda.")}`
 }
 function learnHtml(L){
@@ -864,28 +893,36 @@ function metodeBar(wins,losses,clsName){
   const wp=t? (w/t*100):0, lp=t?(l/t*100):0;
   return `<div class="mbar${clsName?" "+clsName:""}" role="img" aria-label="${w} menang, ${l} kalah"><i class="w" style="width:${wp.toFixed(1)}%"></i><i class="l" style="width:${lp.toFixed(1)}%"></i></div>`;
 }
-function metodeSection(M){
-  const S=M&&M.methods, o=S&&S.overall;
-  if(!S||!S.groups||!S.groups.length){
-    return `<div class="metode"><h3>Metode</h3><p class="mnote">Belum ada transaksi ditutup di buku ini, jadi belum ada ringkasan menang/kalah per metode.</p></div>`;
+/* METODE-BLOCK-START: one renderer for paper Majors, Bitget (real) and the $37 books. Collapsed by default. */
+function metodeBlock(S,o){
+  o=o||{};const id=o.id||"det-metode",$m=o.fmt||moneyR,title=o.title||"Metode: hasil per cara main";
+  const ov=S&&S.overall;
+  if(!S||!S.groups||!S.groups.length||!ov||!ov.n){
+    return `<details class="more metode" id="${esc(id)}"><summary>${esc(title)}</summary><p class="mnote">${esc(o.empty||"Belum ada transaksi yang ditutup, jadi belum ada ringkasan per metode.")}</p></details>`;
   }
-  const ov=o?`<div class="mover"><b>${o.n||0} transaksi utuh</b><span>${o.wins??0} menang · ${o.losses??0} kalah</span><span>${o.win==null?"—":o.win+"% menang"}</span><span class="${cls(o.pnl)}">${moneyR(o.pnl)}</span><span>rata-rata R ${o.avg_r==null?"—":o.avg_r}</span></div>${metodeBar(o.wins,o.losses,"mbar-lg")}`:"";
-  const groups=(S.groups||[]).map(g=>{
+  const head=`<div class="mover"><b>${ov.n} transaksi</b><span>${ov.wins??0} menang · ${ov.losses??0} kalah</span><span>${ov.win==null?"—":ov.win+"% menang"}</span><span class="${cls(ov.pnl)}">${$m(ov.pnl)}</span><span>rata-rata R ${ov.avg_r==null?"—":ov.avg_r}</span></div>${metodeBar(ov.wins,ov.losses,"mbar-lg")}`;
+  const tbl=g=>{
     const rows=(g.rows||[]).map(r=>`<tr>
       <td>${esc(r.label||r.k||"")}</td>
       <td class="n">${r.n??0}</td>
-      <td class="n">${r.wins??0}</td>
-      <td class="n">${r.losses??0}</td>
+      <td class="n hm">${r.wins??0}</td>
+      <td class="n hm">${r.losses??0}</td>
       <td class="n">${r.win==null?"—":r.win+"%"}</td>
-      <td class="n ${cls(r.pnl)}">${moneyR(r.pnl)}</td>
-      <td class="n">${r.avg_r==null?"—":r.avg_r}</td>
-      <td>${metodeBar(r.wins,r.losses)}</td>
+      <td class="n ${cls(r.pnl)}">${$m(r.pnl)}</td>
+      <td class="n hm">${r.avg_r==null?"—":r.avg_r}</td>
+      <td class="hm">${metodeBar(r.wins,r.losses)}</td>
     </tr>`).join("");
-    return `<div class="mgroup"><h4>${esc(g.title||"")}</h4>
-      <div class="tw"><table><tr><th>Metode</th><th class="n">Transaksi</th><th class="n">Menang</th><th class="n">Kalah</th><th class="n">${tip("% menang",TIPS.wr)}</th><th class="n">${tip("Total PnL",TIPS.pnl)}</th><th class="n">Rata-rata R</th><th>Bar</th></tr>${rows}</table></div></div>`;
+    return `<div class="tw"><table><tr><th>Metode</th><th class="n">Transaksi</th><th class="n hm">Menang</th><th class="n hm">Kalah</th><th class="n">${tip("% menang",TIPS.wr)}</th><th class="n">${tip("Total PnL",TIPS.pnl)}</th><th class="n hm">Rata-rata R</th><th class="hm">Bar</th></tr>${rows}</table></div>`};
+  const gs=S.groups||[];
+  const groups=gs.map((g,i)=>{
+    const t=esc(g.title||"");
+    if(i<2)return `<div class="mgroup"><h4>${t}</h4>${tbl(g)}</div>`;
+    return `<details class="mgroup mdet" id="${esc(id)}-g${i}"><summary>${t}</summary>${tbl(g)}</details>`;
   }).join("");
-  return `<div class="metode"><h3>Metode</h3><p class="mnote">${esc(S.note||"Ringkasan hasil per cara masuk dan cara keluar di buku ini.")}</p>${ov}${groups}</div>`;
+  return `<details class="more metode" id="${esc(id)}"><summary>${esc(title)} <span class="sub">· ${ov.n} transaksi · ${ov.win==null?"—":ov.win+"%"} menang</span></summary><p class="mnote">${esc(S.note||"Ringkasan hasil per cara masuk dan cara keluar.")}</p>${head}${groups}</details>`;
 }
+function metodeSection(M){return metodeBlock(M&&M.methods,{id:"det-metode-"+(typeof VIEW!=="undefined"?VIEW:"x"),fmt:moneyR,title:"Metode: hasil per cara main",empty:"Belum ada transaksi ditutup di buku ini, jadi belum ada ringkasan menang/kalah per metode."})}
+/* METODE-BLOCK-END */
 function renderGoal(kind){
  const all=kind==="signals";
  const M=all?((D.real_all)||{}):(((D.real)||{}).mirror||{});
@@ -1975,6 +2012,7 @@ function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
   <div class="kpi"><div class="v">${pos.length} / ${L.max_open??"—"}</div><div class="l">Posisi</div></div>
   <div class="kpi"><div class="v ${cls(daypl)}" data-bg-day>${pct(daypl)}</div><div class="l">Hari ini</div></div></div>
   ${typeof chart==="function"?chart(curve,st):""}
+  ${typeof metodeBlock==="function"?metodeBlock(B.metode,{id:"det-metode-bitget",fmt:moneyR,title:"Metode: hasil per cara main",empty:"Belum ada transaksi Bitget yang ditutup."}):""}
   <div class="sub" style="margin-top:8px">Risiko ${L.risk_pct}% · lev maks ${L.max_lev}x · stop harian −${L.daily_halt_pct}% · mati −${L.kill_dd_pct}%. ${esc(B.updated||"")}${B.kill_reason?" · "+esc(B.kill_reason):""}</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="home-go" onclick="bgControl('ON')">ON</button><button type="button" class="home-go" onclick="bgControl('PAUSE')">PAUSE</button><button type="button" class="home-go" style="color:var(--dn);border-color:var(--dn)" onclick="bgControl('STOP')">STOP</button><button type="button" class="home-go" onclick="bgLock()">Kunci lagi</button></div>
   <p class="sub" style="margin:8px 0 0">Tombol membuka GitHub; klik Submit. Atau ketik STOP di chat.</p></div>`;
@@ -2325,6 +2363,7 @@ $("lbi").addEventListener("click",e=>e.stopPropagation());
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeLb()});
 $("v-bitget")&&$("v-bitget").addEventListener("click",()=>{setView("bitget");if(bgKeyHex())bgFetch()});
 $("v-institusi")&&$("v-institusi").addEventListener("click",()=>{setView("institusi");fetchInstitusi()});
+document.addEventListener("click",e=>{const b=e.target&&e.target.closest&&e.target.closest("#banner");if(b&&!e.target.closest("a"))b.classList.toggle("open")});
 load();
 setInterval(load,120000);
 setInterval(fetchMarks,5000);
