@@ -52,7 +52,7 @@ th{color:var(--mu);font-weight:500;font-size:11px;text-transform:uppercase}th:fi
 .two{display:grid;gap:12px;grid-template-columns:1fr 1fr}@media(max-width:860px){.two{grid-template-columns:1fr}.big{font-size:28px}}
 .oth{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px}.oth h3{margin:0}
 #otsum b{font-size:16px}
-.ogrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.ogrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .oc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;border-left:3px solid var(--line)}
 .oc.pos{border-left-color:var(--up)}.oc.neg{border-left-color:var(--dn)}
 .oc .t{display:flex;justify-content:space-between;align-items:center;gap:6px}.oc .t a,.oc .t b{font-weight:700;font-size:15px}
@@ -259,6 +259,33 @@ abbr.tip,.tip{text-decoration:underline dotted;text-underline-offset:3px;cursor:
 .views button{min-height:44px}
 .kpi .v{font-size:18px}
 .oc .pl{font-size:24px}
+
+/* POS-CARD-V2: compact open-position cards */
+.oc{overflow:hidden;min-width:0;max-width:100%}
+.oc .pl{font-size:26px;font-weight:800;letter-spacing:-.03em;margin:8px 0 8px;line-height:1.15}
+.oc .pl span{font-size:16px;font-weight:700;margin-left:6px;letter-spacing:0}
+.oc .pair{display:flex;justify-content:space-between;gap:12px;margin:0 0 10px}
+.oc .pair div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.oc .pair span{color:var(--mu);font-size:11px}
+.oc .pair b{font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.sltp{margin:0 0 8px;min-width:0}
+.sltp-lab{display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:600;margin:0 0 5px;font-variant-numeric:tabular-nums}
+.sltp-lab span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sltp-track{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 50%,#22c55e 100%);overflow:visible}
+.sltp-mark{position:absolute;top:-3px;width:4px;height:14px;background:#fff;border-radius:2px;transform:translateX(-50%);box-shadow:0 0 0 1px #0008;pointer-events:none}
+.pos-go{font-size:12px;color:var(--mu);margin:0 0 4px;line-height:1.4}
+.pos-go .up,.pos-go .dn{font-weight:700}
+.ocd{margin-top:8px;border:1px solid var(--line);border-radius:10px;background:#0b0e14;padding:0 10px;max-width:100%;min-width:0;overflow:hidden}
+.ocd>summary{cursor:pointer;color:var(--mu);font-size:12px;font-weight:600;padding:8px 0;list-style:none;user-select:none}
+.ocd>summary::-webkit-details-marker{display:none}
+.ocd>summary::after{content:" ▾";color:#5a6478;font-size:10px}
+.ocd[open]>summary::after{content:" ▴"}
+.ocd[open]{padding-bottom:10px}
+.lt-wrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch;margin-top:8px}
+.lt .lh,.lt .lr{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,.9fr) 18px}
+.lt .lh span,.lt .lr span{min-width:0}
+.lt .lh span:first-child,.lt .lr span:first-child{overflow:hidden;text-overflow:ellipsis}
+@media(max-width:560px){.oc .pl{font-size:24px}.oc .pl span{font-size:15px}}
 .wpos .pl{font-size:22px}
 .eq{font-size:28px}
 h1{text-transform:none;letter-spacing:0}
@@ -632,7 +659,7 @@ function levels(o,fine){const L=o.lvls;if(!L||!L.rows||!L.rows.length)return"";
   const st=tot?"":(hit?'<span class="hit" title="Hit">✓</span>':'<span class="mu" title="Pending">–</span>');
   const xc=levelCrossClass(o,r);
   return `<div class="lr${tot?" tot":""}${xc}"><span>${esc(r.k)}${tag}${xc?` <span class="tag">${xc.includes("sl")?"crossed":"crossed"}</span>`:""}</span><span>${r.px!=null?px(r.px):"—"}</span><span class="${cls(r.u)}">${pnl$(r.u,fine)}</span><span class="${cls(r.pc)}">${pct(r.pc)}</span><span>${st}</span></div>`};
- return more("lv-"+esc(o.a),`Detail ${tip("SL",TIPS.sl)} / ${tip("TP",TIPS.tp)}`,`<div class="lt"><div class="lh"><span>Level</span><span>Harga</span><span>${tip("P/L $",TIPS.pnl)}</span><span>${tip("P/L %",TIPS.pnl)}</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">${tip("P/L",TIPS.pnl)} % dari modal posisi ini (${(fine?moneyR:money)(L.m)}). Tanda melewati harga hanya tampilan.</div>`)}
+ return `<div class="lt-wrap"><div class="lt"><div class="lh"><span>Level</span><span>Harga</span><span>${tip("P/L $",TIPS.pnl)}</span><span>${tip("P/L %",TIPS.pnl)}</span><span></span></div>${L.rows.map(row).join("")}</div><div class="lnote">${tip("P/L",TIPS.pnl)} % dari modal posisi ini (${(fine?moneyR:money)(L.m)}). Tanda melewati harga hanya tampilan.</div></div>`}
 const activity=o=>{const a=[...(o.activity||[])].reverse();if(!a.length)return"";return `<details class="al" data-ui="al:${esc(o.desk||'')}:${esc(o.a)}:${o.ts||o.e||''}"><summary>Riwayat</summary>${a.map(x=>`<div><span class="tm">${esc(x.t||hhmm(x.time))}</span><span>${esc(x.event)}</span></div>`).join("")}</details>`};
 const analysisBtn=o=>{if(!o.img)return"";const src=esc(o.img)+"?t="+(o.img_t||D.gen_ts||Date.now());return `<a class="an" href="${src}" target="_blank" rel="noopener" data-alt="${esc(o.a)} analisis" onclick="return openLb(this,event)"><img src="${src}" alt="${esc(o.a)} analisis" width="96" height="67" loading="lazy"><span>Analisis</span></a>`};
 function openLb(a,e){if(e)e.preventDefault();const lb=$("lb"),img=$("lbi"),href=a.getAttribute("href");img.src=href;img.alt=a.getAttribute("data-alt")||"Analisis";$("lbnew").href=href;lb.classList.add("on");document.body.style.overflow="hidden";return false}
@@ -671,27 +698,96 @@ document.addEventListener("toggle",e=>{const d=e.target;if(!d||d.tagName!=="DETA
  let cur=[];try{cur=(JSON.parse(sessionStorage.getItem("deskUi")||"{}")||{}).open||[]}catch(ex){}
  const k=uiKey(d),set=new Set(cur);if(d.open)set.add(k);else set.delete(k);
  try{sessionStorage.setItem("deskUi",JSON.stringify({open:[...set],view:typeof VIEW!=="undefined"?VIEW:"",scroll:UI_SCROLL}))}catch(ex){}},true);
+
+/* POS-CARD-V2 helpers: shared by paper, Bitget, and home cards */
+function nextTpOf(o){
+  const pts=[["TP1",o.tp1,o.tp1_hit],["TP2",o.tp2,o.tp2_hit],["TP3",o.tp3,o.tp3_hit]];
+  for(const [lab,v,hit] of pts){if(v!=null&&v!==""&&!isNaN(+v)&&!hit)return{lab,px:+v}}
+  for(let i=pts.length-1;i>=0;i--){const [lab,v]=pts[i];if(v!=null&&v!==""&&!isNaN(+v))return{lab,px:+v,done:true}}
+  return null;
+}
+function pctFromTo(from,to){if(from==null||to==null||isNaN(from)||isNaN(to)||!from)return null;return (to-from)/from*100}
+function slTpBarHtml(sl,now,ntp,short){
+  if(sl==null||isNaN(sl)||!ntp||ntp.px==null||isNaN(ntp.px)||now==null||isNaN(now)||sl===ntp.px)return"";
+  const t=Math.max(0,Math.min(1,(now-sl)/(ntp.px-sl)))*100;
+  return `<div class="sltp" data-pos-bar>
+    <div class="sltp-lab"><span class="dn">SL ${px(sl)}</span><span class="up">${esc(ntp.lab)} ${px(ntp.px)}</span></div>
+    <div class="sltp-track" role="img" aria-label="Harga sekarang di antara SL dan ${esc(ntp.lab)}"><b class="sltp-mark" style="left:${t.toFixed(1)}%"></b></div>
+  </div>`;
+}
+function posGoLine(now,sl,ntp,short){
+  const bits=[];
+  if(ntp&&ntp.px!=null&&!isNaN(ntp.px)){
+    const r=short?pctFromTo(now,ntp.px)*-1:pctFromTo(now,ntp.px);
+    const lab=ntp.lab||"TP";
+    bits.push(r==null?`Ke ${lab}: —`:r<=0?`Ke ${lab}: sudah`:`Ke ${lab}: <span class="up">+${Math.abs(r).toFixed(2)}%</span>`);
+  }
+  if(sl!=null&&!isNaN(sl)){
+    const r=short?pctFromTo(now,sl):pctFromTo(now,sl)*-1;
+    bits.push(r==null?`Ke SL: —`:r<=0?`Ke SL: sudah`:`Ke SL: <span class="dn">−${Math.abs(r).toFixed(2)}%</span>`);
+  }
+  return bits.length?`<div class="pos-go" data-pos-line>${bits.join(" · ")}</div>`:"";
+}
+function paintPosFace(card,now,live){
+  if(!card)return;
+  const nowEl=card.querySelector("[data-pos-now]");
+  if(nowEl&&now!=null&&!isNaN(now))nowEl.innerHTML=`${px(now)}${live?' <span class="up">●</span>':''}`;
+  const sl=card.getAttribute("data-sl"), tp=card.getAttribute("data-tp");
+  const sln=sl!=null&&sl!==""?+sl:NaN, tpn=tp!=null&&tp!==""?+tp:NaN;
+  const lab=card.getAttribute("data-tplab")||"TP";
+  const short=(card.getAttribute("data-side")||"")==="short";
+  const ntp=!isNaN(tpn)?{lab,px:tpn}:null;
+  const mark=card.querySelector(".sltp-mark");
+  if(mark&&!isNaN(sln)&&!isNaN(tpn)&&now!=null&&!isNaN(now)&&sln!==tpn){
+    const t=Math.max(0,Math.min(1,(now-sln)/(tpn-sln)))*100;
+    mark.style.left=t.toFixed(1)+"%";
+  }
+  const line=card.querySelector("[data-pos-line]");
+  if(line){
+    const html=posGoLine(now,isNaN(sln)?null:sln,ntp,short);
+    if(html){const tmp=document.createElement("div");tmp.innerHTML=html;if(tmp.firstElementChild)line.innerHTML=tmp.firstElementChild.innerHTML}
+  }
+}
+function simplePosCard(c){
+  const $m=c.money||money, u=c.u, p=c.p, short=String(c.side||"").toLowerCase()==="short";
+  const ntp=c.ntp||nextTpOf(c);
+  const sl=c.sl!=null&&c.sl!==""&&!isNaN(+c.sl)?+c.sl:null;
+  const pctHtml=c.pct==null||isNaN(c.pct)?"":` <span>${pct(c.pct)}</span>`;
+  const nowHtml=`${px(p)}${c.live?' <span class="up">●</span>':''}`;
+  const warn=c.warn||"";
+  const detail=c.detail||"";
+  return `<div class="oc ${u>0?"pos":u<0?"neg":""}${c.extraClass||""}" data-a="${esc(c.a||"")}"${c.sym?` data-sym="${esc(c.sym)}"`:""} data-side="${short?"short":"long"}"${sl!=null?` data-sl="${sl}"`:""}${ntp?` data-tp="${ntp.px}" data-tplab="${esc(ntp.lab)}"`:""}>
+    <div class="t"><div>${coinLabel(c.a,c.link)}</div>${sideBadge(c.side,c.lev)}</div>
+    <div class="pl ${cls(u)}">${$m(u)}${pctHtml}</div>
+    <div class="pair"><div><span>Masuk</span><b>${px(c.e)}</b></div><div><span>Sekarang</span><b data-pos-now>${nowHtml}</b></div></div>
+    ${slTpBarHtml(sl,p,ntp,short)}
+    ${posGoLine(p,sl,ntp,short)}
+    ${warn}
+    ${detail?`<details class="ocd" data-ui="ocd-${esc(c.a)}-${esc(c.side||"")}"><summary>Detail</summary>${detail}</details>`:""}
+  </div>`;
+}
+
 function openCards(opens,fine){const $=fine?moneyR:money,sorted=[...opens].sort((a,b)=>(b.ts||0)-(a.ts||0));let tu=0,tm=0;
  const html=sorted.length?sorted.map(o=>{const perp=o.inst==="perp",sz=perp?o.m:o.z,u=o._u,pc=sz?u/sz*100:0,p=o._p,short=o.side==="short";tu+=u;tm+=sz||0;
-  const dist=(o.s&&p)?(short?(o.s-p)/p*100:(p-o.s)/p*100):null;
-  const pxPct=(o.e&&p)?(short?(o.e-p)/o.e*100:(p-o.e)/o.e*100):null;
   const roe=sz?u/sz*100:null;
   const tag=slTag(o),flags=crossFlags(o,p);
   const match=walletMatchBadge(o);
   const tagLab=tag==="trail"?tip("trail",TIPS.trail):tag==="BE"?tip("BE",TIPS.be):tag;
-  const pctLine=(roe!=null&&pxPct!=null)?`ROE ${pct(roe)} <span class="sub">(harga ${pct(pxPct)})</span>`:pct(pc);
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}${flags.sl?" x-sl":""}${flags.tp?" x-tp":""}" data-a="${esc(o.a)}"><div class="t"><div>${coinLabel(o.a,o.link)} <span class="sub">${esc(o.desk)}</span></div>
-  ${sideBadge(o.side,perp?o.lev:null)}</div>
-  <div class="pl ${cls(u)}">${$(u)} <span style="font-size:13px">${pctLine}</span></div>
-  ${o.entered?`<div class="when">Masuk: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
-  <div class="g"><div><span>Masuk</span>${px(o.e)}</div><div><span>Sekarang</span>${px(p)}${LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null?' <span class="up">●</span>':''}</div>
-  <div><span>${tip("Likuidasi",TIPS.liq)}</span>${px(o.liq)}</div><div><span>Jarak ke ${tip("SL",TIPS.sl)}</span><b class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
-  ${o.lvls&&o.lvls.rows?"":`<div><span>${tip("SL",TIPS.sl)}${tag?` <span class="tag">${tagLab}</span>`:""}</span>${px(o.s)}</div>`}
-  ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"ditutup")}
-  <div><span>${tip("Modal",TIPS.margin)}</span>${$(sz)}</div>
-  <div><span>Tesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
-  <div><span>Sisa waktu</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
-  <div><span>${tip("Skor",TIPS.score)}</span>${o.sc??"—"}</div></div>${o.lvls&&o.lvls.rows?levels(o,fine):""}${(o.pat||o.news||analysisBtn(o))?`<details class="ocn" data-ui="ocn-${esc(o.a)}-${esc(o.side)}"><summary>Analisis &amp; berita</summary>${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}</details>`:""}${activity(o)}</div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
+  const live=LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null;
+  const warn=flags.sl?`<div class="xflag sl">Harga sudah melewati ${tip("SL",TIPS.sl)}</div>`:flags.tp?`<div class="xflag tp">Harga sudah melewati ${tip("TP",TIPS.tp)}</div>`:"";
+  const grid=`<div class="g">
+    <div><span>${tip("Likuidasi",TIPS.liq)}</span>${px(o.liq)}</div>
+    <div><span>${tip("Modal",TIPS.margin)}</span>${$(sz)}</div>
+    <div><span>Tesis</span>${o.th?esc(o.th.charAt(0).toUpperCase()+o.th.slice(1)):"—"}</div>
+    <div><span>${tip("Skor",TIPS.score)}</span>${o.sc??"—"}</div>
+    <div><span>Sisa waktu</span>${o.tl?`<b class="${o.tl==="expired"?"dn":""}">${esc(o.tl)}</b>`:"—"}</div>
+    ${o.lvls&&o.lvls.rows?"":`<div><span>${tip("SL",TIPS.sl)}${tag?` <span class="tag">${tagLab}</span>`:""}</span>${px(o.s)}</div>`}
+    ${o.lvls&&o.lvls.rows?"":tpCell("TP1",o.tp1,o.tp1_hit,"50%")+tpCell("TP2",o.tp2,o.tp2_hit,"25%")+tpCell("TP3",o.tp3,o.tp3_hit,"ditutup")}
+  </div>`;
+  const detail=`${o.entered?`<div class="when">Masuk: ${esc(o.entered)}${o.ago?` (${esc(o.ago)})`:""}</div>`:""}${match}${flags.html}
+    ${grid}${o.lvls&&o.lvls.rows?levels(o,fine):""}
+    ${o.pat?`<div class="pat">📐 ${esc(o.pat)}</div>`:""}${o.news?`<div class="news">📰 ${esc(o.news)}</div>`:""}${analysisBtn(o)}${activity(o)}`;
+  return simplePosCard({a:o.a,link:o.link,side:o.side,lev:perp?o.lev:o.lev,u,pct:roe!=null?roe:pc,p,e:o.e,sl:o.s,tp1:o.tp1,tp2:o.tp2,tp3:o.tp3,tp1_hit:o.tp1_hit,tp2_hit:o.tp2_hit,tp3_hit:o.tp3_hit,live,warn,detail,extraClass:(flags.sl?" x-sl":"")+(flags.tp?" x-tp":""),money:$})}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
  return{html,tu,tm}}
 function closedTable(cl,fine){const $=fine?moneyR:money;
  return cl.length?more("det-closed","Detail transaksi ditutup",`<table><tr><th>Koin</th><th>Desk</th><th>${tip("Untung/Rugi",TIPS.pnl)}</th><th>Alasan keluar</th><th>Masuk / Keluar</th></tr>`+cl.map(c=>`<tr><td>${coinLabel(c.a,c.link)}</td><td class="mu">${esc(c.desk)}</td><td class="${cls(c.u)}">${$(c.u)} <span class="sub">${pct(c.pc)}</span></td><td class="mu">${esc(String(c.r||"").replace(/_/g," "))}</td><td class="mu when">${c.entered?`<div>Masuk ${esc(c.entered)}</div>`:""}${c.exited?`<div>Keluar ${esc(c.exited)}</div>`:(c.ts?ago(c.ts):esc(c.t||""))}</td></tr>`).join("")+`</table>`):'<div class="empty">Belum ada transaksi yang ditutup.</div>'}
@@ -1683,10 +1779,8 @@ function homeOpenSection(){const opens=(D.open||[]).slice();
  if(!opens.length)return`<div class="card"><h2>Posisi terbuka</h2><p class="sub" style="margin:0">Tidak ada posisi paper sekarang.</p></div>`;
  let tu=0;
  const cards=opens.map(o=>{const u=o._u,p=o._p,sz=o.inst==="perp"?o.m:o.z,pc=sz?u/sz*100:0;tu+=u;
-  return`<div class="oc ${u>0?"pos":u<0?"neg":""}"><div class="t"><div>${coinLabel(o.a)}</div>${sideBadge(o.side,o.lev)}</div>
-  <div class="pl ${cls(u)}">${money(u)} <span style="font-size:13px">${pct(pc)}</span></div>
-  <div class="g"><div><span>Masuk</span>${px(o.e)}</div><div><span>Sekarang</span>${px(p)}</div>
-  <div><span>SL</span>${px(o.s)}</div><div><span>TP1</span>${px(o.tp1)}</div></div></div>`}).join("");
+  const live=LIVE[o.sym||o.mint||o.a]!=null||LIVE[(o.a||"")+"USDT"]!=null;
+  return simplePosCard({a:o.a,side:o.side,lev:o.lev,u,pct:pc,p,e:o.e,sl:o.s,tp1:o.tp1,tp2:o.tp2,tp3:o.tp3,tp1_hit:o.tp1_hit,tp2_hit:o.tp2_hit,tp3_hit:o.tp3_hit,live})}).join("");
  return`<div><div class="oth"><h3>Posisi terbuka <span class="badge">${opens.length}</span></h3><div class="sub">P/L <b class="${cls(tu)}">${money(tu)}</b></div></div><div class="ogrid">${cards}</div></div>`}
 function homeBitgetCard(){const unlocked=typeof bgKeyHex==="function"&&bgKeyHex()&&typeof BG_DATA!=="undefined"&&BG_DATA;
  if(!unlocked)return`<div class="card home-card home-bitget"><h2>Bitget <span class="badge" style="color:#f59e0b;border-color:#f59e0b">Uang asli</span></h2>
@@ -1971,11 +2065,9 @@ function paintBgLive(){if(typeof VIEW!=="undefined"&&VIEW!=="bitget"||!BG_DATA)r
   tu+=r.u;if(live!=null)nLive++;
   const card=document.querySelector('#open .oc[data-sym="'+esc(p.sym)+'"]');if(!card)return;
   card.classList.toggle("pos",r.u>0);card.classList.toggle("neg",r.u<0);
-  const pl=card.querySelector(".pl");if(pl){pl.className="pl "+cls(r.u);pl.innerHTML=`${money(r.u)} <span style="font-size:13px">${bgPctLine(r.roe,r.pxPct)}</span>`}
-  const nowEl=card.querySelector("[data-bg-now]");if(nowEl)nowEl.innerHTML=`${px(r.mark)}${live!=null?' <span class="up">●</span>':''}`;
-  const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
-  const dist=(!isNaN(sl)&&!isNaN(r.mark)&&r.mark)?(short?(sl-r.mark)/r.mark*100:(r.mark-sl)/r.mark*100):null;
-  const distEl=card.querySelector("[data-bg-sldist]");if(distEl){distEl.className=dist!=null&&dist<1?"dn":"";distEl.textContent=dist==null?"—":dist.toFixed(2)+"%"}});
+  const pl=card.querySelector(".pl");if(pl){const pctv=r.roe!=null?r.roe:r.pxPct;pl.className="pl "+cls(r.u);pl.innerHTML=`${money(r.u)}${pctv==null?"":" <span>"+pct(pctv)+"</span>"}`}
+  if(typeof paintPosFace==="function")paintPosFace(card,r.mark,live!=null);
+  else{const nowEl=card.querySelector("[data-pos-now],[data-bg-now]");if(nowEl)nowEl.innerHTML=`${px(r.mark)}${live!=null?' <span class="up">●</span>':''}`}});
  if($("otsum")&&pos.length)$("otsum").innerHTML=`P/L terbuka <b class="${cls(tu)}">${money(tu)}</b>`;
  const B=BG_DATA,st=+B.start_equity||+B.equity,ds=+B.day_start_equity||+B.equity,up0=+B.upnl||0,eq0=+B.equity;
  const eq=nLive?eq0-up0+tu:eq0,pl=st?eq/st*100-100:0,daypl=ds?eq/ds*100-100:0;
@@ -2006,15 +2098,23 @@ function bgLiveStop(){if(BG_POLL){clearInterval(BG_POLL);BG_POLL=null}bgWsStop()
 function bgOpenCards(pos){let tu=0,tm=0;
  const html=pos.length?pos.map(p=>{const a=bgCoin(p.sym),live=bgLivePx(p.sym),mark=live!=null?live:(p.mark!=null?+p.mark:NaN),r=bgPnl(p,mark);
   const e=p.entry!=null?+p.entry:NaN,size=p.size!=null?+p.size:NaN,notion=(!isNaN(e)&&!isNaN(size))?Math.abs(e*size):0;
-  tu+=r.u;tm+=notion;const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN,short=String(p.side||"").toLowerCase()==="short";
-  const dist=(!isNaN(sl)&&r.mark)?(short?(sl-r.mark)/r.mark*100:(r.mark-sl)/r.mark*100):null;
+  tu+=r.u;tm+=notion;const sl=p.sl!=null&&p.sl!==""?+p.sl:NaN;
   const t=bgTps(p),margin=p.margin!=null?p.margin:(r.margin!=null?r.margin:"");
+  const pctv=r.roe!=null?r.roe:r.pxPct;
+  const detail=`<div class="g">
+    <div><span>Likuidasi</span>${px(p.liq!=null?+p.liq:NaN)}</div>
+    <div><span>Modal</span>${margin!==""&&margin!=null?money(+margin):"—"}</div>
+    <div><span>SL</span>${px(sl)}</div>
+    <div><span>Ukuran</span>${size||"—"}</div>
+    <div><span>TP1</span>${px(t.tp1!=null?+t.tp1:NaN)}</div>
+    <div><span>TP2</span>${px(t.tp2!=null?+t.tp2:NaN)}</div>
+    <div><span>TP3</span>${px(t.tp3!=null?+t.tp3:NaN)}</div>
+    <div><span>Mode</span>${esc(p.mode||"—")}</div>
+  </div>`;
+  if(typeof simplePosCard==="function")return simplePosCard({a,sym:p.sym,side:p.side,lev:p.lev,u:r.u,pct:pctv,p:r.mark,e,sl:isNaN(sl)?null:sl,tp1:t.tp1,tp2:t.tp2,tp3:t.tp3,tp1_hit:p.tp1_done,tp2_hit:p.tp2_done,live:live!=null,detail,money});
   return`<div class="oc ${r.u>0?"pos":r.u<0?"neg":""}" data-a="${esc(a)}" data-sym="${esc(p.sym)}"><div class="t"><div>${coinLabel(a)}</div>${sideBadge(p.side,p.lev)}</div>
-  <div class="pl ${cls(r.u)}">${money(r.u)} <span style="font-size:13px">${bgPctLine(r.roe,r.pxPct)}</span></div>
-  <div class="g"><div><span>Masuk</span>${px(e)}</div><div><span>Sekarang</span><span data-bg-now>${px(r.mark)}${live!=null?' <span class="up">●</span>':''}</span></div>
-  <div><span>SL</span>${px(sl)}</div><div><span>Jarak ke SL</span><b data-bg-sldist class="${dist!=null&&dist<1?"dn":""}">${dist==null?"—":dist.toFixed(2)+"%"}</b></div>
-  <div><span>TP1</span>${px(t.tp1!=null?+t.tp1:NaN)}</div><div><span>TP2</span>${px(t.tp2!=null?+t.tp2:NaN)}</div>
-  <div><span>TP3</span>${px(t.tp3!=null?+t.tp3:NaN)}</div><div><span>Likuidasi</span>${px(p.liq!=null?+p.liq:NaN)}</div></div></div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
+  <div class="pl ${cls(r.u)}">${money(r.u)} <span>${pctv==null?"":pct(pctv)}</span></div>
+  <div class="pair"><div><span>Masuk</span><b>${px(e)}</b></div><div><span>Sekarang</span><b data-pos-now>${px(r.mark)}${live!=null?' <span class="up">●</span>':''}</b></div></div></div>`}).join(""):'<div class="it mu">Tidak ada posisi terbuka sekarang.</div>';
  return{html,tu,tm}}
 function bgMode(B){return B.killed?"Mati":B.halted?"Stop harian":(B.mode||"—")}
 function renderBitget(){const sec=$("bitgetsec");if(!sec)return;
